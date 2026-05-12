@@ -434,25 +434,25 @@
 //#define ELECTROMAGNETIC_SWITCHING_TOOLHEAD
 
 #if ANY(SWITCHING_TOOLHEAD, MAGNETIC_SWITCHING_TOOLHEAD, ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
-  #define SWITCHING_TOOLHEAD_Y_POS          235         // (mm) Y position of the toolhead dock
-  #define SWITCHING_TOOLHEAD_Y_SECURITY      10         // (mm) Security distance Y axis
-  #define SWITCHING_TOOLHEAD_Y_CLEAR         60         // (mm) Minimum distance from dock for unobstructed X axis
-  #define SWITCHING_TOOLHEAD_X_POS          { 215, 0 }  // (mm) X positions for parking the extruders
+  #define SWITCHING_TOOLHEAD_Y_POS          235         // (mm) Y position of the toolhead dock  //工具头停靠的 Y 轴位置
+  #define SWITCHING_TOOLHEAD_Y_SECURITY      10         // (mm) Security distance Y axis   // Y 轴安全距离
+  #define SWITCHING_TOOLHEAD_Y_CLEAR         60         // (mm) Minimum distance from dock for unobstructed X axis   //（毫米）停靠处无障碍 X 轴的最小距离
+  #define SWITCHING_TOOLHEAD_X_POS          { 215, 0 }  // (mm) X positions for parking the extruders   //挤出机停放的 X 轴位置
   #if ENABLED(SWITCHING_TOOLHEAD)
-    #define SWITCHING_TOOLHEAD_SERVO_NR       2         // Index of the servo connector
-    #define SWITCHING_TOOLHEAD_SERVO_ANGLES { 0, 180 }  // (degrees) Angles for Lock, Unlock
+    #define SWITCHING_TOOLHEAD_SERVO_NR       2         // Index of the servo connector   //伺服连接器的索引
+    #define SWITCHING_TOOLHEAD_SERVO_ANGLES { 0, 180 }  // (degrees) Angles for Lock, Unlock   //（度）锁定、解锁的角度
   #elif ENABLED(MAGNETIC_SWITCHING_TOOLHEAD)
-    #define SWITCHING_TOOLHEAD_Y_RELEASE      5         // (mm) Security distance Y axis
-    #define SWITCHING_TOOLHEAD_X_SECURITY   { 90, 150 } // (mm) Security distance X axis (T0,T1)
-    //#define PRIME_BEFORE_REMOVE                       // Prime the nozzle before release from the dock
+    #define SWITCHING_TOOLHEAD_Y_RELEASE      5         // (mm) Security distance Y axis   // Y 轴安全距离
+    #define SWITCHING_TOOLHEAD_X_SECURITY   { 90, 150 } // (mm) Security distance X axis (T0,T1)   // X 轴安全距离（T0、T1）
+    //#define PRIME_BEFORE_REMOVE                       // Prime the nozzle before release from the dock   //在从停靠处释放之前为喷嘴预挤出
     #if ENABLED(PRIME_BEFORE_REMOVE)
-      #define SWITCHING_TOOLHEAD_PRIME_MM           20  // (mm)   Extruder prime length
-      #define SWITCHING_TOOLHEAD_RETRACT_MM         10  // (mm)   Retract after priming length
-      #define SWITCHING_TOOLHEAD_PRIME_FEEDRATE    300  // (mm/min) Extruder prime feedrate
-      #define SWITCHING_TOOLHEAD_RETRACT_FEEDRATE 2400  // (mm/min) Extruder retract feedrate
+      #define SWITCHING_TOOLHEAD_PRIME_MM           20  // (mm)   Extruder prime length     //挤出机预挤出长度
+      #define SWITCHING_TOOLHEAD_RETRACT_MM         10  // (mm)   Retract after priming length   //预挤出后回抽长度
+      #define SWITCHING_TOOLHEAD_PRIME_FEEDRATE    300  // (mm/min) Extruder prime feedrate   //挤出机预挤出进给速度
+      #define SWITCHING_TOOLHEAD_RETRACT_FEEDRATE 2400  // (mm/min) Extruder retract feedrate   //挤出机回抽进给速度
     #endif
   #elif ENABLED(ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
-    #define SWITCHING_TOOLHEAD_Z_HOP          2         // (mm) Z raise for switching
+    #define SWITCHING_TOOLHEAD_Z_HOP          2         // (mm) Z raise for switching   //（毫米）切换时 Z 轴提升高度
   #endif
 #endif
 
@@ -463,26 +463,34 @@
  *   - Optional support for Repetier Firmware's 'M164 S<index>' supporting virtual tools.
  *   - This implementation supports up to two mixing extruders.
  *   - Enable DIRECT_MIXING_IN_G1 for M165 and mixing in G1 (from Pia Taubert's reference implementation).
+ * 
+ *  "混合挤出机"
+  - 添加 G 代码 M163 和 M164 来设置和“提交”当前的混合因子。
+  - 扩展步进程序以按比例移动多个步进电机以实现混合。
+  - 可选支持 Repetier
  */
 //#define MIXING_EXTRUDER
 #if ENABLED(MIXING_EXTRUDER)
-  #define MIXING_STEPPERS 2        // Number of steppers in your mixing extruder
-  #define MIXING_VIRTUAL_TOOLS 16  // Use the Virtual Tool method with M163 and M164
-  //#define DIRECT_MIXING_IN_G1    // Allow ABCDHI mix factors in G1 movement commands
-  //#define GRADIENT_MIX           // Support for gradient mixing with M166 and LCD
-  //#define MIXING_PRESETS         // Assign 8 default V-tool presets for 2 or 3 MIXING_STEPPERS
+  #define MIXING_STEPPERS 2        // Number of steppers in your mixing extruder  //混合挤出机中的步进电机数量
+  #define MIXING_VIRTUAL_TOOLS 16  // Use the Virtual Tool method with M163 and M164  //使用 M163 和 M164 的虚拟工具方法
+  //#define DIRECT_MIXING_IN_G1    // Allow ABCDHI mix factors in G1 movement commands  //允许在 G1 移动命令中使用 ABCDHI 混合因子
+  //#define GRADIENT_MIX           // Support for gradient mixing with M166 and LCD  //支持使用 M166 和 LCD 的渐变混合
+  //#define MIXING_PRESETS         // Assign 8 default V-tool presets for 2 or 3 MIXING_STEPPERS  //为 2 或 3 个 MIXING_STEPPERS 分配 8 个默认 V 工具预设
   #if ENABLED(GRADIENT_MIX)
-    //#define GRADIENT_VTOOL       // Add M166 T to use a V-tool index as a Gradient alias
+    //#define GRADIENT_VTOOL       // Add M166 T to use a V-tool index as a Gradient alias  //添加 M166 T 以使用 V 工具索引作为渐变别名
   #endif
 #endif
 
 // Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
 // The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).
 // For the other hotends it is their distance from the extruder 0 hotend.
-//#define HOTEND_OFFSET_X { 0.0, 20.00 } // (mm) relative X-offset for each nozzle
-//#define HOTEND_OFFSET_Y { 0.0, 5.00 }  // (mm) relative Y-offset for each nozzle
-//#define HOTEND_OFFSET_Z { 0.0, 0.00 }  // (mm) relative Z-offset for each nozzle
+// 挤出机偏移量（若使用多挤出机且依赖固件在换刀时自动定位，请取消注释）
+// 挤出机 0（默认挤出机）的热端偏移量必须设置为 X=0、Y=0。
+// 其余热端的偏移量为其相对于挤出机 0 热端的距离。
 
+//#define HOTEND_OFFSET_X { 0.0, 20.00 } // (mm) relative X-offset for each nozzle  
+//#define HOTEND_OFFSET_Y { 0.0, 5.00 }  // (mm) relative Y-offset for each nozzle  
+//#define HOTEND_OFFSET_Z { 0.0, 0.00 }  // (mm) relative Z-offset for each nozzle  
 // @section multi-material
 
 /**
@@ -499,6 +507,19 @@
  * Requires NOZZLE_PARK_FEATURE to park print head in case MMU unit fails.
  * See additional options in Configuration_adv.h.
  * :["PRUSA_MMU1", "PRUSA_MMU2", "PRUSA_MMU2S", "PRUSA_MMU3", "EXTENDABLE_EMU_MMU2", "EXTENDABLE_EMU_MMU2S"]
+ * 
+ * 多材料单元
+  设置为以下预定义型号之一：
+
+  PRUSA_MMU1           : Průša MMU1（“多路复用器”版本）
+  PRUSA_MMU2           : Průša MMU2
+  PRUSA_MMU2S          : Průša MMU2S（需要带有运动传感器的 MK3S 挤出机，EXTRUDERS = 5）
+  PRUSA_MMU3           : Průša MMU3（需要带有运动传感器和 MMU 固件版本 3.x.x 的 MK3S 挤出机，EXTRUDERS = 5）
+  EXTENDABLE_EMU_MMU2  : 配置可调节数量的耗材的 MMU（ERCF、SMuFF 或类似具有 Průša MMU2 兼容固件的设备）
+  EXTENDABLE_EMU_MMU2S : 配置可调节数量的耗材的 MMUS（ERCF、SMuFF 或类似具有 Průša MMU2 兼容固件的设备）
+
+  在 MMU 单元发生故障时，需要 NOZZLE_PARK_FEATURE 来停放打印头。
+  更多选项请参见 Configuration_adv.h。
  */
 //#define MMU_MODEL PRUSA_MMU3
 
@@ -509,50 +530,54 @@
  *
  * Enable and connect the power supply to the PS_ON_PIN.
  * Specify whether the power supply is active HIGH or active LOW.
+ * 
+ * 电源控制
+  启用并将电源连接到 PS_ON_PIN。
+  指定电源是高电平有效还是低电平有效。
  */
 //#define PSU_CONTROL
 //#define PSU_NAME "Power Supply"
 
 #if ENABLED(PSU_CONTROL)
-  //#define MKS_PWC                 // Using the MKS PWC add-on
-  //#define PS_OFF_CONFIRM          // Confirm dialog when power off
-  //#define PS_OFF_SOUND            // Beep 1s when power off
-  #define PSU_ACTIVE_STATE LOW      // Set 'LOW' for ATX, 'HIGH' for X-Box
+  //#define MKS_PWC                 // Using the MKS PWC add-on  //使用 MKS PWC 附加模块
+  //#define PS_OFF_CONFIRM          // Confirm dialog when power off  //电源关闭时的确认对话框
+  //#define PS_OFF_SOUND            // Beep 1s when power off  //电源关闭时蜂鸣 1 秒
+  #define PSU_ACTIVE_STATE LOW      // Set 'LOW' for ATX, 'HIGH' for X-Box  //ATX 电源设置为 'LOW'，X-Box 电源设置为 'HIGH'
 
-  //#define PSU_DEFAULT_OFF             // Keep power off until enabled directly with M80
-  //#define PSU_POWERUP_DELAY      250  // (ms) Delay for the PSU to warm up to full power
-  //#define LED_POWEROFF_TIMEOUT 10000  // (ms) Turn off LEDs after power-off, with this amount of delay
+  //#define PSU_DEFAULT_OFF             // Keep power off until enabled directly with M80  //保持电源关闭，直到直接使用 M80 启用
+  //#define PSU_POWERUP_DELAY      250  // (ms) Delay for the PSU to warm up to full power  //（毫秒）PSU 加热到全功率的延迟
+  //#define LED_POWEROFF_TIMEOUT 10000  // (ms) Turn off LEDs after power-off, with this amount of delay  //（毫秒）电源关闭后关闭 LED 的延迟时间
 
-  //#define PSU_OFF_REDUNDANT           // Second pin for redundant power control
-  //#define PSU_OFF_REDUNDANT_INVERTED  // Redundant pin state is the inverse of PSU_ACTIVE_STATE
+  //#define PSU_OFF_REDUNDANT           // Second pin for redundant power control  //冗余电源控制的第二个引脚
+  //#define PSU_OFF_REDUNDANT_INVERTED  // Redundant pin state is the inverse of PSU_ACTIVE_STATE  //冗余引脚状态与 PSU_ACTIVE_STATE 相反
 
-  //#define PS_ON1_PIN               6  // Redundant pin required to enable power in combination with PS_ON_PIN
+  //#define PS_ON1_PIN               6  // Redundant pin required to enable power in combination with PS_ON_PIN  //与 PS_ON_PIN 组合使用时需要冗余引脚以启用电源
 
-  //#define PS_ON_EDM_PIN            8  // External Device Monitoring pins for external power control relay feedback. Fault on mismatch.
+  //#define PS_ON_EDM_PIN            8  // External Device Monitoring pins for external power control relay feedback. Fault on mismatch.  //外部设备监控引脚，用于外部电源控制继电器反馈。不匹配时发生故障。
   //#define PS_ON1_EDM_PIN           9
-  #define PS_EDM_RESPONSE          250  // (ms) Time to allow for relay action
+  #define PS_EDM_RESPONSE          250  // (ms) Time to allow for relay action  //（毫秒）允许继电器动作的时间
 
-  //#define POWER_OFF_TIMER               // Enable M81 D<seconds> to power off after a delay
-  //#define POWER_OFF_WAIT_FOR_COOLDOWN   // Enable M81 S to power off only after cooldown
+  //#define POWER_OFF_TIMER               // Enable M81 D<seconds> to power off after a delay  //启用 M81 D<seconds> 以在延迟后关闭电源
+  //#define POWER_OFF_WAIT_FOR_COOLDOWN   // Enable M81 S to power off only after cooldown   //启用 M81 S 以仅在冷却后关闭电源
 
-  //#define PSU_POWERUP_GCODE  "M355 S1"  // G-code to run after power-on (e.g., case light on)
-  //#define PSU_POWEROFF_GCODE "M355 S0"  // G-code to run before power-off (e.g., case light off)
+  //#define PSU_POWERUP_GCODE  "M355 S1"  // G-code to run after power-on (e.g., case light on)  //电源开启后要运行的 G 代码（例如，打开机箱灯）
+  //#define PSU_POWEROFF_GCODE "M355 S0"  // G-code to run before power-off (e.g., case light off)  //电源关闭前要运行的 G 代码（例如，关闭机箱灯）
 
-  //#define AUTO_POWER_CONTROL      // Enable automatic control of the PS_ON pin
+  //#define AUTO_POWER_CONTROL      // Enable automatic control of the PS_ON pin  //启用 PS_ON 引脚的自动控制
   #if ENABLED(AUTO_POWER_CONTROL)
-    #define AUTO_POWER_FANS           // Turn on PSU for fans
-    #define AUTO_POWER_E_FANS         // Turn on PSU for E Fans
-    #define AUTO_POWER_CONTROLLERFAN  // Turn on PSU for Controller Fan
-    #define AUTO_POWER_CHAMBER_FAN    // Turn on PSU for Chamber Fan
-    #define AUTO_POWER_COOLER_FAN     // Turn on PSU for Cooler Fan
-    #define AUTO_POWER_SPINDLE_LASER  // Turn on PSU for Spindle/Laser
-    #define POWER_TIMEOUT              30 // (s) Turn off power if the machine is idle for this duration
-    //#define POWER_OFF_DELAY          60 // (s) Delay of poweroff after M81 command. Useful to let fans run for extra time.
+    #define AUTO_POWER_FANS           // Turn on PSU for fans    // 开启电源模块为风扇供电
+    #define AUTO_POWER_E_FANS         // Turn on PSU for E Fans  //开启电源模块为挤出机风扇供电
+    #define AUTO_POWER_CONTROLLERFAN  // Turn on PSU for Controller Fan  //开启电源模块为控制器风扇供电
+    #define AUTO_POWER_CHAMBER_FAN    // Turn on PSU for Chamber Fan  //开启电源模块为机箱风扇供电
+    #define AUTO_POWER_COOLER_FAN     // Turn on PSU for Cooler Fan  //开启电源模块为冷却风扇供电
+    #define AUTO_POWER_SPINDLE_LASER  // Turn on PSU for Spindle/Laser  //开启电源模块为主轴/激光供电
+    #define POWER_TIMEOUT              30 // (s) Turn off power if the machine is idle for this duration  //（秒）如果机器空闲超过此时间则关闭电源
+    //#define POWER_OFF_DELAY          60 // (s) Delay of poweroff after M81 command. Useful to let fans run for extra time.  //（秒）M81 命令后关闭电源的延迟。用于让风扇额外运行一段时间。
   #endif
   #if ANY(AUTO_POWER_CONTROL, POWER_OFF_WAIT_FOR_COOLDOWN)
-    //#define AUTO_POWER_E_TEMP        50 // (°C) PSU on if any extruder is over this temperature
-    //#define AUTO_POWER_CHAMBER_TEMP  30 // (°C) PSU on if the chamber is over this temperature
-    //#define AUTO_POWER_COOLER_TEMP   26 // (°C) PSU on if the cooler is over this temperature
+    //#define AUTO_POWER_E_TEMP        50 // (°C) PSU on if any extruder is over this temperature  //（°C）如果任何挤出机超过此温度则开启电源模块
+    //#define AUTO_POWER_CHAMBER_TEMP  30 // (°C) PSU on if the chamber is over this temperature  //（°C）如果机箱超过此温度则开启电源模块
+    //#define AUTO_POWER_COOLER_TEMP   26 // (°C) PSU on if the cooler is over this temperature  //（°C）如果冷却器超过此温度则开启电源模块
   #endif
 #endif
 
@@ -565,6 +590,7 @@
  * Temperature Sensors:
  *
  * NORMAL IS 4.7kΩ PULLUP! Hotend sensors can use 1kΩ pullup with correct resistor and table.
+ * 默认配置为 4.7kΩ 上拉电阻！热端传感器若搭配正确的电阻与测温表，可使用 1kΩ 上拉电阻。
  *
  * ================================================================
  *  Analog Thermistors - 4.7kΩ pullup - Normal
@@ -607,22 +633,70 @@
  *    70 : 100kΩ bq Hephestos 2
  *    75 : 100kΩ Generic Silicon Heat Pad with NTC100K MGB18-104F39050L32
  *   666 : 200kΩ Einstart S custom thermistor with 10k pullup.
- *  2000 : 100kΩ Ultimachine Rambo TDK NTCG104LH104KT1 NTC100K motherboard Thermistor
+ *  2000 : 100kΩ Ultimachine Rambo TDK NTCG104LH104KT1 NTC100K motherboard Thermistor  
+ * 
+ * *     1 : 100kΩ EPCOS - EPCOS热敏电阻的最佳选型
+*   331 : 100kΩ 与1号参数相同，适配MEGA主板3.3V分压
+*   332 : 100kΩ 与1号参数相同，适配DUE主板3.3V分压
+*     2 : 200kΩ ATC Semitec 204GT-2
+*   202 : 200kΩ Copymaster 3D
+*     3 : ???Ω  Mendel-parts 热敏电阻
+*     4 : 10kΩ  通用热敏电阻！！禁止用于热端 - 高温段分辨率极差！！
+*     5 : 100kΩ ATC Semitec 104GT-2/104NT-4-R025H42G - 用于ParCan、J-Head、E3D热端，SliceEngineering 300℃测温
+*   501 : 100kΩ Zonestar - Tronxy X3A
+*   502 : 100kΩ Zonestar - 用于Zonestar Průša P802M热床
+*   503 : 100kΩ Zonestar (Z8XM2) 热床热敏电阻
+*   504 : 100kΩ Zonestar P802QR2 (型号QWG-104F-B3950) 热端热敏电阻
+*   505 : 100kΩ Zonestar P802QR2 (型号QWG-104F-3950) 热床热敏电阻
+*   512 : 100kΩ RPW-Ultra 热端
+*     6 : 100kΩ EPCOS - 精度低于1号表（基于福禄克热电偶校准）
+*     7 : 100kΩ 霍尼韦尔 135-104LAG-J01
+*    71 : 100kΩ 霍尼韦尔 135-104LAF-J01
+*     8 : 100kΩ 威世 0603 贴片 NTCS0603E3104FXT
+*     9 : 100kΩ 通用电气传感 AL03006-58.2K-97-G1
+*    10 : 100kΩ RS PRO 198-961
+*    11 : 100kΩ Keenovo交流硅胶加热垫、多数Wanhao i3机型 - B值3950，精度1%
+*    12 : 100kΩ 威世 0603 贴片 NTCS0603E3104FXT（8号）- Makibox热床专用校准参数
+*    13 : 100kΩ Hisens 耐高温300℃ - 用于"Simple ONE"和"All In ONE"热端 - B值3950，精度1%
+*    14 : 100kΩ (25℃阻值)、4092K (25℃B值)、4.7kΩ上拉电阻 - 创想Ender-5 S1热床热敏电阻
+*    15 : 100kΩ JGAurora A5热端专用校准参数
+*    17 : 100kΩ Dagoma 白色NTC热敏电阻
+*    18 : 200kΩ ATC Semitec 204GT-2 Dagoma.Fr - MKS_Base_DKU001327
+*    22 : 100kΩ GTM32 Pro vB 主板 - 热端 - 3.3V 4.7kΩ上拉+模拟输入220Ω限流
+*    23 : 100kΩ GTM32 Pro vB 主板 - 热床 - 3.3V 4.7kΩ上拉+模拟输入220Ω限流
+*    30 : 100kΩ Kis3d 200W/300W硅胶加热垫（6mm精铸铝板EN AW 5083）NTC100K - B值3950
+*    60 : 100kΩ Maker's Tool Works  Kapton热床热敏电阻 - B值3950
+*    61 : 100kΩ Formbot/Vivedino 350℃热敏电阻 - B值3950
+*    66 : 4.7MΩ Dyze Design / 三角翼 T-D500 500℃高温热敏电阻
+*    67 : 500kΩ SliceEngineering 450℃热敏电阻
+*    68 : PT100 放大板（Dyze Design出品）
+*    70 : 100kΩ bq Hephestos 2
+*    75 : 100kΩ 通用硅胶加热垫，搭配NTC100K MGB18-104F39050L32
+*   666 : 200kΩ Einstart S 定制热敏电阻（10k上拉电阻）
+*  2000 : 100kΩ Ultimachine Rambo 主板 TDK NTCG104LH104KT1 NTC100K 主板热敏电阻
+ *  
  *
  * ================================================================
  *  Analog Thermistors - 1kΩ pullup
  *   Atypical, and requires changing out the 4.7kΩ pullup for 1kΩ.
  *   (but gives greater accuracy and more stable PID)
+ * 
+ * 模拟热敏电阻 - 1kΩ 上拉电阻
+   非标准配置，需将 4.7kΩ 上拉电阻更换为 1kΩ。
+   但能提升测温精度并让PID调节更稳定）
  * ================================================================
  *    51 : 100kΩ EPCOS (1kΩ pullup)
  *    52 : 200kΩ ATC Semitec 204GT-2 (1kΩ pullup)
  *    55 : 100kΩ ATC Semitec 104GT-2 - Used in ParCan & J-Head (1kΩ pullup)
  *
+ *    51 : 100kΩ EPCOS 热敏电阻（1kΩ 上拉电阻）
+      52 : 200kΩ ATC Semitec 204GT-2 热敏电阻（1kΩ 上拉电阻）
+      55 : 100kΩ ATC Semitec 104GT-2 热敏电阻 - 用于 ParCan 和 J-Head 热端（1kΩ 上拉电阻）
  * ================================================================
- *  Analog Thermistors - 10kΩ pullup - Atypical
+ *  Analog Thermistors - 10kΩ pullup - Atypical    模拟热敏电阻 - 10kΩ 上拉电阻 - 非标准配置
  * ================================================================
  *    99 : 100kΩ Found on some Wanhao i3 machines with a 10kΩ pull-up resistor
- *
+ *    99 : 100kΩ  见于部分万好i3机型，搭配10kΩ上拉电阻
  * ================================================================
  *  Analog RTDs (Pt100/Pt1000)
  * ================================================================
