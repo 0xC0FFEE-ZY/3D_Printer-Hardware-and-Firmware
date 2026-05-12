@@ -20,20 +20,39 @@
  *
  */
 #pragma once
+/*
+
+————————————————————————————————————————————————前言——————————————————————————————————————————————————————————
+
+*本工程为Marlin 2.1.3-beta3的中文翻译版本，由0xC0FFEE_ZY翻译。原版工程来自https://github.com/MarlinFirmware/Marlin
+*本工程各项参数已配置完成，适用于本人自制的3D打印机（基于UM架构），
+*该3D打印机设计图纸，硬件原理图，PCB已全部开源,未来预计更新制作教程至抖音/B站。
+*开源项目见本人Github主页：https://github.com/0xC0FFEE-ZY
+*欢迎关注本人抖音：（抖音号:Technophilic)，昵称：0xC0FFEE_ZY，里面有很多电子科技创作相关的视频，欢迎大家点赞关注！谢谢！
+*B站UID:481302692，昵称：0xC0FFEE_ZY
+*up为2024级本科生，热爱电子科技，欢迎和我一起进行讨论和交流！
+
+*控制板芯片型号为STM32F407,
+*步进电机采用TMC2209驱动。
+
+    2026.5.13     By 0xC0FFEE_ZY
+
+——————————————————————————————————————————————————————————————————————————————————————————————————————————————
+*/
 
 /**
  * Configuration.h
  *
- * Basic settings such as:
+ * Basic settings such as:   本文件基础配置如下：
  *
- * - Type of electronics
- * - Type of temperature sensor
- * - Printer geometry
- * - Endstop configuration
- * - LCD controller
- * - Extra features
+ * - Type of electronics   控制板型号
+ * - Type of temperature sensor   温度传感器类型
+ * - Printer geometry   打印机结构
+ * - Endstop configuration   限位开关配置
+ * - LCD controller   屏幕控制
+ * - Extra features  其他功能
  *
- * Advanced settings can be found in Configuration_adv.h
+ * Advanced settings can be found in Configuration_adv.h   高级设置可以在 Configuration_adv.h 中找到
  */
 #define CONFIGURATION_H_VERSION 02010300
 
@@ -43,7 +62,7 @@
 
 /**
  * Here are some useful links to help get your machine configured and calibrated:
- *
+ * 这里有一些有用的链接，可帮助您配置和校准您的机器
  * Example Configs:     https://github.com/MarlinFirmware/Configurations/branches/all
  *
  * Průša Calculator:    https://blog.prusa3d.com/calculator_3416/
@@ -63,10 +82,11 @@
 // Author info of this build printed to the host during boot and M115
 #define STRING_CONFIG_H_AUTHOR "(none, default config)" // Original author or contributor.
 //#define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
-
+//定义作者信息（默认无，为原版配置）
 // @section machine
 
-// Choose the name from boards.h that matches your setup
+// Choose the name from boards.h that matches your setup   从boards.h中选择与您的设备匹配的型号
+
 #ifndef MOTHERBOARD
   #define MOTHERBOARD BOARD_RAMPS_14_EFB
 #endif
@@ -80,6 +100,12 @@
  * Note: The first serial port (-1 or 0) will always be used by the Arduino bootloader.
  *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+ * 
+ * 
+ * 选择主板上用于与上位机通信的串口。
+  此举可将无线适配器等设备连接到非默认端口引脚。
+  串口设为 -1 代表使用USB 虚拟串口（如硬件支持）。
+  注意：Arduino 引导程序将始终占用第一个串口（-1 或 0）。
  */
 #define SERIAL_PORT 0
 
@@ -93,23 +119,41 @@
  * You may try up to 1000000 to speed up SD file transfer.
  *
  * :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000]
+ * 
+ * 
+ * 串口波特率
+  此项为所有串口的默认通信速率。
+  下方可设置其他附加串口的默认波特率。
+  250000 波特在绝大多数场景下均可正常使用；
+  若在上位机打印过程中经常出现断连丢包，可尝试调低速率。
+  如需加快 SD 卡文件传输速度，最高可设至 1000000 波特。
+  可选波特率：[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000]
  */
 #define BAUDRATE 250000
 
-//#define BAUD_RATE_GCODE     // Enable G-code M575 to set the baud rate
+//#define BAUD_RATE_GCODE     // Enable G-code M575 to set the baud rate   启用 G 代码 M575 以设置波特率
 
 /**
  * Select a secondary serial port on the board to use for communication with the host.
  * Currently Ethernet (-2) is only supported on Teensy 4.1 boards.
  * :[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+ * 
+ * 选择主板上用于与上位机通信的第二串口。
+  目前仅 Teensy 4.1 板支持以太网串口（-2）。
+  可选串口：[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
  */
 //#define SERIAL_PORT_2 -1
 //#define BAUDRATE_2 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE
+
 
 /**
  * Select a third serial port on the board to use for communication with the host.
  * Currently supported for AVR, DUE, SAMD51, LPC1768/9, STM32/STM32F1/HC32, and Teensy 4.x
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+ * 
+ * 选择主板上用于与上位机通信的第三串口。
+  目前支持 AVR、DUE、SAMD51、LPC1768/9、STM32/STM32F1/HC32 和 Teensy 4.x 板。
+  可选串口：[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
  */
 //#define SERIAL_PORT_3 1
 //#define BAUDRATE_3 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE
@@ -117,22 +161,27 @@
 /**
  * Select a serial port to communicate with RS485 protocol
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+ * 
+ * 选择一个串口用于 RS485 协议通信
+  可选串口：[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
  */
 //#define RS485_SERIAL_PORT 1
 #ifdef RS485_SERIAL_PORT
-  //#define M485_PROTOCOL 1   // Check your host for protocol compatibility
+  //#define M485_PROTOCOL 1   // Check your host for protocol compatibility   检查你的上位机是否兼容当前通信协议
   //#define RS485_BUS_BUFFER_SIZE 128
 #endif
 
-// Enable the Bluetooth serial interface on AT90USB devices
+// Enable the Bluetooth serial interface on AT90USB devices   启用 AT90USB 设备上的蓝牙串口接口
 //#define BLUETOOTH
 
-// Name displayed in the LCD "Ready" message and Info menu
+// Name displayed in the LCD "Ready" message and Info menu   在液晶显示屏的就绪提示和信息菜单中显示的设备名称
+
 //#define CUSTOM_MACHINE_NAME "3D Printer"
 //#define CONFIGURABLE_MACHINE_NAME // Add G-code M550 to set/report the machine name
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like https://www.uuidgenerator.net/version4
+
 //#define MACHINE_UUID "00000000-0000-0000-0000-000000000000"
 
 // @section stepper drivers
@@ -151,6 +200,22 @@
  *          TMC2240, TMC2660, TMC2660_STANDALONE,
  *          TMC5130, TMC5130_STANDALONE, TMC5160, TMC5160_STANDALONE
  * :['A4988', 'A5984', 'DRV8825', 'LV8729', 'TB6560', 'TB6600', 'TMC2100', 'TMC2130', 'TMC2130_STANDALONE', 'TMC2160', 'TMC2160_STANDALONE', 'TMC2208', 'TMC2208_STANDALONE', 'TMC2209', 'TMC2209_STANDALONE', 'TMC2240', 'TMC2660', 'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE', 'TMC5160', 'TMC5160_STANDALONE']
+ * 
+ * 
+ * 步进电机驱动器
+  这些设置允许 Marlin 调整步进电机驱动器的时序，并为支持的驱动器启用高级选项。
+  你也可以在 Configuration_adv.h 中覆盖时序选项。
+
+  对于 TMC2225 驱动器，使用 TMC2208/TMC2208_STANDALONE；对于 TMC2226 驱动器，使用 TMC2209/TMC2209_STANDALONE。
+
+  可选驱动器：A4988、A5984、DRV8825、LV8729、TB6560、TB6600、TMC2100、TMC2130、TMC2130_STANDALONE、TMC2160、
+  TMC2160_STANDALONE、TMC2208、TMC2208_STANDALONE、TMC2209、TMC2209_STANDALONE、TMC2240、TMC2660、
+  TMC2660_STANDALONE、TMC5130、TMC5130_STANDALONE、TMC5160、TMC5160_STANDALONE
+
+  可选列表：['A4988', 'A5984', 'DRV8825', 'LV8729', 'TB6560', 'TB6600', 'TMC2100', 
+  'TMC2130', 'TMC2130_STANDALONE', 'TMC2160', 'TMC2160_STANDALONE', 'TMC2208', 
+  'TMC2208_STANDALONE', 'TMC2209', 'TMC2209_STANDALONE', 'TMC2240', 'TMC2660', 
+  'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE', 'TMC5160', 'TMC5160_STANDALONE']
  */
 #define X_DRIVER_TYPE  A4988
 #define Y_DRIVER_TYPE  A4988
@@ -191,6 +256,21 @@
  *   'W' : Secondary linear axis parallel to Z
  *
  * Regardless of these settings the axes are internally named I, J, K, U, V, W.
+ * 
+ * 额外轴设置
+  定义 AXISn_ROTATES 用于所有旋转或枢轴轴。
+  旋转轴坐标以度为单位表示。
+
+  AXISn_NAME 定义了在（大多数）G 代码命令中用于引用轴的字母。
+  按惯例，名称和角色通常是：
+    'A' : 与 X 平行的旋转轴
+    'B' : 与 Y 平行的旋转轴
+    'C' : 与 Z 平行的旋转轴
+    'U' : 与 X 平行的第二线性轴
+    'V' : 与 Y 平行的第二线性轴
+    'W' : 与 Z 平行的第二线性轴
+
+  无论这些设置如何，轴在内部命名为 I、J、K、U、V、W。
  */
 #ifdef I_DRIVER_TYPE
   #define AXIS4_NAME 'A' // :['A', 'B', 'C', 'U', 'V', 'W']
@@ -219,24 +299,28 @@
 
 // @section extruder
 
-// This defines the number of extruders
+// This defines the number of extruders   此项用于定义挤出机数量
 // :[0, 1, 2, 3, 4, 5, 6, 7, 8]
 #define EXTRUDERS 1
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
+//常规默认耗材直径（1.75、2.85、3.0 等）。用于体积挤出、耗材宽度传感器等功能。
 #define DEFAULT_NOMINAL_FILAMENT_DIA 1.75
 
 // For Cyclops or any "multi-extruder" that shares a single nozzle.
+//适用于Cyclops 挤出头或任何共用单个喷嘴的多挤出机结构。
 //#define SINGLENOZZLE
 
 // Save and restore temperature and fan speed on tool-change.
 // Set standby for the unselected tool with M104/106/109 T...
+// 换喷头时保存并恢复温度与风扇转速。
+// 使用 M104/106/109 T... 指令为未选中的喷头设置待机状态。
 #if ENABLED(SINGLENOZZLE)
   //#define SINGLENOZZLE_STANDBY_TEMP
   //#define SINGLENOZZLE_STANDBY_FAN
 #endif
 
-// A dual extruder that uses a single stepper motor
+// A dual extruder that uses a single stepper motor   采用单个步进电机的双挤出机
 //#define SWITCHING_EXTRUDER
 #if ENABLED(SWITCHING_EXTRUDER)
   #define SWITCHING_EXTRUDER_SERVO_NR 0
@@ -247,11 +331,15 @@
 #endif
 
 // Switch extruders by bumping the toolhead. Requires EVENT_GCODE_TOOLCHANGE_#.
+//通过撞击喷头实现挤出机切换。需要配合 EVENT_GCODE_TOOLCHANGE_# 配置项使用。
 //#define MECHANICAL_SWITCHING_EXTRUDER
 
 /**
  * A dual-nozzle that uses a servomotor to raise/lower one (or both) of the nozzles.
  * Can be combined with SWITCHING_EXTRUDER.
+ * 采用伺服电机升降单个或两个喷嘴的双喷嘴结构。
+   可与切换式挤出机（SWITCHING_EXTRUDER）组合使用。
+ * 
  */
 //#define SWITCHING_NOZZLE
 #if ENABLED(SWITCHING_NOZZLE)
@@ -264,11 +352,14 @@
 #endif
 
 // Switch nozzles by bumping the toolhead. Requires EVENT_GCODE_TOOLCHANGE_#.
+//通过碰撞工具头完成喷嘴切换。需依赖 EVENT_GCODE_TOOLCHANGE_# 事件 G 代码。
 //#define MECHANICAL_SWITCHING_NOZZLE
 
 /**
  * Two separate X-carriages with extruders that connect to a moving part
  * via a solenoid docking mechanism. Requires SOL1_PIN and SOL2_PIN.
+ * 
+ * 两条独立的 X 轴滑架，挤出机通过电磁铁对接机构连接到移动部件。需要 SOL1_PIN 和 SOL2_PIN。
  */
 //#define PARKING_EXTRUDER
 
@@ -279,27 +370,33 @@
  * project   : https://www.thingiverse.com/thing:3080893
  * movements : https://youtu.be/0xCEiG9VS3k
  *             https://youtu.be/Bqbcs0CU2FE
+ * 
+ * 两条独立的 X 轴滑架，挤出机通过运动实现的磁性对接机构连接到移动部件，无需电磁铁
+
+  项目地址：https://www.thingiverse.com/thing:3080893
+  运动演示：https://youtu.be/0xCEiG9VS3k
+            https://youtu.be/Bqbcs0CU2FE
  */
 //#define MAGNETIC_PARKING_EXTRUDER
 
 #if ANY(PARKING_EXTRUDER, MAGNETIC_PARKING_EXTRUDER)
 
-  #define PARKING_EXTRUDER_PARKING_X { -78, 184 }     // X positions for parking the extruders
-  #define PARKING_EXTRUDER_GRAB_DISTANCE 1            // (mm) Distance to move beyond the parking point to grab the extruder
+  #define PARKING_EXTRUDER_PARKING_X { -78, 184 }     // X positions for parking the extruders   //挤出机停放的 X 轴位置
+  #define PARKING_EXTRUDER_GRAB_DISTANCE 1            // (mm) Distance to move beyond the parking point to grab the extruder   //（毫米）在停放点之外移动以抓取挤出机的距离
 
   #if ENABLED(PARKING_EXTRUDER)
 
-    #define PARKING_EXTRUDER_SOLENOIDS_INVERT           // If enabled, the solenoid is NOT magnetized with applied voltage
-    #define PARKING_EXTRUDER_SOLENOIDS_PINS_ACTIVE LOW  // LOW or HIGH pin signal energizes the coil
-    #define PARKING_EXTRUDER_SOLENOIDS_DELAY 250        // (ms) Delay for magnetic field. No delay if 0 or not defined.
-    //#define MANUAL_SOLENOID_CONTROL                   // Manual control of docking solenoids with M380 S / M381
+    #define PARKING_EXTRUDER_SOLENOIDS_INVERT           // If enabled, the solenoid is NOT magnetized with applied voltage   //如果启用，电磁铁在施加电压时不会被磁化
+    #define PARKING_EXTRUDER_SOLENOIDS_PINS_ACTIVE LOW  // LOW or HIGH pin signal energizes the coil   // LOW 或 HIGH 引脚信号激励线圈
+    #define PARKING_EXTRUDER_SOLENOIDS_DELAY 250        // (ms) Delay for magnetic field. No delay if 0 or not defined.   //（毫秒）磁场延迟。设置为 0 或未定义则无延迟。
+    //#define MANUAL_SOLENOID_CONTROL                   // Manual control of docking solenoids with M380 S / M381   //使用 M380 S / M381 手动控制对接电磁铁
 
   #elif ENABLED(MAGNETIC_PARKING_EXTRUDER)
 
-    #define MPE_FAST_SPEED      9000      // (mm/min) Speed for travel before last distance point
-    #define MPE_SLOW_SPEED      4500      // (mm/min) Speed for last distance travel to park and couple
-    #define MPE_TRAVEL_DISTANCE   10      // (mm) Last distance point
-    #define MPE_COMPENSATION       0      // Offset Compensation -1 , 0 , 1 (multiplier) only for coupling
+    #define MPE_FAST_SPEED      9000      // (mm/min) Speed for travel before last distance point   //（毫米/分钟）最后距离点之前的移动速度
+    #define MPE_SLOW_SPEED      4500      // (mm/min) Speed for last distance travel to park and couple   //（毫米/分钟）最后距离点的移动速度，用于停放和耦合
+    #define MPE_TRAVEL_DISTANCE   10      // (mm) Last distance point    //（毫米）最后距离点
+    #define MPE_COMPENSATION       0      // Offset Compensation -1 , 0 , 1 (multiplier) only for coupling   //补偿 -1、0、1（乘数），仅用于耦合
 
   #endif
 
@@ -310,6 +407,8 @@
  *
  * Support for swappable and dockable toolheads, such as
  * the E3D Tool Changer. Toolheads are locked with a servo.
+ * 
+ * 支持可交换和可停靠的工具头，例如 E3D Tool Changer。工具头通过伺服电机锁定。
  */
 //#define SWITCHING_TOOLHEAD
 
@@ -318,6 +417,8 @@
  *
  * Support swappable and dockable toolheads with a magnetic
  * docking mechanism using movement and no servo.
+ * 
+ * 支持通过运动实现的磁性对接机构的可交换和可停靠工具头，无需伺服电机。
  */
 //#define MAGNETIC_SWITCHING_TOOLHEAD
 
@@ -327,6 +428,8 @@
  * Parking for CoreXY / HBot kinematics.
  * Toolheads are parked at one edge and held with an electromagnet.
  * Supports more than 2 Toolheads. See https://youtu.be/JolbsAKTKf4
+ * 
+ * 适用于 CoreXY / HBot 运动学的停靠。工具头停放在一侧，并通过电磁铁固定。支持多于 2 个工具头。详见 https://youtu.be/JolbsAKTKf4
  */
 //#define ELECTROMAGNETIC_SWITCHING_TOOLHEAD
 
