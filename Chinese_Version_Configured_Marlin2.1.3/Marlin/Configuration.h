@@ -1686,6 +1686,7 @@
 //=============================================================================
 //============================== Movement Settings ============================
 //=============================================================================
+//运动参数设置
 // @section motion
 
 /**
@@ -1694,12 +1695,25 @@
  * These settings can be reset by M502
  *
  * Note that if EEPROM is enabled, saved values will override these.
+ * 
+ * 
+ * 默认参数设置
+ *
+ * 这些设置可通过 M502 指令恢复为默认值
+ *
+ * 注意：如果启用了 EEPROM（参数存储），保存到芯片中的参数会覆盖这些默认值。
+ *
  */
 
 /**
  * With this option each E stepper can have its own factors for the
  * following movement settings. If fewer factors are given than the
  * total number of extruders, the last value applies to the rest.
+ * 
+ * 
+ * 启用此选项后，每个挤出机步进电机都可以拥有独立的运动参数系数。
+ * 如果提供的系数数量少于挤出机总数，则最后一个系数将应用于剩余的挤出机。
+ *
  */
 //#define DISTINCT_E_FACTORS
 
@@ -1707,11 +1721,18 @@
  * Default Axis Steps Per Unit (linear=steps/mm, rotational=steps/°)
  * Override with M92 (when enabled below)
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
+ * 
+ * 
+ * 各轴默认单位步数（直线轴：步数/毫米，旋转轴：步数/度）
+ * 可通过 M92 指令覆盖（需下方启用权限）
+ *                                    X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
+ *
  */
 #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 500 }
 
 /**
  * Enable support for M92. Disable to save at least ~530 bytes of flash.
+ * // 启用对 M92 指令的支持。禁用可节省至少约 530 字节的闪存空间。
  */
 #define EDITABLE_STEPS_PER_UNIT
 
@@ -1719,12 +1740,18 @@
  * Default Max Feed Rate (linear=mm/s, rotational=°/s)
  * Override with M203
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
+ * 
+ * 
+ * 默认最大进给速度（直线轴：毫米/秒，旋转轴：度/秒）
+ * 可通过 M203 指令覆盖
+ *                                    X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
+ *
  */
 #define DEFAULT_MAX_FEEDRATE          { 300, 300, 5, 25 }
 
-//#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
+//#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2// 限制通过 M203 指令或 LCD 屏幕修改的速度上限为 DEFAULT_MAX_FEEDRATE 的 2 倍
 #if ENABLED(LIMITED_MAX_FR_EDITING)
-  #define MAX_FEEDRATE_EDIT_VALUES    { 600, 600, 10, 50 } // ...or, set your own edit limits
+  #define MAX_FEEDRATE_EDIT_VALUES    { 600, 600, 10, 50 } // ...or, set your own edit limits// ...或者，设置你自定义的修改上限
 #endif
 
 /**
@@ -1732,12 +1759,19 @@
  * (Maximum start speed for accelerated moves)
  * Override with M201
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
+ * 
+ * 默认最大加速度（速度随时间的变化率）
+ * 直线轴单位：mm/(s²)，旋转轴单位：°/(s²)
+ *（加速运动的最大启动速度）
+ * 可通过 M201 指令覆盖
+ *                                    X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
+ *
  */
 #define DEFAULT_MAX_ACCELERATION      { 3000, 3000, 100, 10000 }
 
-//#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
+//#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2  // 限制通过 M201 指令或 LCD 屏幕修改的加速度上限为 DEFAULT_MAX_ACCELERATION 的 2 倍
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
-  #define MAX_ACCEL_EDIT_VALUES       { 6000, 6000, 200, 20000 } // ...or, set your own edit limits
+  #define MAX_ACCEL_EDIT_VALUES       { 6000, 6000, 200, 20000 } // ...or, set your own edit limits  // ...或者，设置你自定义的修改上限
 #endif
 
 /**
@@ -1747,10 +1781,20 @@
  *   M204 P    Acceleration
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
+ * 
+ * 
+ * 默认加速度（速度随时间的变化率）
+ * 直线轴单位：mm/(s²)，旋转轴单位：°/(s²)
+ * 可通过 M204 指令覆盖
+ *
+ *   M204 P    打印加速度
+ *   M204 R    回抽加速度
+ *   M204 T    空移加速度
+ *
  */
-#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   3000    // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves// 打印移动时 X、Y、Z、E 轴的加速度
+#define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts  // 回抽时 E 轴（挤出机）的加速度
+#define DEFAULT_TRAVEL_ACCELERATION   3000    // X, Y, Z acceleration for travel (non printing) moves  // 空移（非打印移动）时 X、Y、Z 轴的加速度
 
 /**
  * Default Jerk limits (mm/s)
@@ -1759,6 +1803,21 @@
  * "Jerk" specifies the minimum speed change that requires acceleration.
  * When changing speed and direction, if the difference is less than the
  * value set here, it may happen instantaneously.
+ * 
+ * 
+ * 默认瞬时速度（Jerk）限制（单位：mm/s）
+ * 可通过 M205 X Y Z E 指令覆盖
+ *
+ * “Jerk（瞬时速度）”定义了：无需经过加减速，可直接突变的最小速度变化值。
+ * 在改变速度和方向时，如果速度差小于此处设置的值，
+ * 电机将瞬间完成速度/方向切换，不做平滑加减速。
+ * 
+ *  附：
+ *
+ *  Jerk是什么？
+ * Jerk = 瞬间启停的 “爆发力”，它决定了：机器能不能瞬间启动、瞬间转向、瞬间停，而不用慢慢加速减速。
+    数值越大：转向越干脆、打印越快，但震动大、抖边、丢步、撞头
+    数值越小：移动越平滑、打印越稳，但速度慢、转角圆钝
  */
 //#define CLASSIC_JERK
 #if ENABLED(CLASSIC_JERK)
@@ -1773,25 +1832,27 @@
   //#define DEFAULT_VJERK  0.3
   //#define DEFAULT_WJERK  0.3
 
-  //#define TRAVEL_EXTRA_XYJERK 0.0     // Additional jerk allowance for all travel moves
+  //#define TRAVEL_EXTRA_XYJERK 0.0     // Additional jerk allowance for all travel moves  // 所有空移（非打印移动）的额外 XY 轴瞬时速度允许值
 
-  //#define LIMITED_JERK_EDITING        // Limit edit via M205 or LCD to DEFAULT_aJERK * 2
+  //#define LIMITED_JERK_EDITING        // Limit edit via M205 or LCD to DEFAULT_aJERK * 2  // 限制通过 M205 指令或 LCD 屏幕修改的瞬时速度上限为 DEFAULT_aJERK 的 2 倍
   #if ENABLED(LIMITED_JERK_EDITING)
-    #define MAX_JERK_EDIT_VALUES { 20, 20, 0.6, 10 } // ...or, set your own edit limits
+    #define MAX_JERK_EDIT_VALUES { 20, 20, 0.6, 10 } // ...or, set your own edit limits  // ...或者，设置你自定义的修改上限
   #endif
 #endif
 
 /**
- * Junction Deviation Factor
+ * Junction Deviation Factor(拐角偏差因子)
  *
  * See:
  *   https://reprap.org/forum/read.php?1,739819
  *   https://blog.kyneticcnc.com/2018/10/computing-junction-deviation-for-marlin.html
  */
 #if DISABLED(CLASSIC_JERK)
-  #define JUNCTION_DEVIATION_MM 0.013 // (mm) Distance from real junction edge
+  #define JUNCTION_DEVIATION_MM 0.013 // (mm) Distance from real junction edge  // (mm) 距离真实拐角顶点的距离（圆弧偏移量）
   #define JD_HANDLE_SMALL_SEGMENTS    // Use curvature estimation instead of just the junction angle
                                       // for small segments (< 1mm) with large junction angles (> 135°).
+                                      // 对于长度 < 1mm 的小段路径，且拐角角度 > 135° 的大角度拐角
+                                      // 使用曲率估算算法，而非仅使用拐角角度计算。
 #endif
 
 /**
@@ -1801,6 +1862,15 @@
  * curve to move acceleration, producing much smoother direction changes.
  *
  * See https://github.com/synthetos/TinyG/wiki/Jerk-Controlled-Motion-Explained
+ * 
+ * 
+ * S 型曲线加速度
+ *
+ * 此功能通过使用贝塞尔曲线控制加速度变化，
+ * 消除打印过程中的震动，使方向变化更加平滑。
+ *
+ * 详见：https://github.com/synthetos/TinyG/wiki/Jerk-Controlled-Motion-Explained
+ *
  */
 //#define S_CURVE_ACCELERATION
 
