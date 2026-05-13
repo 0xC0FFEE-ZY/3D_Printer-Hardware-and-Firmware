@@ -1812,7 +1812,7 @@
  * 在改变速度和方向时，如果速度差小于此处设置的值，
  * 电机将瞬间完成速度/方向切换，不做平滑加减速。
  * 
- *  附：
+ *  附（译者注）：
  *
  *  Jerk是什么？
  * Jerk = 瞬间启停的 “爆发力”，它决定了：机器能不能瞬间启动、瞬间转向、瞬间停，而不用慢慢加速减速。
@@ -1877,6 +1877,7 @@
 //===========================================================================
 //============================= Z Probe Options =============================
 //===========================================================================
+// Z 轴探头 / 自动调平探头 设置
 // @section probes
 
 //
@@ -1887,10 +1888,17 @@
  * Enable this option for a probe connected to the Z-MIN pin.
  * The probe replaces the Z-MIN endstop and is used for Z homing.
  * (Automatically enables USE_PROBE_FOR_Z_HOMING.)
+ * 
+ * 
+ * 如果你的探头连接到 Z-MIN 引脚，请启用此选项。
+ * 该探头将替代 Z-MIN 限位开关，用于 Z 轴归位。
+ * （启用后会自动开启 USE_PROBE_FOR_Z_HOMING 功能。）
+ *
  */
 #define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
 
 // Force the use of the probe for Z-axis homing
+// 强制使用探头进行 Z 轴归位
 //#define USE_PROBE_FOR_Z_HOMING
 
 /**
@@ -1905,6 +1913,20 @@
  *  - For simple switches...
  *    - Normally-closed (NC) also connect to GND.
  *    - Normally-open (NO) also connect to 5V.
+ * 
+ * 
+ * Z_MIN_PROBE_PIN （Z轴探头信号引脚）
+ *
+ * 仅当你的探头无法连接到当前主板默认的 Z_MIN_PROBE_PIN 时，
+ * 才需要手动修改这个引脚。
+ *
+ *  - 最简单的方法：使用一个空闲的限位开关接口。
+ *  - 带供电的传感器（通常是电感式）需要接 5V。
+ *
+ *  - 普通机械开关探头:
+ *    - 常闭型 (NC) 开关：另一脚接 GND。
+ *    - 常开型 (NO) 开关：另一脚接 5V。
+ *
  */
 //#define Z_MIN_PROBE_PIN -1
 
@@ -1913,40 +1935,86 @@
  *
  * Allen Key Probes, Servo Probes, Z-Sled Probes, FIX_MOUNTED_PROBE, etc.
  * Activate one of these to use Auto Bed Leveling below.
+ * 
+ * 
+ * 探头类型选择
+ *
+ * 内六角探头、舵机探头、Z轴滑台探头、固定安装探头等
+ * 启用其中一种，才能使用下方的自动调平功能。
+ * 
+ * 附（译者注）：
+ * BLTouch、3D Touch、电感探头，选FIX_MOUNTED_PROBE
+ * 小舵机、会伸缩 / 翻出的机械探头,选SERVO_PROBE(老机器用，现在很少见)
+ *
  */
 
 /**
  * The "Manual Probe" provides a means to do "Auto" Bed Leveling without a probe.
  * Use G29 repeatedly, adjusting the Z height at each point with movement commands
  * or (with LCD_BED_LEVELING) the LCD controller.
+ * 
+ * 
+ * “手动探头”：无需物理探头，也能实现“自动”调平。
+ * 反复执行 G29，通过移动指令或（配合 LCD 调平时）LCD 屏幕
+ * 在每个点手动调整 Z 高度，完成调平。
+ * 
+ * 附（译者注）：
+ *  这是 无探头也能用的 “手动调平模式”：
+    没有 BLTouch ， 没有任何传感器
+    也能使用固件里的 G29 自动调平功能
+    原理：你自己用眼睛、纸张测试，手动点按调平
  */
 //#define PROBE_MANUALLY
 
 /**
  * A Fix-Mounted Probe either doesn't deploy or needs manual deployment.
  *   (e.g., an inductive probe or a nozzle-based probe-switch.)
+ * 
+ * 
+ * 固定安装式探头：不会自动伸出，或需要手动伸出。
+ *（例如：电感式接近探头、基于喷嘴的探头切换装置。）
+ *
  */
 //#define FIX_MOUNTED_PROBE
 
 /**
  * Use the nozzle as the probe, as with a conductive
  * nozzle system or a piezo-electric smart effector.
+ * 
+ * 
+ * 使用喷嘴本身作为探头，
+ * 例如导电喷嘴系统、压电式智能效应器等。
+ * 
+ * 附（译者注）：
+ * 这是一种特殊的探头模式：不用额外的探针、BLTouch，直接用喷嘴本身当探头。
+   它适用于哪些设备？
+    导电床 / 喷嘴系统
+    喷嘴碰到热床 → 电路导通 → 触发信号
+    压电传感器（Piezo）
+    喷嘴一碰床 → 传感器感应压力 → 触发
+    一些三角洲（Delta）3D 打印机的智能效应器
+
+ *
  */
 //#define NOZZLE_AS_PROBE
 
 /**
  * Z Servo Probe, such as an endstop switch on a rotating arm.
+ * // Z 轴舵机探头，例如安装在旋转机械臂上的限位开关。
  */
 //#define Z_PROBE_SERVO_NR 0
 #ifdef Z_PROBE_SERVO_NR
-  //#define Z_SERVO_ANGLES { 70, 0 }      // Z Servo Deploy and Stow angles
-  //#define Z_SERVO_MEASURE_ANGLE 45      // Use if the servo must move to a "free" position for measuring after deploy
-  //#define Z_SERVO_INTERMEDIATE_STOW     // Stow the probe between points
-  //#define Z_SERVO_DEACTIVATE_AFTER_STOW // Deactivate the servo when probe is stowed
+  //#define Z_SERVO_ANGLES { 70, 0 }      // Z Servo Deploy and Stow angles  // Z 轴舵机的伸出和收回角度
+  //#define Z_SERVO_MEASURE_ANGLE 45      // Use if the servo must move to a "free" position for measuring after deploy  // 如果舵机必须在伸出后移动到一个“空闲”位置进行测量，请设置这个角度
+  //#define Z_SERVO_INTERMEDIATE_STOW     // Stow the probe between points  // 在测量点之间收回探头
+  //#define Z_SERVO_DEACTIVATE_AFTER_STOW // Deactivate the servo when probe is stowed  // 探头收回后停用舵机
 #endif
 
 /**
  * The BLTouch probe uses a Hall effect sensor and emulates a servo.
+ * 
+ * BLTouch 探头使用霍尔效应传感器，并模拟一个舵机工作。
+ *
  */
 //#define BLTOUCH
 
@@ -1954,11 +2022,14 @@
  * MagLev V4 probe by MDD
  *
  * This probe is deployed and activated by powering a built-in electromagnet.
+ * 
+ * 该探头通过内置电磁铁通电来伸出并激活。
+ *
  */
 //#define MAGLEV4
 #if ENABLED(MAGLEV4)
-  //#define MAGLEV_TRIGGER_PIN 11     // Set to the connected digital output
-  #define MAGLEV_TRIGGER_DELAY 15     // Changing this risks overheating the coil
+  //#define MAGLEV_TRIGGER_PIN 11     // Set to the connected digital output  // 设置为连接的数字输出引脚
+  #define MAGLEV_TRIGGER_DELAY 15     // Changing this risks overheating the coil  // 修改这个值可能会导致线圈过热
 #endif
 
 /**
@@ -1970,12 +2041,23 @@
  *
  * Also requires: BABYSTEPPING, BABYSTEP_ZPROBE_OFFSET, Z_SAFE_HOMING,
  *                and a minimum Z_CLEARANCE_FOR_HOMING of 10.
+ * 
+ * 
+ * Touch-MI Probe (由 hotends.fr 设计的探头)
+ *
+ * 该探头需要将 X 轴移动到热床边缘的磁铁处，才能伸出并激活。
+ * 默认情况下，磁铁位于左侧，并通过归位动作触发。如果磁铁位于右侧，
+ * 请启用并设置 TOUCH_MI_DEPLOY_XPOS 为伸出位置。
+ *
+ * 同时还需要启用：BABYSTEPPING, BABYSTEP_ZPROBE_OFFSET, Z_SAFE_HOMING
+ *                   并且 Z_CLEARANCE_FOR_HOMING 至少为 10。
+ *
  */
 //#define TOUCH_MI_PROBE
 #if ENABLED(TOUCH_MI_PROBE)
-  #define TOUCH_MI_RETRACT_Z 0.5                  // Height at which the probe retracts
-  //#define TOUCH_MI_DEPLOY_XPOS (X_MAX_BED + 2)  // For a magnet on the right side of the bed
-  //#define TOUCH_MI_MANUAL_DEPLOY                // For manual deploy (LCD menu)
+  #define TOUCH_MI_RETRACT_Z 0.5                  // Height at which the probe retracts  // 探头收回时的 Z 高度
+  //#define TOUCH_MI_DEPLOY_XPOS (X_MAX_BED + 2)  // For a magnet on the right side of the bed  // 磁铁位于热床右侧时的探头伸出 X 位置
+  //#define TOUCH_MI_MANUAL_DEPLOY                // For manual deploy (LCD menu)  // 手动伸出（LCD 菜单）
 #endif
 
 /**
@@ -1984,10 +2066,18 @@
  * Measures the distance from bed to nozzle with accuracy of 0.01mm.
  * For information about this sensor https://github.com/markniu/Bed_Distance_sensor
  * Uses I2C port, so it requires I2C library markyue/Panda_SoftMasterI2C.
+ * 
+ * 
+ * 热床距离传感器
+ *
+ * 以 0.01mm 的精度测量热床到喷嘴的距离。
+ * 关于此传感器的信息：https://github.com/markniu/Bed_Distance_sensor
+ * 使用 I2C 接口，因此需要 I2C 库：markyue/Panda_SoftMasterI2C。
+ *
  */
 //#define BD_SENSOR
 #if ENABLED(BD_SENSOR)
-  //#define BD_SENSOR_PROBE_NO_STOP // Probe bed without stopping at each probe point
+  //#define BD_SENSOR_PROBE_NO_STOP // Probe bed without stopping at each probe point  // 在每个探测点不停止，直接探测热床
 #endif
 
 /**
@@ -1997,18 +2087,54 @@
  * For information about this sensor https://github.com/bigtreetech/MicroProbe
  *
  * Also requires PROBE_ENABLE_DISABLE
+ * 
+ * 
+ * BIQU MicroProbe （必趣电子的微型探头）
+ *
+ * 一种轻量化、由电磁螺线管驱动的探头。
+ * 传感器相关信息：https://github.com/bigtreetech/MicroProbe
+ *
+ * 同时需要启用：PROBE_ENABLE_DISABLE
+ *
  */
-//#define BIQU_MICROPROBE_V1  // Triggers HIGH
-//#define BIQU_MICROPROBE_V2  // Triggers LOW
+//#define BIQU_MICROPROBE_V1  // Triggers HIGH // 探头触发信号为 高电平（HIGH）
+//#define BIQU_MICROPROBE_V2  // Triggers LOW  // 探头触发信号为 低电平（LOW）
 
 // A probe that is deployed and stowed with a solenoid pin (SOL1_PIN)
+// 通过螺线管引脚（SOL1_PIN）来伸出和收回的探头
+/*
+    附（译者注）：
+    这是电磁螺线管驱动的专用探头：
+    内部有一个小电磁铁
+    给 SOL1_PIN 通电 → 探头伸出
+    断电 → 探头收回
+*/
 //#define SOLENOID_PROBE
 
 // A sled-mounted probe like those designed by Charles Bell.
+// 一种安装在滑架上的探头，例如 Charles Bell 设计的那款。
+/*
+    附（译者注）：
+    这是一种非常老、非常少见的机械滑台探头：
+    靠 Z 轴滑架带动探头机械弹出 / 收回
+    没有舵机、没有电磁铁
+    纯机械结构
+*/
+
 //#define Z_PROBE_SLED
-//#define SLED_DOCKING_OFFSET 5  // The extra distance the X axis must travel to pickup the sled. 0 should be fine but you can push it further if you'd like.
+//#define SLED_DOCKING_OFFSET 5  // The extra distance the X axis must travel to pickup the sled. 0 should be fine but you can push it further if you'd like. 
+                                 // X轴必须额外移动的距离，以拾取滑架。0应该就可以了，但如果你想的话，可以设置更大的值。
 
 // A probe deployed by moving the x-axis, such as the Wilson II's rack-and-pinion probe designed by Marty Rice.
+// 通过移动 X 轴来伸出/收回的探头，例如 Marty Rice 设计的 Wilson II 齿轮齿条式探头。
+/*
+  附（译者注）：  
+  这又是一种极少见的老式纯机械探头：
+  没有电机、没有舵机、没有电磁铁
+  靠喷头左右撞一下机器边框
+  用齿轮 / 齿条结构把探头顶出来、收回去
+
+*/
 //#define RACK_AND_PINION_PROBE
 #if ENABLED(RACK_AND_PINION_PROBE)
   #define Z_PROBE_DEPLOY_X  X_MIN_POS
@@ -2018,11 +2144,24 @@
 /**
  * Magnetically Mounted Probe
  * For probes such as Euclid, Klicky, Klackender, etc.
+ * 
+ * 
+ * 磁吸式探头
+ * 适用于 Euclid、Klicky、Klackender 等类型的探头。
+ *
+ * 附（译者注）：
+ * 这是现在比较流行的磁吸探头专用设置
+  什么是磁吸探头？
+  探头不是固定死在喷头架上，
+  -靠磁铁吸在喷头旁边
+  -调平时自动拾取探头
+  -打印时自动放回支架，不挡空间
+  代表型号：Euclid Probe、Klicky Probe
  */
 //#define MAG_MOUNTED_PROBE
 #if ENABLED(MAG_MOUNTED_PROBE)
-  #define PROBE_DEPLOY_FEEDRATE (133*60)  // (mm/min) Probe deploy speed
-  #define PROBE_STOW_FEEDRATE   (133*60)  // (mm/min) Probe stow speed
+  #define PROBE_DEPLOY_FEEDRATE (133*60)  // (mm/min) Probe deploy speed  // 探头伸出/展开速度（单位：毫米/分钟）
+  #define PROBE_STOW_FEEDRATE   (133*60)  // (mm/min) Probe stow speed  // 探头收回/收起速度（单位：毫米/分钟）
 
   /**
    * Magnetically Mounted Probe with a Servo mechanism
@@ -2030,31 +2169,42 @@
    *  - Rotate the SERVO to its Deployed angle
    *  - Perform XYZ moves to deploy or stow the PROBE
    *  - Rotate the SERVO to its Stowed angle
+   * 
+   * 
+   * 带舵机结构的磁吸式探头
+   * 探头伸出与收回遵循相同的基本流程：
+   *  1. 将舵机旋转到【伸出角度】
+   *  2. 执行 XYZ 运动来拾取/放回探头
+   *  3. 将舵机旋转到【收回角度】
+   *
    */
-  //#define MAG_MOUNTED_PROBE_SERVO_NR 0             // Servo Number for this probe
+  //#define MAG_MOUNTED_PROBE_SERVO_NR 0             // Servo Number for this probe  // 用于此探头的舵机编号
   #ifdef MAG_MOUNTED_PROBE_SERVO_NR
-    #define MAG_MOUNTED_PROBE_SERVO_ANGLES { 90, 0 } // Servo Angles for Deployed, Stowed
-    #define MAG_MOUNTED_PRE_DEPLOY { PROBE_DEPLOY_FEEDRATE, { 15, 160, 30 } }  // Safe position for servo activation
-    #define MAG_MOUNTED_PRE_STOW   { PROBE_DEPLOY_FEEDRATE, { 15, 160, 30 } }  // Safe position for servo deactivation
+    #define MAG_MOUNTED_PROBE_SERVO_ANGLES { 90, 0 } // Servo Angles for Deployed, Stowed  // 舵机的伸出和收回角度
+    #define MAG_MOUNTED_PRE_DEPLOY { PROBE_DEPLOY_FEEDRATE, { 15, 160, 30 } }  // Safe position for servo activation  // 舵机激活的安全位置
+    #define MAG_MOUNTED_PRE_STOW   { PROBE_DEPLOY_FEEDRATE, { 15, 160, 30 } }  // Safe position for servo deactivation  // 舵机停用的安全位置
   #endif
 
-  #define MAG_MOUNTED_DEPLOY_1 { PROBE_DEPLOY_FEEDRATE, { 245, 114, 30 } }  // Move to side Dock & Attach probe
-  #define MAG_MOUNTED_DEPLOY_2 { PROBE_DEPLOY_FEEDRATE, { 210, 114, 30 } }  // Move probe off dock
-  #define MAG_MOUNTED_DEPLOY_3 { PROBE_DEPLOY_FEEDRATE, {   0,   0,  0 } }  // Extra move if needed
-  #define MAG_MOUNTED_DEPLOY_4 { PROBE_DEPLOY_FEEDRATE, {   0,   0,  0 } }  // Extra move if needed
-  #define MAG_MOUNTED_DEPLOY_5 { PROBE_DEPLOY_FEEDRATE, {   0,   0,  0 } }  // Extra move if needed
-  #define MAG_MOUNTED_STOW_1   { PROBE_STOW_FEEDRATE,   { 245, 114, 20 } }  // Move to dock
-  #define MAG_MOUNTED_STOW_2   { PROBE_STOW_FEEDRATE,   { 245, 114,  0 } }  // Place probe beside remover
-  #define MAG_MOUNTED_STOW_3   { PROBE_STOW_FEEDRATE,   { 230, 114,  0 } }  // Side move to remove probe
-  #define MAG_MOUNTED_STOW_4   { PROBE_STOW_FEEDRATE,   { 210, 114, 20 } }  // Side move to remove probe
-  #define MAG_MOUNTED_STOW_5   { PROBE_STOW_FEEDRATE,   {   0,   0,  0 } }  // Extra move if needed
+  #define MAG_MOUNTED_DEPLOY_1 { PROBE_DEPLOY_FEEDRATE, { 245, 114, 30 } }  // Move to side Dock & Attach probe  // 移动到侧边停靠点并吸附探头
+  #define MAG_MOUNTED_DEPLOY_2 { PROBE_DEPLOY_FEEDRATE, { 210, 114, 30 } }  // Move probe off dock  // 将探头从停靠点移开
+  #define MAG_MOUNTED_DEPLOY_3 { PROBE_DEPLOY_FEEDRATE, {   0,   0,  0 } }  // Extra move if needed  // 如有需要，额外的移动
+  #define MAG_MOUNTED_DEPLOY_4 { PROBE_DEPLOY_FEEDRATE, {   0,   0,  0 } }  // Extra move if needed  // 如有需要，额外的移动
+  #define MAG_MOUNTED_DEPLOY_5 { PROBE_DEPLOY_FEEDRATE, {   0,   0,  0 } }  // Extra move if needed  // 如有需要，额外的移动
+  #define MAG_MOUNTED_STOW_1   { PROBE_STOW_FEEDRATE,   { 245, 114, 20 } }  // Move to dock  // 移动到停靠点
+  #define MAG_MOUNTED_STOW_2   { PROBE_STOW_FEEDRATE,   { 245, 114,  0 } }  // Place probe beside remover  // 将探头放在移除器旁边
+  #define MAG_MOUNTED_STOW_3   { PROBE_STOW_FEEDRATE,   { 230, 114,  0 } }  // Side move to remove probe  // 侧面移动以移除探头
+  #define MAG_MOUNTED_STOW_4   { PROBE_STOW_FEEDRATE,   { 210, 114, 20 } }  // Side move to remove probe  // 侧面移动以移除探头
+  #define MAG_MOUNTED_STOW_5   { PROBE_STOW_FEEDRATE,   {   0,   0,  0 } }  // Extra move if needed  // 如有需要，额外的移动
 #endif
 
 // Duet Smart Effector (for delta printers) - https://docs.duet3d.com/en/Duet3D_hardware/Accessories/Smart_Effector
 // When the pin is defined you can use M672 to set/reset the probe sensitivity.
+
+// Duet Smart Effector（用于三角洲/Delta打印机）- 官方文档链接https://docs.duet3d.com/en/Duet3D_hardware/Accessories/Smart_Effector
+// 当引脚定义后，你可以使用 M672 指令来设置/重置探头灵敏度。
 //#define DUET_SMART_EFFECTOR
 #if ENABLED(DUET_SMART_EFFECTOR)
-  #define SMART_EFFECTOR_MOD_PIN  -1  // Connect a GPIO pin to the Smart Effector MOD pin
+  #define SMART_EFFECTOR_MOD_PIN  -1  // Connect a GPIO pin to the Smart Effector MOD pin  // 将 GPIO 引脚连接到 Smart Effector 的 MOD 引脚
 #endif
 
 /**
@@ -2062,6 +2212,19 @@
  * Requires stallGuard-capable Trinamic stepper drivers.
  * CAUTION: This can damage machines with Z lead screws.
  *          Take extreme care when setting up this feature.
+ * 
+ * 
+ * 使用 StallGuard2 技术，让喷嘴直接探测热床。
+ * 必须使用支持 stallGuard 功能的 Trinamic 步进电机驱动。
+ * 注意：此功能可能会损坏带有 Z 轴丝杆的机器！
+ *      设置时请务必极度小心。
+ * 
+ * 附（译者注）：
+ * 这是一个无探头、无传感器的功能：
+ * 不用 BLTouch、不用任何硬件
+ * 直接让喷嘴撞热床
+ * 靠电机堵转检测（StallGuard）判断是否接触
+ *
  */
 //#define SENSORLESS_PROBING
 
