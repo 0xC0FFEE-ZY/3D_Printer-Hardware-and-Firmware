@@ -28,7 +28,7 @@
 *本工程各项参数已配置完成，适用于本人自制的3D打印机（基于UM架构），
 *该3D打印机设计图纸，硬件原理图，PCB已全部开源,未来预计更新制作教程至抖音/B站。
 *开源项目见本人Github主页：https://github.com/0xC0FFEE-ZY
-*欢迎关注本人抖音：（抖音号:Technophilic)，昵称：0xC0FFEE_ZY，里面有很多电子科技创作相关的视频，欢迎大家点赞关注！谢谢！
+*欢迎关注本人抖音：（抖音号:Technophilic)，昵称：0xC0FFEE_ZY，里面有一些电子科技创作相关的视频，欢迎大家点赞关注！谢谢！
 *B站UID:481302692，昵称：0xC0FFEE_ZY
 *up为2024级本科生，热爱电子科技，欢迎和我一起进行讨论和交流！
 
@@ -301,7 +301,7 @@
 
 // This defines the number of extruders   此项用于定义挤出机数量
 // :[0, 1, 2, 3, 4, 5, 6, 7, 8]
-#define EXTRUDERS 1
+#define EXTRUDERS 1 //我的打印机只用了一个挤出机（远程挤出）
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
 //常规默认耗材直径（1.75、2.85、3.0 等）。用于体积挤出、耗材宽度传感器等功能。
@@ -725,15 +725,18 @@
  *        Configuration_adv.h file. At this time, separate Hardware SPI buses for sensors are not supported.
  *
  * ================================================================
- *  Analog Thermocouple Boards
+ *  Analog Thermocouple Boards   模拟热电偶转接板
  * ================================================================
  *    -4 : AD8495 with Thermocouple
  *    -1 : AD595  with Thermocouple
+ * 
+ *    -4 : AD8495 热电偶转接板
+      -1 : AD595  热电偶转接板
  *
  * ================================================================
- *  SoC internal sensor
+ *  SoC internal sensor   SoC 内部传感器
  * ================================================================
- *   100 : SoC internal sensor
+ *   100 : SoC internal sensor  
  *
  * ================================================================
  *  Custom/Dummy/Other Thermal Sensors
@@ -744,6 +747,9 @@
  *   !!! Use these for Testing or Development purposes. NEVER for production machine. !!!
  *   998 : Dummy Table that ALWAYS reads 25°C or the temperature defined below.
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
+ *  !!! 仅用于测试或开发目的。切勿用于生产机器！！！
+    998 : 始终读取 25°C 或下方定义的温度的虚拟表。
+    999 : 始终读取 100°C 或下方定义的温度的虚拟表。
  */
 #define TEMP_SENSOR_0 1
 #define TEMP_SENSOR_1 0
@@ -761,14 +767,15 @@
 #define TEMP_SENSOR_SOC 0
 #define TEMP_SENSOR_REDUNDANT 0
 
-// Dummy thermistor constant temperature readings, for use with 998 and 999
+// Dummy thermistor constant temperature readings, for use with 998 and 999   // 虚拟热敏电阻恒温读数，供 998 和 999 型号使用
 #define DUMMY_THERMISTOR_998_VALUE  25
 #define DUMMY_THERMISTOR_999_VALUE 100
 
 // Resistor values when using MAX31865 sensors (-5) on TEMP_SENSOR_0 / 1 / 2 / BED
+// 在 TEMP_SENSOR_0 / 1 / 2 / BED 上使用 MAX31865 传感器（型号-5）时的电阻值配置
 #if TEMP_SENSOR_IS_MAX_TC(0)
-  #define MAX31865_SENSOR_OHMS_0      100 // (Ω) Typically 100 or 1000 (PT100 or PT1000)
-  #define MAX31865_CALIBRATION_OHMS_0 430 // (Ω) Typically 430 for Adafruit PT100; 4300 for Adafruit PT1000
+  #define MAX31865_SENSOR_OHMS_0      100 // (Ω) Typically 100 or 1000 (PT100 or PT1000)  // (Ω) 通常为 100 或 1000（对应 PT100 或 PT1000 传感器）
+  #define MAX31865_CALIBRATION_OHMS_0 430 // (Ω) Typically 430 for Adafruit PT100; 4300 for Adafruit PT1000  // (Ω) Adafruit PT100 通常为 430；Adafruit PT1000 通常为 4300
 #endif
 #if TEMP_SENSOR_IS_MAX_TC(1)
   #define MAX31865_SENSOR_OHMS_1      100
@@ -784,21 +791,21 @@
 #endif
 
 #if HAS_E_TEMP_SENSOR
-  #define TEMP_RESIDENCY_TIME         10  // (seconds) Time to wait for hotend to "settle" in M109
-  #define TEMP_WINDOW                  1  // (°C) Temperature proximity for the "temperature reached" timer
-  #define TEMP_HYSTERESIS              3  // (°C) Temperature proximity considered "close enough" to the target
+  #define TEMP_RESIDENCY_TIME         10  // (seconds) Time to wait for hotend to "settle" in M109  // (秒) M109 指令中等待热端温度稳定的延时时间
+  #define TEMP_WINDOW                  1  // (°C) Temperature proximity for the "temperature reached" timer  // (°C) “温度达到”计时器的温度接近度
+  #define TEMP_HYSTERESIS              3  // (°C) Temperature proximity considered "close enough" to the target  // (°C) 被认为“足够接近”目标的温度接近度
 #endif
 
 #if TEMP_SENSOR_BED
-  #define TEMP_BED_RESIDENCY_TIME     10  // (seconds) Time to wait for bed to "settle" in M190
-  #define TEMP_BED_WINDOW              1  // (°C) Temperature proximity for the "temperature reached" timer
-  #define TEMP_BED_HYSTERESIS          3  // (°C) Temperature proximity considered "close enough" to the target
+  #define TEMP_BED_RESIDENCY_TIME     10  // (seconds) Time to wait for bed to "settle" in M190  // (秒) M190 指令中等待热床温度稳定的延时时间
+  #define TEMP_BED_WINDOW              1  // (°C) Temperature proximity for the "temperature reached" timer  // (°C) “温度达到”计时器的温度接近度
+  #define TEMP_BED_HYSTERESIS          3  // (°C) Temperature proximity considered "close enough" to the target  // (°C) 被认为“足够接近”目标的温度接近度
 #endif
 
 #if TEMP_SENSOR_CHAMBER
-  #define TEMP_CHAMBER_RESIDENCY_TIME 10  // (seconds) Time to wait for chamber to "settle" in M191
-  #define TEMP_CHAMBER_WINDOW          1  // (°C) Temperature proximity for the "temperature reached" timer
-  #define TEMP_CHAMBER_HYSTERESIS      3  // (°C) Temperature proximity considered "close enough" to the target
+  #define TEMP_CHAMBER_RESIDENCY_TIME 10  // (seconds) Time to wait for chamber to "settle" in M191  // (秒) M191 指令中等待机箱温度稳定的延时时间
+  #define TEMP_CHAMBER_WINDOW          1  // (°C) Temperature proximity for the "temperature reached" timer  // (°C) “温度达到”计时器的温度接近度
+  #define TEMP_CHAMBER_HYSTERESIS      3  // (°C) Temperature proximity considered "close enough" to the target  // (°C) 被认为“足够接近”目标的温度接近度
 #endif
 
 /**
@@ -810,15 +817,22 @@
  * the Bed sensor (-1) will disable bed heating/monitoring.
  *
  * For selecting source/target use: COOLER, PROBE, BOARD, CHAMBER, BED, E0, E1, E2, E3, E4, E5, E6, E7
+ * 
+ * 冗余温度传感器（TEMP_SENSOR_REDUNDANT）
+  使用一个温度传感器作为另一个读数的冗余传感器。选择一个未使用的温度传感器，以及另一个你希望它冗余的传感器。
+  如果两个热敏电阻的温度差异超过 TEMP_SENSOR_REDUNDANT_MAX_DIFF（°C），打印将被中止。
+  无论选择哪个传感器，都将禁用其正常功能；例如，选择床传感器（-1）将禁用床加热/监测。
  */
 #if TEMP_SENSOR_REDUNDANT
-  #define TEMP_SENSOR_REDUNDANT_SOURCE    E1  // The sensor that will provide the redundant reading.
-  #define TEMP_SENSOR_REDUNDANT_TARGET    E0  // The sensor that we are providing a redundant reading for.
-  #define TEMP_SENSOR_REDUNDANT_MAX_DIFF  10  // (°C) Temperature difference that will trigger a print abort.
+  #define TEMP_SENSOR_REDUNDANT_SOURCE    E1  // The sensor that will provide the redundant reading.  // 将提供冗余读数的传感器。
+  #define TEMP_SENSOR_REDUNDANT_TARGET    E0  // The sensor that we are providing a redundant reading for.  // 我们正在为其提供冗余读数的传感器。
+  #define TEMP_SENSOR_REDUNDANT_MAX_DIFF  10  // (°C) Temperature difference that will trigger a print abort.  //（°C）将触发打印中止的温度差异。
 #endif
 
 // Below this temperature the heater will be switched off
 // because it probably indicates a broken thermistor wire.
+// 低于该温度时，加热器将自动关闭
+// 因为这种情况通常表明热敏电阻线路断路。
 #define HEATER_0_MINTEMP   5
 #define HEATER_1_MINTEMP   5
 #define HEATER_2_MINTEMP   5
@@ -833,6 +847,9 @@
 // Above this temperature the heater will be switched off.
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
+// 高于该温度时，加热器将自动关闭。
+// 可保护元件免受过热损坏，但无法防护短路与故障。
+// （使用 MINTEMP 实现热敏电阻短路/故障保护。）
 #define HEATER_0_MAXTEMP 275
 #define HEATER_1_MAXTEMP 275
 #define HEATER_2_MAXTEMP 275
@@ -849,14 +866,19 @@
  * During heatup (and printing) the temperature can often "overshoot" the target by many degrees
  * (especially before PID tuning). Setting the target temperature too close to MAXTEMP guarantees
  * a MAXTEMP shutdown! Use these values to forbid temperatures being set too close to MAXTEMP.
+ * 
+ * 热过冲
+  在加热（和打印）过程中，温度通常会超过目标温度很多度（尤其是在 PID 调整之前）。
+  将目标温度设置得太接近 MAXTEMP 会导致 MAXTEMP 关机！使用这些值禁止将温度设置得过于接近 MAXTEMP。
  */
-#define HOTEND_OVERSHOOT 15   // (°C) Forbid temperatures over MAXTEMP - OVERSHOOT
-#define BED_OVERSHOOT    10   // (°C) Forbid temperatures over MAXTEMP - OVERSHOOT
-#define COOLER_OVERSHOOT  2   // (°C) Forbid temperatures closer than OVERSHOOT
+#define HOTEND_OVERSHOOT 15   // (°C) Forbid temperatures over MAXTEMP - OVERSHOOT  //（°C）禁止设置超过 MAXTEMP - OVERSHOOT 的温度
+#define BED_OVERSHOOT    10   // (°C) Forbid temperatures over MAXTEMP - OVERSHOOT  //（°C）禁止设置超过 MAXTEMP - OVERSHOOT 的温度
+#define COOLER_OVERSHOOT  2   // (°C) Forbid temperatures closer than OVERSHOOT  //（°C）禁止设置接近 OVERSHOOT 的温度
 
 //===========================================================================
 //============================= PID Settings ================================
 //===========================================================================
+//PID参数设置
 
 // @section hotend temp
 
@@ -866,23 +888,28 @@
  *  (NONE) : Bang-bang heating
  * PIDTEMP : PID temperature control (~4.1K)
  * MPCTEMP : Predictive Model temperature control. (~1.8K without auto-tune)
+ * 
+ * 温度控制
+  (NONE) : 开/关加热
+  PIDTEMP : PID 温度控制（约占用4.1K字节）
+  MPCTEMP : 预测模型温度控制（无自动调节时约占用1.8K字节）
  */
-#define PIDTEMP           // See the PID Tuning Guide at https://reprap.org/wiki/PID_Tuning
-//#define MPCTEMP         // See https://marlinfw.org/docs/features/model_predictive_control.html
+#define PIDTEMP           // See the PID Tuning Guide at https://reprap.org/wiki/PID_Tuning  // 参阅PID调参指南，网址：https://reprap.org/wiki/PID_Tuning
+//#define MPCTEMP         // See https://marlinfw.org/docs/features/model_predictive_control.html  // 参阅：https://marlinfw.org/docs/features/model_predictive_control.html
 
-#define PID_MAX  255      // Limit hotend current while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
-#define PID_K1     0.95   // Smoothing factor within any PID loop
+#define PID_MAX  255      // Limit hotend current while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current  // PID激活时限制热端电流（见下文PID_FUNCTIONAL_RANGE）；255=全电流
+#define PID_K1     0.95   // Smoothing factor within any PID loop  // PID循环内的平滑因子
 
 #if ENABLED(PIDTEMP)
-  //#define MIN_POWER 0           // Min power to improve PID stability (0..PID_MAX).
-                                  // Get the power from the temperature report ('M105' => @:nnn) and try P*2-20 to P*2-10.
-  //#define PID_DEBUG             // Print PID debug data to the serial port. Use 'M303 D' to enable/disable.
-  //#define PID_PARAMS_PER_HOTEND // Use separate PID parameters for each extruder (useful for mismatched extruders)
-                                  // Set/get with G-code: M301 E[extruder number, 0-2]
+  //#define MIN_POWER 0           // Min power to improve PID stability (0..PID_MAX).  // 提升PID稳定性的最小功率输出（取值范围：0 到 PID_MAX）
+                                  // Get the power from the temperature report ('M105' => @:nnn) and try P*2-20 to P*2-10.  // 从温度反馈指令中获取功率值（'M105' => @:nnn），尝试将P值设为 当前功率值×2-20 至 当前功率值×2-10 区间。
+  //#define PID_DEBUG             // Print PID debug data to the serial port. Use 'M303 D' to enable/disable.  // 将PID调试数据打印到串口。使用 'M303 D' 命令启用/禁用。
+  //#define PID_PARAMS_PER_HOTEND // Use separate PID parameters for each extruder (useful for mismatched extruders)  // 为每个挤出机使用单独的PID参数（适用于不匹配的挤出机）
+                                  // Set/get with G-code: M301 E[extruder number, 0-2]  // 使用G-code设置/获取：M301 E[挤出机编号，0-2] P[KP] I[KI] D[KD]
 
   #if ENABLED(PID_PARAMS_PER_HOTEND)
-    // Specify up to one value per hotend here, according to your setup.
-    // If there are fewer values, the last one applies to the remaining hotends.
+    // Specify up to one value per hotend here, according to your setup.  // 根据你的设备配置，在此为每个热端分别指定一个参数值。
+    // If there are fewer values, the last one applies to the remaining hotends.  // 如果值的数量较少，则最后一个值将适用于剩余的热端。
     #define DEFAULT_Kp_LIST {  22.20,  22.20 }
     #define DEFAULT_Ki_LIST {   1.08,   1.08 }
     #define DEFAULT_Kd_LIST { 114.00, 114.00 }
@@ -892,7 +919,7 @@
     #define DEFAULT_Kd 114.00
   #endif
 #else
-  #define BANG_MAX 255    // Limit hotend current while in bang-bang mode; 255=full current
+  #define BANG_MAX 255    // Limit hotend current while in bang-bang mode; 255=full current  // 在开/关模式下限制热端电流；255=全电流
 #endif
 
 /**
@@ -902,34 +929,40 @@
  * better responsiveness and stability than PID and removes the need for PID_EXTRUSION_SCALING
  * and PID_FAN_SCALING. Enable MPC_AUTOTUNE and use M306 T to autotune the model.
  * @section mpc temp
+ * 
+ * 热端的模型预测控制
+  使用热端的物理模型来控制温度。当正确配置时，这比PID具有更好的响应性和稳定性，并且不需要PID_EXTRUSION_SCALING和PID_FAN_SCALING。
+  启用MPC_AUTOTUNE并使用M306 T进行自动调节模型。
+  @section mpc temp
  */
 #if ENABLED(MPCTEMP)
-  #define MPC_AUTOTUNE                                // Include a method to do MPC auto-tuning (~6.3K bytes of flash)
+  #define MPC_AUTOTUNE                                // Include a method to do MPC auto-tuning (~6.3K bytes of flash)  // 启用MPC自动调参功能（约占用6.3KB闪存空间）
   #if ENABLED(MPC_AUTOTUNE)
-    //#define MPC_AUTOTUNE_DEBUG                      // Enable MPC debug logging (~870 bytes of flash)
+    //#define MPC_AUTOTUNE_DEBUG                      // Enable MPC debug logging (~870 bytes of flash)  // 启用MPC调试日志记录（约占用870字节的闪存空间）
   #endif
-  //#define MPC_EDIT_MENU                             // Add MPC editing to the "Advanced Settings" menu. (~1.3K bytes of flash)
-  //#define MPC_AUTOTUNE_MENU                         // Add MPC auto-tuning to the "Advanced Settings" menu. (~350 bytes of flash)
+  //#define MPC_EDIT_MENU                             // Add MPC editing to the "Advanced Settings" menu. (~1.3K bytes of flash)  // 在“高级设置”菜单中添加MPC编辑功能（约占用1.3KB的闪存空间）
+  //#define MPC_AUTOTUNE_MENU                         // Add MPC auto-tuning to the "Advanced Settings" menu. (~350 bytes of flash)  // 在“高级设置”菜单中添加MPC自动调节功能（约占用350字节的闪存空间）
 
-  #define MPC_MAX 255                                 // (0..255) Current to nozzle while MPC is active.
-  #define MPC_HEATER_POWER { 40.0f }                  // (W) Nominal heat cartridge powers.
-  //#define MPC_PTC                                   // Hotend power changes with temperature (e.g., PTC heat cartridges).
+  #define MPC_MAX 255                                 // (0..255) Current to nozzle while MPC is active.  255=full current.  // MPC激活时喷嘴的电流（取值范围：0 到 255，255=全电流）
+  #define MPC_HEATER_POWER { 40.0f }                  // (W) Nominal heat cartridge powers.    //（W）名义热卡功率。用于自动调节和作为模型的基础。
+  //#define MPC_PTC                                   // Hotend power changes with temperature (e.g., PTC heat cartridges).  // 热端功率随温度变化（例如，PTC热卡）。启用后需要定义MPC_HEATER_ALPHA和MPC_HEATER_REFTEMP。
   #if ENABLED(MPC_PTC)
-    #define MPC_HEATER_ALPHA { 0.0028f }              // Temperature coefficient of resistance of the heat cartridges.
-    #define MPC_HEATER_REFTEMP { 20 }                 // (°C) Reference temperature for MPC_HEATER_POWER and MPC_HEATER_ALPHA.
+    #define MPC_HEATER_ALPHA { 0.0028f }              // Temperature coefficient of resistance of the heat cartridges.  // 热卡的电阻温度系数。用于自动调节和作为模型的基础。
+    #define MPC_HEATER_REFTEMP { 20 }                 // (°C) Reference temperature for MPC_HEATER_POWER and MPC_HEATER_ALPHA.  // MPC_HEATER_POWER和MPC_HEATER_ALPHA的参考温度（°C）。通常为室温。
   #endif
 
-  #define MPC_INCLUDE_FAN                             // Model the fan speed?
+  #define MPC_INCLUDE_FAN                             // Model the fan speed?  // 启用风扇速度建模？
 
   // Measured physical constants from M306
-  #define MPC_BLOCK_HEAT_CAPACITY { 16.7f }           // (J/K) Heat block heat capacities.
-  #define MPC_SENSOR_RESPONSIVENESS { 0.22f }         // (K/s per ∆K) Rate of change of sensor temperature from heat block.
-  #define MPC_AMBIENT_XFER_COEFF { 0.068f }           // (W/K) Heat transfer coefficients from heat block to room air with fan off.
+  #define MPC_BLOCK_HEAT_CAPACITY { 16.7f }           // (J/K) Heat block heat capacities.   //（J/K）热块热容量。
+  #define MPC_SENSOR_RESPONSIVENESS { 0.22f }         // (K/s per ∆K) Rate of change of sensor temperature from heat block.  //（K/s per ∆K）热块温度变化引起的传感器温度变化率。用于自动调节和作为模型的基础。
+  #define MPC_AMBIENT_XFER_COEFF { 0.068f }           // (W/K) Heat transfer coefficients from heat block to room air with fan off.  //（W/K）热块到室内空气的热传递系数，风扇关闭时。用于自动调节和作为模型的基础。
   #if ENABLED(MPC_INCLUDE_FAN)
-    #define MPC_AMBIENT_XFER_COEFF_FAN255 { 0.097f }  // (W/K) Heat transfer coefficients from heat block to room air with fan on full.
+    #define MPC_AMBIENT_XFER_COEFF_FAN255 { 0.097f }  // (W/K) Heat transfer coefficients from heat block to room air with fan on full.  //（W/K）热块到室内空气的热传递系数，风扇全速时。用于自动调节和作为模型的基础。
   #endif
 
   // For one fan and multiple hotends MPC needs to know how to apply the fan cooling effect.
+  // 当使用单个风扇为多个热端散热时，MPC温控算法需要明确风扇的散热影响分配方式。
   #if ENABLED(MPC_INCLUDE_FAN)
     //#define MPC_FAN_0_ALL_HOTENDS
     //#define MPC_FAN_0_ACTIVE_HOTEND
@@ -937,24 +970,25 @@
 
   // Filament Heat Capacity (joules/kelvin/mm)
   // Set at runtime with M306 H<value>
-  #define FILAMENT_HEAT_CAPACITY_PERMM { 5.6e-3f }    // 0.0056 J/K/mm for 1.75mm PLA (0.0149 J/K/mm for 2.85mm PLA).
-                                                      // 0.0036 J/K/mm for 1.75mm PETG (0.0094 J/K/mm for 2.85mm PETG).
-                                                      // 0.00515 J/K/mm for 1.75mm ABS (0.0137 J/K/mm for 2.85mm ABS).
-                                                      // 0.00522 J/K/mm for 1.75mm Nylon (0.0138 J/K/mm for 2.85mm Nylon).
+  #define FILAMENT_HEAT_CAPACITY_PERMM { 5.6e-3f }    // 0.0056 J/K/mm for 1.75mm PLA (0.0149 J/K/mm for 2.85mm PLA).  // 1.75mm PLA 耗材热容参数：0.0056 J/K/mm（2.85mm PLA 耗材热容参数：0.0149 J/K/mm）
+                                                      // 0.0036 J/K/mm for 1.75mm PETG (0.0094 J/K/mm for 2.85mm PETG).  // 1.75mm PETG 耗材热容参数：0.0036 J/K/mm（2.85mm PETG 耗材热容参数：0.0094 J/K/mm）  
+                                                      // 0.00515 J/K/mm for 1.75mm ABS (0.0137 J/K/mm for 2.85mm ABS).  // 1.75mm ABS 耗材热容参数：0.00515 J/K/mm（2.85mm ABS 耗材热容参数：0.0137 J/K/mm）
+                                                      // 0.00522 J/K/mm for 1.75mm Nylon (0.0138 J/K/mm for 2.85mm Nylon).  // 1.75mm 尼龙 耗材热容参数：0.00522 J/K/mm（2.85mm 尼龙 耗材热容参数：0.0138 J/K/mm）
 
-  // Advanced options
-  #define MPC_SMOOTHING_FACTOR 0.5f                   // (0.0...1.0) Noisy temperature sensors may need a lower value for stabilization.
-  #define MPC_MIN_AMBIENT_CHANGE 1.0f                 // (K/s) Modeled ambient temperature rate of change, when correcting model inaccuracies.
-  #define MPC_STEADYSTATE 0.5f                        // (K/s) Temperature change rate for steady state logic to be enforced.
+  // Advanced options  高级选项
+  #define MPC_SMOOTHING_FACTOR 0.5f                   // (0.0...1.0) Noisy temperature sensors may need a lower value for stabilization.  //（0.0...1.0）// 温度传感器信号噪声较大时，可能需要降低该参数值以实现稳定。
+  #define MPC_MIN_AMBIENT_CHANGE 1.0f                 // (K/s) Modeled ambient temperature rate of change, when correcting model inaccuracies.  //(开尔文/秒) 用于修正模型误差时，模拟环境温度的变化速率
+  #define MPC_STEADYSTATE 0.5f                        // (K/s) Temperature change rate for steady state logic to be enforced.  // (开尔文/秒) 稳态逻辑生效所需的温度变化速率
 
-  #define MPC_TUNING_POS { X_CENTER, Y_CENTER, 1.0f } // (mm) M306 Autotuning position, ideally bed center at first layer height.
-  #define MPC_TUNING_END_Z 10.0f                      // (mm) M306 Autotuning final Z position.
-  //#define EVENT_GCODE_AFTER_MPC_TUNE "M84"          // G-code to execute after MPC tune finished and Z raised.
+  #define MPC_TUNING_POS { X_CENTER, Y_CENTER, 1.0f } // (mm) M306 Autotuning position, ideally bed center at first layer height.  // (毫米) M306 自动调参坐标，理想位置为第一层高度时的热床中心
+  #define MPC_TUNING_END_Z 10.0f                      // (mm) M306 Autotuning final Z position.  // (毫米) M306 自动调参结束时的Z坐标位置
+  //#define EVENT_GCODE_AFTER_MPC_TUNE "M84"          // G-code to execute after MPC tune finished and Z raised.  // M306自动调节完成并提升Z轴后执行的G-code
 #endif
 
 //===========================================================================
 //====================== PID > Bed Temperature Control ======================
 //===========================================================================
+//热床温度PID控制
 
 // @section bed temp
 
@@ -963,6 +997,10 @@
  * Applies to all forms of bed control (PID, bang-bang, and bang-bang with hysteresis).
  * When set to any value below 255, enables a form of PWM to the bed that acts like a divider
  * so don't use it unless you are OK with PWM on your bed. (See the comment on enabling PIDTEMPBED)
+ * 
+ * 最大热床功率
+  适用于所有形式的床控制（PID、开/关和带滞后的开/关）。
+  当设置为255以下的任何值时，会启用一种对床进行PWM控制的方式，类似于一个分频器，所以除非你能接受对床进行PWM控制，否则不要使用它。（参见启用PIDTEMPBED的注释）
  */
 #define MAX_BED_POWER 255 // limits duty cycle to bed; 255=full current
 
@@ -977,23 +1015,37 @@
  * the issues involved, don't use bed PID until someone else verifies that your hardware works.
  *
  * With this option disabled, bang-bang will be used. BED_LIMIT_SWITCHING enables hysteresis.
+ * 
+  *
+ * 热床 PID 恒温控制
+ *
+ * PID 控制频率与挤出机 PWM 频率一致。
+ * 如果使用默认的 PID_dT 参数且适配你的硬件/配置，则频率为 7.689Hz，
+ * 该频率非常适合驱动电阻式加热负载（热床），且不会对 FET 场效应管造成明显发热。
+ * 此参数在 Fotek SSR-10DA 固态继电器驱动 250W 加热器的配置下也能稳定运行。
+ * 如果你的硬件配置与上述情况差异极大，且你不理解相关原理，
+ * 请勿使用热床 PID 功能，直到其他专业人士验证你的硬件可行。
+ *
+ * 若禁用此选项，将使用【开关控制（bang-bang）】模式。
+ * BED_LIMIT_SWITCHING 选项用于启用【回差控制】。
  */
+ 
 //#define PIDTEMPBED
 
 #if ENABLED(PIDTEMPBED)
-  //#define MIN_BED_POWER 0   // Min power to improve PID stability (0..MAX_BED_POWER).
-                              // Get the power from the temperature report ('M105' => B@:nnn) and try P*2-20 to P*2-10.
-  //#define PID_BED_DEBUG     // Print Bed PID debug data to the serial port. Use 'M303 D' to enable/disable.
+  //#define MIN_BED_POWER 0   // Min power to improve PID stability (0..MAX_BED_POWER).  // 提升热床PID稳定性的最小输出功率（取值范围：0 到 MAX_BED_POWER）
+                              // Get the power from the temperature report ('M105' => B@:nnn) and try P*2-20 to P*2-10.  // 从温度反馈指令中获取功率值（'M105' => B@:nnn），尝试将P值设为 当前功率值×2-20 至 当前功率值×2-10 区间。
+  //#define PID_BED_DEBUG     // Print Bed PID debug data to the serial port. Use 'M303 D' to enable/disable.  // 将热床PID调试数据打印到串口。使用 'M303 D' 命令启用/禁用。
 
-  // 120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
-  // from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
+  // 120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)  // 适配 120V 250W 硅胶加热板 + 4mm 硼硅玻璃热床（MendelMax 1.5+ 机型）
+  // from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)  // 来自 FOPDT 模型 - kp=.39 Tp=405 Tdead=66，Tc 设置为 79.2，激进因子为 .15（相对于 .1、1、10）
   #define DEFAULT_bedKp  10.00
   #define DEFAULT_bedKi   0.023
   #define DEFAULT_bedKd 305.4
 
-  // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
+  // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.  // 运行自动调节命令 "M303 E-1 C8 S90"，在热床上以 90°C 进行 8 个周期的自动调节，来获取适合你设备的 PID 参数。
 #else
-  //#define BED_LIMIT_SWITCHING   // Keep the bed temperature within BED_HYSTERESIS of the target
+  //#define BED_LIMIT_SWITCHING   // Keep the bed temperature within BED_HYSTERESIS of the target  // 将热床温度保持在目标温度的 BED_HYSTERESIS 范围内
 #endif
 
 /**
@@ -1023,11 +1075,38 @@
  * Cooling applications are more common than heating, so the pin states are commonly:
  *   LOW  = Heating = Relay Energized
  *   HIGH = Cooling = Relay in "Normal" state
+ * 
+ * 
+ * 半导体制冷片热床 - 加热与制冷
+ *
+ * 半导体制冷片（Peltier）通过改变通过的电流大小与方向，
+ * 实现热量从一侧转移到另一侧。因此同一个器件既能加热也能制冷。
+ *
+ * 当处于【制冷模式】时，除了要将热量从热端转移到冷端外，
+ * 器件自身消耗的功率（电压 × 电流）产生的热量也必须一并散掉。
+ * 务必配置一个与制冷片同步供电的散热风扇。
+ *
+ * 该功能仅设置为【开关控制】模式运行，
+ * 因为在没有滤波电路的情况下，半导体制冷片不适合使用 PWM 控制。
+ *
+ * 由于现有3D打印机的热床电路本身就能承受较大电流，
+ * 因此可以直接使用热床电源引脚，通过热床相同的G代码（M140、M190等）控制半导体制冷片。
+ *
+ * 需要额外一个GPIO引脚来控制电流方向。
+ * 支持两种配置方式：继电器模式 和 H桥驱动模式
+ *
+ * （当前仅支持继电器模式。H桥模式需要配置4个MOS管组成H桥电路。）
+ *
+ * 功率由开关控制回路处理：只有全开（255）或全关（0）两种状态。
+ * 制冷应用比加热更常见，因此引脚状态通常定义为：
+ *   LOW  = 加热 = 继电器吸合
+ *   HIGH = 制冷 = 继电器默认状态
+ *
  */
 //#define PELTIER_BED
 #if ENABLED(PELTIER_BED)
-  #define PELTIER_DIR_PIN           -1  // Relay control pin for Peltier
-  #define PELTIER_DIR_HEAT_STATE   LOW  // The relay pin state that causes the Peltier to heat
+  #define PELTIER_DIR_PIN           -1  // Relay control pin for Peltier  // 半导体制冷片的继电器控制引脚
+  #define PELTIER_DIR_HEAT_STATE   LOW  // The relay pin state that causes the Peltier to heat  // 导致半导体制冷片加热的继电器引脚状态
 #endif
 
 // Add 'M190 R T' for more gradual M190 R bed cooling.
