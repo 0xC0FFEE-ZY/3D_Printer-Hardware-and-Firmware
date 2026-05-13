@@ -1324,55 +1324,76 @@
 // @section delta
 
 // Enable for DELTA kinematics and configure below
+// 启用三角洲（DELTA）运动学架构，并在下方进行配置
+//DELTA：三角洲打印机（那种三根立柱、吊一个喷头的并联臂打印机）
+//kinematics：运动学算法（控制三个臂怎么动才能让喷头走直线）
+
 //#define DELTA
 #if ENABLED(DELTA)
 
   // Make delta curves from many straight lines (linear interpolation).
   // This is a trade-off between visible corners (not enough segments)
   // and processor overload (too many expensive sqrt calls).
+  // 通过多条直线段拟合三角洲机型的曲线运动（线性插值）。
+  // 这是一个折中设置：
+  // 线段太少 → 打印件出现明显棱角；
+  // 线段太多 → 处理器负载过高（大量耗时的平方根运算）。
   #define DEFAULT_SEGMENTS_PER_SECOND 200
 
   // After homing move down to a height where XY movement is unconstrained
+  // 归位完成后，向下移动到一个 XY 轴可以自由移动、不受限制的高度
+
   //#define DELTA_HOME_TO_SAFE_ZONE
 
   // Delta calibration menu
   // Add three-point calibration to the MarlinUI menu.
   // See http://minow.blogspot.com/index.html#4918805519571907051
+  // 三角洲打印机校准菜单
+  // 在 Marlin 界面菜单中添加三点校准功能
+  // 参考链接：http://minow.blogspot.com/index.html#4918805519571907051
+
   //#define DELTA_CALIBRATION_MENU
 
   // G33 Delta Auto-Calibration. Enable EEPROM_SETTINGS to store results.
+  // G33 三角洲自动校准功能。需启用 EEPROM_SETTINGS 以保存校准结果。
   //#define DELTA_AUTO_CALIBRATION
 
   #if ENABLED(DELTA_AUTO_CALIBRATION)
-    // Default number of probe points : n*n (1 -> 7)
+    // Default number of probe points : n*n (1 -> 7)   // 默认探测点数量：n*n (1 -> 7)
     #define DELTA_CALIBRATION_DEFAULT_POINTS 4
   #endif
 
   #if ANY(DELTA_AUTO_CALIBRATION, DELTA_CALIBRATION_MENU)
-    // Step size for paper-test probing
+    // Step size for paper-test probing  // 纸张测试探测的步进尺寸
     #define PROBE_MANUALLY_STEP 0.05      // (mm)
   #endif
 
   // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
+  // 打印台面直径 / 2 减去不可到达的区域（避免与垂直立柱发生碰撞）
   #define PRINTABLE_RADIUS       140.0    // (mm)
 
   // Center-to-center distance of the holes in the diagonal push rods.
+  // 对角线推杆上的孔位中心距
   #define DELTA_DIAGONAL_ROD 250.0        // (mm)
 
-  // Distance between bed and nozzle Z home position
-  #define DELTA_HEIGHT 250.00             // (mm) Get this value from G33 auto calibrate
+  // Distance between bed and nozzle Z home position  // 床面与喷嘴Z轴归位位置之间的距离
+  #define DELTA_HEIGHT 250.00             // (mm) Get this value from G33 auto calibrate  //（毫米）从 G33 自动校准中获取此值
 
-  #define DELTA_ENDSTOP_ADJ { 0.0, 0.0, 0.0 } // (mm) Get these values from G33 auto calibrate
+  #define DELTA_ENDSTOP_ADJ { 0.0, 0.0, 0.0 } // (mm) Get these values from G33 auto calibrate  // (mm) 从 G33 自动校准中获取这些值
 
-  // Horizontal distance bridged by diagonal push rods when effector is centered.
-  #define DELTA_RADIUS 124.0              // (mm) Get this value from G33 auto calibrate
+  // Horizontal distance bridged by diagonal push rods when effector is centered.  
+  // 当挤出机位于中心位置时，对角线推杆桥接的水平距离。
+  #define DELTA_RADIUS 124.0              // (mm) Get this value from G33 auto calibrate  //（毫米）从 G33 自动校准中获取此值
 
   // Trim adjustments for individual towers
   // tower angle corrections for X and Y tower / rotate XYZ so Z tower angle = 0
   // measured in degrees anticlockwise looking from above the printer
-  #define DELTA_TOWER_ANGLE_TRIM { 0.0, 0.0, 0.0 } // (mm) Get these values from G33 auto calibrate
+  // 独立立柱的微调校正
+  // X 立柱和 Y 立柱的角度校正 / 旋转 XYZ 使 Z 立柱角度 = 0
+  // 从打印机顶部向下看，以逆时针方向测量角度（单位：度）
+  #define DELTA_TOWER_ANGLE_TRIM { 0.0, 0.0, 0.0 } // (mm) Get these values from G33 auto calibrate  // (mm) 从 G33 自动校准中获取这些值
 
-  // Delta radius and diagonal rod adjustments
+  // Delta radius and diagonal rod adjustments  // 三角洲半径与对角线推杆长度校正
   //#define DELTA_RADIUS_TRIM_TOWER       { 0.0, 0.0, 0.0 } // (mm)
   //#define DELTA_DIAGONAL_ROD_TRIM_TOWER { 0.0, 0.0, 0.0 } // (mm)
 #endif
@@ -1390,24 +1411,24 @@
 //#define MORGAN_SCARA
 //#define MP_SCARA
 #if ANY(MORGAN_SCARA, MP_SCARA)
-  // If movement is choppy try lowering this value
+  // If movement is choppy try lowering this value  // 如果运动不流畅，请尝试降低此值
   #define DEFAULT_SEGMENTS_PER_SECOND 200
 
-  // Length of inner and outer support arms. Measure arm lengths precisely.
+  // Length of inner and outer support arms. Measure arm lengths precisely.  // 内外支撑臂的长度。请精确测量臂长。
   #define SCARA_LINKAGE_1 150       // (mm)
   #define SCARA_LINKAGE_2 150       // (mm)
 
-  // SCARA tower offset (position of Tower relative to bed zero position)
-  // This needs to be reasonably accurate as it defines the printbed position in the SCARA space.
+  // SCARA tower offset (position of Tower relative to bed zero position) // SCARA 立柱偏移量（立柱相对于平台原点的位置）
+  // This needs to be reasonably accurate as it defines the printbed position in the SCARA space.  // 这需要相当准确，因为它定义了 SCARA 空间中的打印床位置。
   #define SCARA_OFFSET_X  100       // (mm)
   #define SCARA_OFFSET_Y  -56       // (mm)
 
   #if ENABLED(MORGAN_SCARA)
 
     //#define DEBUG_SCARA_KINEMATICS
-    #define FEEDRATE_SCALING        // Convert XY feedrate from mm/s to degrees/s on the fly
+    #define FEEDRATE_SCALING        // Convert XY feedrate from mm/s to degrees/s on the fly  // 将 XY 轴的进给速度从 mm/s 转换为 degrees/s（角度/秒）以实时调整运动速度
 
-    // Radius around the center where the arm cannot reach
+    // Radius around the center where the arm cannot reach  // 机械臂无法到达的中心区域半径
     #define MIDDLE_DEAD_ZONE_R   0  // (mm)
 
   #elif ENABLED(MP_SCARA)
@@ -1421,25 +1442,27 @@
 
 // @section tpara
 
-// Enable for TPARA kinematics and configure below
+// Enable for TPARA kinematics and configure below  // 启用 TPARA 运动学架构，并在下方进行配置
 //#define AXEL_TPARA
 #if ENABLED(AXEL_TPARA)
   #define DEBUG_TPARA_KINEMATICS
   #define DEFAULT_SEGMENTS_PER_SECOND 200
 
-  // Length of inner and outer support arms. Measure arm lengths precisely.
+  // Length of inner and outer support arms. Measure arm lengths precisely.  // 内外支撑臂的长度。请精确测量臂长。
   #define TPARA_LINKAGE_1 120     // (mm)
   #define TPARA_LINKAGE_2 120     // (mm)
 
   // TPARA tower offset (position of Tower relative to bed zero position)
   // This needs to be reasonably accurate as it defines the printbed position in the TPARA space.
+  // TPARA 立柱偏移量（立柱相对于打印平台原点的位置）
+  // 该参数需要设置得相对精准，因为它定义了打印平台在 TPARA 空间中的位置。
   #define TPARA_OFFSET_X    0     // (mm)
   #define TPARA_OFFSET_Y    0     // (mm)
   #define TPARA_OFFSET_Z    0     // (mm)
 
-  #define FEEDRATE_SCALING        // Convert XY feedrate from mm/s to degrees/s on the fly
+  #define FEEDRATE_SCALING        // Convert XY feedrate from mm/s to degrees/s on the fly  // 将 XY 轴的进给速度从 mm/s 转换为 degrees/s（角度/秒）以实时调整运动速度
 
-  // Radius around the center where the arm cannot reach
+  // Radius around the center where the arm cannot reach  // 机械臂无法到达的中心区域半径
   #define MIDDLE_DEAD_ZONE_R   0  // (mm)
 #endif
 
@@ -1479,18 +1502,56 @@
  *
  * Milling:
  * This shouldn't be a problem for cutting/milling operations.
+ * 
+ * 
+ * 极坐标运动学 (POLAR Kinematics)
+ * 由 Kadır İlkimen 为 PolarBear CNC 和 babyBear 开发
+ *  https://github.com/kadirilkimen/Polar-Bear-Cnc-Machine
+ *  https://github.com/kadirilkimen/babyBear-3D-printer
+ *
+ * 极坐标机型可使用不同的配置，本运动学仅兼容以下配置：
+ *        X : 独立直线轴
+ *   Y 或 B : 极坐标旋转轴
+ *        Z : 独立直线轴
+ *
+ * 例如：PolarBear 使用 CoreXZ + 极坐标 Y/B 轴
+ *
+ * 极坐标轴在原点/中心附近的运动问题：
+ *
+ * 3D 打印：
+ * 靠近极坐标中心的旋转运动耗时更长，
+ * 喷嘴内的压力会导致此处**挤出过多材料**。
+ *
+ * 当前运动学与速度缩放通过尽可能提高移动速度来缓解，
+ * 低速打印有效，但高速效果不佳，需要更复杂的挤出补偿。
+ *
+ * 理想方案：
+ * 提前预判中心长旋转会造成的多余挤出，
+ * 并**预先进行挤出补偿**。
+ *
+ * 激光切割：
+ * 中心旋转会导致激光**过度烧蚀材料**，
+ * 同样需要类似补偿。
+ *
+ * 铣削/雕刻：
+ * 此问题不影响铣削加工。
+ *
  */
 //#define POLAR
 #if ENABLED(POLAR)
-  #define DEFAULT_SEGMENTS_PER_SECOND 180   // If movement is choppy try lowering this value
-  #define PRINTABLE_RADIUS 82.0f            // (mm) Maximum travel of X axis
+  #define DEFAULT_SEGMENTS_PER_SECOND 180   // If movement is choppy try lowering this value  // 如果运动不流畅，请尝试降低此值
+  #define PRINTABLE_RADIUS 82.0f            // (mm) Maximum travel of X axis  (毫米) X轴最大行程
 
   // Movements fall inside POLAR_FAST_RADIUS are assigned the highest possible feedrate
   // to compensate unwanted deposition related to the near-origin motion problem.
+  // 在 POLAR_FAST_RADIUS 半径范围内的移动，会以尽可能高的速度运行
+  // 以补偿因靠近原点运动而产生的多余挤出（堆料）问题。
   #define POLAR_FAST_RADIUS 3.0f            // (mm)
 
   // Radius which is unreachable by the tool.
   // Needed if the tool is not perfectly aligned to the center of the polar axis.
+  // 刀具无法到达的半径（禁区半径）
+  // 当喷头/刀具无法与极坐标中心完全对准时，需要设置此值。
   #define POLAR_CENTER_OFFSET 0.0f          // (mm)
 
   #define FEEDRATE_SCALING                  // Convert XY feedrate from mm/s to degrees/s on the fly
