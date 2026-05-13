@@ -1115,6 +1115,7 @@
 //===========================================================================
 //==================== PID > Chamber Temperature Control ====================
 //===========================================================================
+// PID 腔体温控(这个是封闭打印机内部的环境温度)
 
 /**
  * PID Chamber Heating
@@ -1130,6 +1131,19 @@
  * heater. If your configuration is significantly different than this and you don't understand
  * the issues involved, don't use chamber PID until someone else verifies that your hardware works.
  * @section chamber temp
+ * 腔体加热 PID 控制
+ *
+ * 启用此选项后，请在下方设置 PID 参数。
+ * 禁用此选项则使用【开关控制】，
+ * 同时 CHAMBER_LIMIT_SWITCHING 用于启用回差保护。
+ *
+ * PID 频率与挤出机 PWM 频率一致。
+ * 若使用默认的 PID_dT 且适配你的硬件/配置，则频率为 7.689Hz，
+ * 该频率适用于电阻式加热负载，不会明显导致 FET 管发热。
+ * 此参数在 Fotek SSR-10DA 固态继电器驱动 200W 加热器的配置下可稳定工作。
+ * 如果你的硬件配置差异极大且你不了解相关原理，
+ * 请勿使用腔体 PID，直到他人验证你的硬件可行。
+ * @section 腔体温度
  */
 //#define PIDTEMPCHAMBER
 //#define CHAMBER_LIMIT_SWITCHING
@@ -1139,34 +1153,48 @@
  * Applies to all forms of chamber control (PID, bang-bang, and bang-bang with hysteresis).
  * When set to any value below 255, enables a form of PWM to the chamber heater that acts like a divider
  * so don't use it unless you are OK with PWM on your heater. (See the comment on enabling PIDTEMPCHAMBER)
+ * 
+ * 
+ * 腔体最大加热功率
+ * 适用于所有腔体控制方式（PID、开关控制、带回差的开关控制）。
+ * 当设置为低于 255 的任意值时，会为腔体加热器启用一种 PWM 限流模式，
+ * 相当于功率分频器。
+ * 因此，除非你的加热器支持 PWM 控制，否则不要修改此值。
+ * (详见启用 PIDTEMPCHAMBER 时的注释说明)
+ *
  */
-#define MAX_CHAMBER_POWER 255 // limits duty cycle to chamber heater; 255=full current
+#define MAX_CHAMBER_POWER 255 // limits duty cycle to chamber heater; 255=full current  // 限制腔体加热器的工作占空比；255 = 满电流/满功率
 
 #if ENABLED(PIDTEMPCHAMBER)
-  //#define MIN_CHAMBER_POWER 0 // Min power to improve PID stability. (0..MAX_CHAMBER_POWER)
-                                // Get the power from the temperature report ('M105' => C@:nnn) and try P*2-20 to P*2-10.
-  //#define PID_CHAMBER_DEBUG   // Print Chamber PID debug data to the serial port. Use 'M303 D' to enable/disable.
+  //#define MIN_CHAMBER_POWER 0 // Min power to improve PID stability. (0..MAX_CHAMBER_POWER)  // 提升腔体 PID 稳定性的最小输出功率（取值范围：0 到 MAX_CHAMBER_POWER）
+                                // Get the power from the temperature report ('M105' => C@:nnn) and try P*2-20 to P*2-10.  // 从温度反馈指令中获取功率值（'M105' => C@:nnn），尝试将P值设为 当前功率值×2-20 至 当前功率值×2-10 区间。
+  //#define PID_CHAMBER_DEBUG   // Print Chamber PID debug data to the serial port. Use 'M303 D' to enable/disable.  // 将腔体 PID 调试数据打印到串口。使用 'M303 D' 命令启用/禁用。
 
   // Lasko "MyHeat Personal Heater" (200w) modified with a Fotek SSR-10DA to control only the heating element
   // and placed inside the small Creality printer enclosure tent.
+  // 拉斯克“MyHeat”小型加热器（200W），改装了Fotek SSR-10DA固态继电器，仅用于控制加热芯，
+  // 并放置在创想三维（Creality）小型打印机封闭保温罩内使用。
   #define DEFAULT_chamberKp  37.04
   #define DEFAULT_chamberKi   1.40
   #define DEFAULT_chamberKd 655.17
   // M309 P37.04 I1.04 D655.17
 
   // FIND YOUR OWN: "M303 E-2 C8 S50" to run autotune on the chamber at 50 degreesC for 8 cycles.
+  // 自行获取适配参数：执行指令 "M303 E-2 C8 S50"
+  // 即可在 50℃ 温度下对腔体加热器进行 8 次循环的自动调参。
 #endif // PIDTEMPCHAMBER
 
 // @section pid temp
 
 #if ANY(PIDTEMP, PIDTEMPBED, PIDTEMPCHAMBER)
-  //#define PID_OPENLOOP          // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX
-  //#define SLOW_PWM_HEATERS      // PWM with very low frequency (roughly 0.125Hz=8s) and minimum state time of approximately 1s useful for heaters driven by a relay
+  //#define PID_OPENLOOP          // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX  // 将 PID 设置为开环模式。M104/M140 指令将输出功率设置为 0 到 PID_MAX 之间的值
+  //#define SLOW_PWM_HEATERS      // PWM with very low frequency (roughly 0.125Hz=8s) and minimum state time of approximately 1s useful for heaters driven by a relay  // 通过继电器驱动的加热器适用的非常低频率（大约0.125Hz=8秒）和最小状态时间约为1秒的PWM
   #define PID_FUNCTIONAL_RANGE 20 // If the temperature difference between the target temperature and the actual temperature
                                   // is more than PID_FUNCTIONAL_RANGE then the PID will be shut off and the heater will be set to min/max.
+                                  //当目标温度与实际温度之差超过 PID_FUNCTIONAL_RANGE 时，将关闭 PID 控制，并将加热器设置为最大/最小功率。
 
-  //#define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of flash)
-  //#define PID_AUTOTUNE_MENU     // Add PID auto-tuning to the "Advanced Settings" menu. (~250 bytes of flash)
+  //#define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of flash)  // 在“高级设置”菜单中添加 PID 编辑功能（约占用700字节的闪存空间）
+  //#define PID_AUTOTUNE_MENU     // Add PID auto-tuning to the "Advanced Settings" menu. (~250 bytes of flash)  // 在“高级设置”菜单中添加 PID 自动调节功能（约占用250字节的闪存空间）
 #endif
 
 // @section safety
@@ -1177,6 +1205,13 @@
  * cold extrusion prevention on and off.
  *
  * *** IT IS HIGHLY RECOMMENDED TO LEAVE THIS OPTION ENABLED! ***
+ * 
+ * 
+ * 当温度低于 EXTRUDE_MINTEMP 时，禁止挤出耗材。
+ * 可通过指令 M302 设置最低挤出温度，以及开启/关闭低温挤出保护功能。
+ *
+ * *** 强烈建议保持此选项开启！ ***
+ *
  */
 #define PREVENT_COLD_EXTRUSION
 #define EXTRUDE_MINTEMP 170
@@ -1184,6 +1219,11 @@
 /**
  * Prevent a single extrusion longer than EXTRUDE_MAXLENGTH.
  * Note: For Bowden Extruders make this large enough to allow load/unload.
+ * 
+ * 
+ * 限制单次挤出操作的长度不超过 EXTRUDE_MAXLENGTH。
+ * 注意：对于 Bowden 远程挤出机，需将此值设置得足够大，以支持耗材的装入与退出操作。
+ *
  */
 #define PREVENT_LENGTHY_EXTRUDE
 #define EXTRUDE_MAXLENGTH 200
@@ -1191,6 +1231,7 @@
 //===========================================================================
 //======================== Thermal Runaway Protection =======================
 //===========================================================================
+//热失控保护
 
 /**
  * Thermal Protection provides additional protection to your printer from damage
@@ -1203,21 +1244,39 @@
  *
  * If you get "Thermal Runaway" or "Heating failed" errors the
  * details can be tuned in Configuration_adv.h
+ * 
+ * 
+ * 热保护功能为打印机提供额外防护，避免损坏和火灾风险。
+ * Marlin 固件内置了安全的最低/最高温度范围，
+ * 可防止热敏电阻断线、接触不良等故障引发危险。
+ *
+ * 存在的风险：
+ * 如果热敏电阻脱落，它会检测到远低于实际的室温，
+ * 固件会因此持续让加热器加热，导致温度失控、起火。
+ *
+ * 如果你出现“热失控（Thermal Runaway）”或“加热失败（Heating failed）”报错，
+ * 可在 Configuration_adv.h 中调整相关参数。
+ *
  */
 
-#define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
-#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
-#define THERMAL_PROTECTION_CHAMBER // Enable thermal protection for the heated chamber
-#define THERMAL_PROTECTION_COOLER  // Enable thermal protection for the laser cooling
+#define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders  // 为所有挤出机启用热保护功能
+#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed  // 为热床启用热保护功能
+#define THERMAL_PROTECTION_CHAMBER // Enable thermal protection for the heated chamber  // 为加热腔体启用热保护功能
+#define THERMAL_PROTECTION_COOLER  // Enable thermal protection for the laser cooling  // 为激光冷却系统启用热保护功能
 
 //===========================================================================
 //============================= Mechanical Settings =========================
 //===========================================================================
+//机械参数设置
 
 // @section kinematics
 
 // Enable one of the options below for CoreXY, CoreXZ, or CoreYZ kinematics,
 // either in the usual order or reversed
+// @section 运动学架构
+
+// 启用以下选项之一，以支持 CoreXY、CoreXZ 或 CoreYZ 运动学架构
+// 支持标准布局或反向布局
 //#define COREXY
 //#define COREXZ
 //#define COREYZ
@@ -1232,27 +1291,34 @@
 //#define MARKFORGED_XY
 //#define MARKFORGED_YX
 #if ANY(MARKFORGED_XY, MARKFORGED_YX)
-  //#define MARKFORGED_INVERSE  // Enable for an inverted Markforged kinematics belt path
+  //#define MARKFORGED_INVERSE  // Enable for an inverted Markforged kinematics belt path  // 启用反向 Markforged 运动学皮带路径
 #endif
 
-// Enable for a belt style printer with endless "Z" motion
+// Enable for a belt style printer with endless "Z" motion // 启用此选项：适用于采用皮带传动、可实现无限Z轴运动的打印机
 //#define BELTPRINTER
 
-// Articulated robot (arm). Joints are directly mapped to axes with no kinematics.
+// Articulated robot (arm). Joints are directly mapped to axes with no kinematics.  适用于机械臂式打印机，关节直接映射到轴，无运动学计算。
 //#define ARTICULATED_ROBOT_ARM
 
 // For a hot wire cutter with parallel horizontal axes (X, I) where the heights of the two wire
 // ends are controlled by parallel axes (Y, J). Joints are directly mapped to axes (no kinematics).
+// 适用于热线切割机，配备平行的水平轴 (X, I)，
+// 切割线两端的高度由平行轴 (Y, J) 控制。
+// 关节直接映射到坐标轴（无运动学算法转换）。
 //#define FOAMCUTTER_XYUV
 
 // @section polargraph
 
-// Enable for Polargraph Kinematics
+// Enable for Polargraph Kinematics  适用于 Polargraph 运动学
 //#define POLARGRAPH
+  // 下面这个选项是给绘图机、写字机用的
+  // Pen Up = 抬笔（离开纸面）
+  // Pen Down = 落笔（开始书写 / 绘画）
+  // 普通 3D 打印机用不到
 #if ENABLED(POLARGRAPH)
-  #define POLARGRAPH_MAX_BELT_LEN  1035.0 // (mm) Belt length at full extension. Override with M665 H.
-  #define DEFAULT_SEGMENTS_PER_SECOND 5   // Move segmentation based on duration
-  #define PEN_UP_DOWN_MENU                // Add "Pen Up" and "Pen Down" to the MarlinUI menu
+  #define POLARGRAPH_MAX_BELT_LEN  1035.0 // (mm) Belt length at full extension. Override with M665 H.  // 全伸展时的皮带长度（毫米）。可通过 M665 H 指令覆盖此值。
+  #define DEFAULT_SEGMENTS_PER_SECOND 5   // Move segmentation based on duration  // 基于持续时间的运动分段（毫米/秒）。
+  #define PEN_UP_DOWN_MENU                // Add "Pen Up" and "Pen Down" to the MarlinUI menu  // 在 MarlinUI 菜单中添加“Pen Up”和“Pen Down”选项
 #endif
 
 // @section delta
