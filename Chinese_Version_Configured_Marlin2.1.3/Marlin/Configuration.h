@@ -1560,13 +1560,16 @@
 //===========================================================================
 //============================== Endstop Settings ===========================
 //===========================================================================
+//限位开关配置
 
 // @section endstops
 
 // Enable pullup for all endstops to prevent a floating state
+// 为所有限位开关启用内部上拉电阻，防止信号处于浮动不确定状态
 #define ENDSTOPPULLUPS
 #if DISABLED(ENDSTOPPULLUPS)
   // Disable ENDSTOPPULLUPS to set pullups individually
+  // 禁用全局限位开关上拉电阻，以便单独配置每个限位的上拉功能
   //#define ENDSTOPPULLUP_XMIN
   //#define ENDSTOPPULLUP_YMIN
   //#define ENDSTOPPULLUP_ZMIN
@@ -1589,9 +1592,11 @@
 #endif
 
 // Enable pulldown for all endstops to prevent a floating state
+// 为所有限位开关启用内部下拉电阻，防止信号处于浮动不确定状态
 //#define ENDSTOPPULLDOWNS
 #if DISABLED(ENDSTOPPULLDOWNS)
   // Disable ENDSTOPPULLDOWNS to set pulldowns individually
+  // 禁用全局限位开关下拉电阻，以便单独配置每个限位的下拉功能
   //#define ENDSTOPPULLDOWN_XMIN
   //#define ENDSTOPPULLDOWN_YMIN
   //#define ENDSTOPPULLDOWN_ZMIN
@@ -1616,6 +1621,10 @@
 /**
  * Endstop "Hit" State
  * Set to the state (HIGH or LOW) that applies to each endstop.
+ * 
+ * 限位开关触发状态
+ * 设置每个限位开关被触发时的信号状态（HIGH 高电平 或 LOW 低电平）。
+ *
  */
 #define X_MIN_ENDSTOP_HIT_STATE HIGH
 #define X_MAX_ENDSTOP_HIT_STATE HIGH
@@ -1639,6 +1648,8 @@
 
 // Enable this feature if all enabled endstop pins are interrupt-capable.
 // This will remove the need to poll the interrupt pins, saving many CPU cycles.
+// 如果所有已启用的限位开关引脚都支持中断功能，则启用此选项。
+// 这将消除轮询检测中断引脚的需要，节省大量 CPU 运算周期。
 //#define ENDSTOP_INTERRUPTS_FEATURE
 
 /**
@@ -1652,10 +1663,24 @@
  *   based on the Makerbot design, which already have the 100nF capacitor.
  *
  * :[2,3,4,5,6,7]
+ * 
+ * 
+ * 限位开关噪声过滤阈值
+ *
+ * 如果你的探头或限位开关因信号干扰而误触发，请启用此功能。
+ *
+ * - 数值过高可能会影响某些调平探头的重复精度与准确度。
+ * - 根治干扰问题：在开关两端并联一个 100nF 陶瓷电容。
+ * - 基于 Makerbot 设计、带 PCB 板的普通机械限位开关无需此功能，
+ *   因为它们已经自带 100nF 电容。
+ *
+ * 可选数值：[2,3,4,5,6,7]
+ *
  */
 //#define ENDSTOP_NOISE_THRESHOLD 2
 
 // Check for stuck or disconnected endstops during homing moves.
+// 在归位移动过程中，检测限位开关是否卡住或断线。
 //#define DETECT_BROKEN_ENDSTOP
 
 //=============================================================================
