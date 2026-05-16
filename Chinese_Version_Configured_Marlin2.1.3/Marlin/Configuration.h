@@ -2231,11 +2231,18 @@
 /**
  * Allen key retractable z-probe as seen on many Kossel delta printers - https://reprap.org/wiki/Kossel#Autolevel_probe
  * Deploys by touching z-axis belt. Retracts by pushing the probe down.
+ * 
+ * 内六角可伸缩Z轴探头，多见于多款Kossel三角洲打印机
+ * 依靠触碰Z轴皮带完成伸出，下压探头即可收回
+ *
  */
 //#define Z_PROBE_ALLEN_KEY
 #if ENABLED(Z_PROBE_ALLEN_KEY)
   // 2 or 3 sets of coordinates for deploying and retracting the spring loaded touch probe on G29,
   // if servo actuated touch probe is not defined. Uncomment as appropriate for your printer/probe.
+  // 如果未定义舵机驱动式触控探头，
+  // 则在此配置 2 组或 3 组坐标，用于 G29 时伸出/收回弹簧式触控探头。
+  // 根据你的打印机/探头型号取消注释并使用。
 
   #define Z_PROBE_ALLEN_KEY_DEPLOY_1 { 30.0, PRINTABLE_RADIUS, 100.0 }
   #define Z_PROBE_ALLEN_KEY_DEPLOY_1_FEEDRATE XY_PROBE_FEEDRATE
@@ -2246,13 +2253,13 @@
   #define Z_PROBE_ALLEN_KEY_DEPLOY_3 { 0.0, (PRINTABLE_RADIUS) * 0.75, 100.0 }
   #define Z_PROBE_ALLEN_KEY_DEPLOY_3_FEEDRATE XY_PROBE_FEEDRATE
 
-  #define Z_PROBE_ALLEN_KEY_STOW_1 { -64.0, 56.0, 23.0 } // Move the probe into position
+  #define Z_PROBE_ALLEN_KEY_STOW_1 { -64.0, 56.0, 23.0 } // Move the probe into position  // 移动探头至探测就位位置
   #define Z_PROBE_ALLEN_KEY_STOW_1_FEEDRATE XY_PROBE_FEEDRATE
 
-  #define Z_PROBE_ALLEN_KEY_STOW_2 { -64.0, 56.0, 3.0 } // Push it down
+  #define Z_PROBE_ALLEN_KEY_STOW_2 { -64.0, 56.0, 3.0 } // Push it down  // 下压探头
   #define Z_PROBE_ALLEN_KEY_STOW_2_FEEDRATE (XY_PROBE_FEEDRATE)/10
 
-  #define Z_PROBE_ALLEN_KEY_STOW_3 { -64.0, 56.0, 50.0 } // Move it up to clear
+  #define Z_PROBE_ALLEN_KEY_STOW_3 { -64.0, 56.0, 50.0 } // Move it up to clear  // 将探头上移以避开障碍物
   #define Z_PROBE_ALLEN_KEY_STOW_3_FEEDRATE XY_PROBE_FEEDRATE
 
   #define Z_PROBE_ALLEN_KEY_STOW_4 { 0.0, 0.0, 50.0 }
@@ -2283,12 +2290,38 @@
  *  - Probe to LEFT  of the Nozzle has a Negative X offset
  *  - Probe in BACK  of the Nozzle has a Positive Y offset
  *  - Probe in FRONT of the Nozzle has a Negative Y offset
+ * 
+ * 喷嘴到探头的偏移量 { X, Y, Z }
  *
+ * X 和 Y 偏移量
+ *   用卡尺或直尺测量喷嘴尖端到探头中心点
+ *   在 X 轴和 Y 轴上的距离。
+ *
+ * Z 偏移量
+ * - 使用你最准确的已知值作为初始值，后续可运行时微调。
+ * - 常见探头触发点低于喷嘴，Z 偏移值为**负数**。
+ * - 触发点高于喷嘴的探头很少见，但确实存在。
+ *   使用此类探头时，请仔细设置 Z_CLEARANCE_DEPLOY_PROBE
+ *   和 Z_CLEARANCE_BETWEEN_PROBES，避免探测时发生碰撞。
+ *
+ * 校准与调整
+ * - 探头偏移量可通过指令 M851、LCD 菜单、微步调整等方式实时修改。
+ * - 可使用 PROBE_OFFSET_WIZARD（配置文件）向导设置 Z 偏移量。
+ *
+ * 标准坐标系方向规则：
+ *  - 探头在喷嘴**右侧** → X 偏移为**正数**
+ *  - 探头在喷嘴**左侧** → X 偏移为**负数**
+ *  - 探头在喷嘴**后方** → Y 偏移为**正数**
+ *  - 探头在喷嘴**前方** → Y 偏移为**负数**
+ *
+ * 示例：
  * Some examples:
  *   #define NOZZLE_TO_PROBE_OFFSET { 10, 10, -1 }   // Example "1"
  *   #define NOZZLE_TO_PROBE_OFFSET {-10,  5, -1 }   // Example "2"
  *   #define NOZZLE_TO_PROBE_OFFSET {  5, -5, -1 }   // Example "3"
  *   #define NOZZLE_TO_PROBE_OFFSET {-15,-10, -1 }   // Example "4"
+ * 
+ * 
  *
  *     +-- BACK ---+
  *     |    [+]    |
@@ -2299,10 +2332,21 @@
  *     | 4         | T <-- Example "4" ( left-, front-)
  *     |    [-]    |
  *     O-- FRONT --+
+ * 
+ * 
+ * 
+ * 注（译者注）：
+ * 这个设置是 BLTouch / 自动调平探头的参数，决定打印会不会刮床、悬空。
+ * X 偏移：探头在喷嘴左边还是右边，差几毫米
+ * Y 偏移：探头在喷嘴前边还是后边，差几毫米
+ * Z 偏移：探头比喷嘴高还是低，差多少
  */
 #define NOZZLE_TO_PROBE_OFFSET { 10, 10, 0 }
 
 // Enable and set to use a specific tool for probing. Disable to allow any tool.
+// 启用并设置【指定工具号】进行探测调平。
+// 禁用此项 = 允许任意工具执行探测。
+// 注（译者注）：这是给多喷头打印机用的设置（双喷头 / 三喷头）。如果你是单喷头打印机，保持关闭。
 #define PROBING_TOOL 0
 #ifdef PROBING_TOOL
   //#define PROBE_TOOLCHANGE_NO_MOVE  // Suppress motion on probe tool-change
@@ -2310,26 +2354,44 @@
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
+// 大多数探头应远离热床边缘，
+// 但如果使用喷嘴作为探头（NOZZLE_AS_PROBE），
+// 可以设置为负值以获得更宽的探测区域。
 #define PROBING_MARGIN 10
 
 // X and Y axis travel speed between probes.
 // Leave undefined to use the average of the current XY homing feedrate.
+// 探测点之间 X 轴和 Y 轴的移动速度
+// 不定义则使用当前 XY 归位速度的平均值
 #define XY_PROBE_FEEDRATE    (133*60) // (mm/min)
 
 // Feedrate for the first approach when double-probing (MULTIPLE_PROBING == 2)
+// 双次探测模式下（MULTIPLE_PROBING == 2），第一次靠近热床的进给速度
+// 注（译者注）：这是双次探测模式下第一次探测的速度，第二次探测会更慢，以提高精度。
 #define Z_PROBE_FEEDRATE_FAST  (4*60) // (mm/min)
 
 // Feedrate for the "accurate" probe of each point
+// 每个探测点精准探测时的进给速度
 #define Z_PROBE_FEEDRATE_SLOW (Z_PROBE_FEEDRATE_FAST / 2) // (mm/min)
 
 /**
  * Probe Activation Switch
  * A switch indicating proper deployment, or an optical
  * switch triggered when the carriage is near the bed.
+ * 
+ * 探头激活开关
+ * 一个用于检测探头是否正确展开的开关，
+ * 或者是当喷头靠近热床时触发的光学开关。
+ * 注（译者注）：
+ * 这是给特殊机械探头（比如可收起的探针）加装一个小传感器 / 开关，用来确认：
+ * 探头真的伸出来了，或者喷头确实靠近热床了
+ * 只有开关检测到探头就绪，才会开始探测。
+ * 只有带物理开关的特殊机械探头才需要。
+ *
  */
 //#define PROBE_ACTIVATION_SWITCH
 #if ENABLED(PROBE_ACTIVATION_SWITCH)
-  #define PROBE_ACTIVATION_SWITCH_STATE LOW // State indicating probe is active
+  #define PROBE_ACTIVATION_SWITCH_STATE LOW // State indicating probe is active  // 探头处于激活状态时的信号状态
   //#define PROBE_ACTIVATION_SWITCH_PIN PC6 // Override default pin
 #endif
 
@@ -2337,26 +2399,35 @@
  * Tare Probe (determine zero-point) prior to each probe.
  * Useful for a strain gauge or piezo sensor that needs to factor out
  * elements such as cables pulling on the carriage.
+ * 
+ * 在每次探测前，对探头进行置零（确定零点）。
+ * 对于应变片或压电传感器非常有用，因为它们需要排除诸如线缆拉扯喷头等干扰因素。
+ *
+ * 
  */
 //#define PROBE_TARE
 #if ENABLED(PROBE_TARE)
-  #define PROBE_TARE_TIME  200    // (ms) Time to hold tare pin
-  #define PROBE_TARE_DELAY 200    // (ms) Delay after tare before
-  #define PROBE_TARE_STATE HIGH   // State to write pin for tare
-  //#define PROBE_TARE_PIN PA5    // Override default pin
-  //#define PROBE_TARE_MENU       // Display a menu item to tare the probe
+  #define PROBE_TARE_TIME  200    // (ms) Time to hold tare pin  // 保持置零引脚状态的时间（毫秒）
+  #define PROBE_TARE_DELAY 200    // (ms) Delay after tare before  // 置零后到开始探测的延迟（毫秒）
+  #define PROBE_TARE_STATE HIGH   // State to write pin for tare  // 置零时引脚的信号状态
+  //#define PROBE_TARE_PIN PA5    // Override default pin  // 覆盖默认引脚
+  //#define PROBE_TARE_MENU       // Display a menu item to tare the probe  // 显示一个菜单项来执行探头置零
   #if ENABLED(PROBE_ACTIVATION_SWITCH)
-    //#define PROBE_TARE_ONLY_WHILE_INACTIVE  // Fail to tare/probe if PROBE_ACTIVATION_SWITCH is active
+    //#define PROBE_TARE_ONLY_WHILE_INACTIVE  // Fail to tare/probe if PROBE_ACTIVATION_SWITCH is active  // 仅在探头未激活时执行置零/探测，如果 PROBE_ACTIVATION_SWITCH 处于激活状态则失败
   #endif
 #endif
 
 /**
  * Probe Enable / Disable
  * The probe only provides a triggered signal when enabled.
+ * 
+ * 探头启用 / 禁用
+ * 仅在启用状态下，探头才会输出触发信号。
+ *
  */
 //#define PROBE_ENABLE_DISABLE
 #if ENABLED(PROBE_ENABLE_DISABLE)
-  //#define PROBE_ENABLE_PIN -1   // Override the default pin here
+  //#define PROBE_ENABLE_PIN -1   // Override the default pin here  // 在此处覆盖默认引脚
 #endif
 
 /**
@@ -2367,6 +2438,16 @@
  *
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
+ * 
+ * 
+ * 多次探测（增强精度）
+ *
+ * 通过探测 2 次或更多次，可以获得更精准的结果。
+ * 配合 EXTRA_PROBING 使用时，会自动忽略偏差较大的异常值。
+ *
+ * 总共探测 2 次：采用【快速粗探 + 慢速精探】，并加权平均。
+ * 总共探测 3 次及以上：增加更多慢速精探，然后取平均值。
+ *
  */
 //#define MULTIPLE_PROBING 2
 //#define EXTRA_PROBING    1
@@ -2384,16 +2465,37 @@
  *
  * Example: 'M851 Z-5' with a CLEARANCE of 4  =>  9mm from bed to nozzle.
  *     But: 'M851 Z+1' with a CLEARANCE of 2  =>  2mm from bed to nozzle.
+ * 
+ * 
+ * Z轴探头在展开、收回、以及探测点之间移动时，
+ * 需要预留安全间隙，避免撞击热床或其他部件。
+ * 舵机安装式探头需要额外空间让机械臂旋转。
+ * 电感式探头需要空间避免提前触发。
+ *
+ * 使用这些设置来指定抬高探头（或降低热床）的距离（毫米）。
+ * 这里设置的值，是在通过 NOZZLE_TO_PROBE_OFFSET、M851 或 LCD 设置的
+ * （负）探头Z偏移量基础上**额外增加**的高度。
+ * 此处仅支持 >= 1 的整数值。
+ *
+ * 示例：
+ * 'M851 Z-5' 配合间隙 4  => 喷嘴距热床总高度 9mm
+ * 但是：
+ * 'M851 Z+1' 配合间隙 2  => 喷嘴距热床总高度 2mm
+ * 
+ * 注（译者注）：
+ * 这一段设置的是探头移动时的安全高度，防止探头在换点移动时撞坏热床
+ * 探测完一个点后Z轴抬升到安全高度，再飞到下一个点，这个设置就是控制抬多高
+ *
  */
-#define Z_CLEARANCE_DEPLOY_PROBE   10 // (mm) Z Clearance for Deploy/Stow
-#define Z_CLEARANCE_BETWEEN_PROBES  5 // (mm) Z Clearance between probe points
-#define Z_CLEARANCE_MULTI_PROBE     5 // (mm) Z Clearance between multiple probes
-#define Z_PROBE_ERROR_TOLERANCE     3 // (mm) Tolerance for early trigger (<= -probe.offset.z + ZPET)
-//#define Z_AFTER_PROBING           5 // (mm) Z position after probing is done
+#define Z_CLEARANCE_DEPLOY_PROBE   10 // (mm) Z Clearance for Deploy/Stow  //探头展开 / 收回时的 Z 轴安全间隙（毫米）
+#define Z_CLEARANCE_BETWEEN_PROBES  5 // (mm) Z Clearance between probe points  // 探测点之间的 Z 轴安全间隙（毫米）
+#define Z_CLEARANCE_MULTI_PROBE     5 // (mm) Z Clearance between multiple probes  // (mm) Z Clearance between multiple probes  // 多次探测之间的 Z 轴安全间隙（毫米）
+#define Z_PROBE_ERROR_TOLERANCE     3 // (mm) Tolerance for early trigger (<= -probe.offset.z + ZPET)  // 过早触发的容差范围（毫米）。探头触发时，如果 Z 轴位置低于 -probe.offset.z + Z_PROBE_ERROR_TOLERANCE，则认为是过早触发。
+//#define Z_AFTER_PROBING           5 // (mm) Z position after probing is done  // 探测完成后的 Z 轴位置（毫米）
 
-#define Z_PROBE_LOW_POINT          -2 // (mm) Farthest distance below the trigger-point to go before stopping
+#define Z_PROBE_LOW_POINT          -2 // (mm) Farthest distance below the trigger-point to go before stopping  // 探测时，探头触发点以下的最远距离（毫米）。如果探头在触发点以下继续下降超过这个距离，则停止探测并报告错误。
 
-// For M851 provide ranges for adjusting the X, Y, and Z probe offsets
+// For M851 provide ranges for adjusting the X, Y, and Z probe offsets  //// 用于 M851 指令：设置探头 X、Y、Z 偏移量的可调范围
 //#define PROBE_OFFSET_XMIN -50   // (mm)
 //#define PROBE_OFFSET_XMAX  50   // (mm)
 //#define PROBE_OFFSET_YMIN -50   // (mm)
@@ -2401,13 +2503,13 @@
 //#define PROBE_OFFSET_ZMIN -20   // (mm)
 //#define PROBE_OFFSET_ZMAX  20   // (mm)
 
-// Enable the M48 repeatability test to test probe accuracy
+// Enable the M48 repeatability test to test probe accuracy  // 启用 M48 重复性测试以测试探头的准确性
 //#define Z_MIN_PROBE_REPEATABILITY_TEST
 
-// Before deploy/stow pause for user confirmation
+// Before deploy/stow pause for user confirmation  // 在伸出/收回探头之前暂停，等待用户确认
 //#define PAUSE_BEFORE_DEPLOY_STOW
 #if ENABLED(PAUSE_BEFORE_DEPLOY_STOW)
-  //#define PAUSE_PROBE_DEPLOY_WHEN_TRIGGERED // For Manual Deploy Allenkey Probe
+  //#define PAUSE_PROBE_DEPLOY_WHEN_TRIGGERED // For Manual Deploy Allenkey Probe //用于：手动展开式内六角探头（老式三角洲机械探头）
 #endif
 
 /**
@@ -2416,32 +2518,46 @@
  * noise. A delay can also be added to allow noise and vibration to settle.
  * These options are most useful for the BLTouch probe, but may also improve
  * readings with inductive probes and piezo sensors.
+ * 
+ * 
+ * 如果探测（调平）看起来不可靠，启用以下一个或多个选项。
+ * 可以在探测期间关闭加热器和/或风扇，以最小化电气干扰。
+ * 还可以添加延迟，让干扰和振动稳定下来。
+ * 这些选项对 BLTouch 探头最有用，但也可能改善
+ * 电感式探头和压电传感器的读数。
+ * 
+ * 注（译者注）：
+ * 这是专门解决 BLTouch 误触、调平失败、乱跳的抗干扰设置
+ * 打印机的加热棒、风扇工作时会产生电磁干扰，干扰可能会让 BLTouch 乱触发、假触发
+ *
  */
-//#define PROBING_HEATERS_OFF       // Turn heaters off when probing
+//#define PROBING_HEATERS_OFF       // Turn heaters off when probing //探测调平时，关闭加热器
 #if ENABLED(PROBING_HEATERS_OFF)
-  //#define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
-  //#define WAIT_FOR_HOTEND         // Wait for hotend to heat back up between probes (to improve accuracy & prevent cold extrude)
+  //#define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy) //在探测间隙等待热床重新升温（以提高精度）
+  //#define WAIT_FOR_HOTEND         // Wait for hotend to heat back up between probes (to improve accuracy & prevent cold extrude)  //在探测间隙等待热端重新升温（以提高精度并防止冷挤出）
 #endif
-//#define PROBING_FANS_OFF          // Turn fans off when probing
-//#define PROBING_ESTEPPERS_OFF     // Turn all extruder steppers off when probing
-//#define PROBING_STEPPERS_OFF      // Turn all steppers off (unless needed to hold position) when probing (including extruders)
-//#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
+//#define PROBING_FANS_OFF          // Turn fans off when probing  //探测调平时，关闭风扇
+//#define PROBING_ESTEPPERS_OFF     // Turn all extruder steppers off when probing  //探测调平时，关闭所有挤出机电机
+//#define PROBING_STEPPERS_OFF      // Turn all steppers off (unless needed to hold position) when probing (including extruders)  //探测调平时，关闭所有电机（除非需要保持位置）（包括挤出机电机）
+//#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors  //探测前的延迟（毫秒），以防止振动触发压电传感器
 
-// Require minimum nozzle and/or bed temperature for probing
+// Require minimum nozzle and/or bed temperature for probing  // 要求探测时喷嘴和/或热床的最低温度
 //#define PREHEAT_BEFORE_PROBING
 #if ENABLED(PREHEAT_BEFORE_PROBING)
-  #define PROBING_NOZZLE_TEMP 120   // (°C) Only applies to E0 at this time
+  #define PROBING_NOZZLE_TEMP 120   // (°C) Only applies to E0 at this time  // 探测时喷嘴的最低温度（摄氏度）。目前仅适用于 E0。
   #define PROBING_BED_TEMP     50
 #endif
 
 // @section stepper drivers
 
 // For Inverting Stepper Enable Pins (Active Low) use 0, Non Inverting (Active High) use 1
+// 对于【低电平有效】的步进电机使能引脚，使用 0
+// 对于【高电平有效】的步进电机使能引脚，使用 1
 // :['LOW', 'HIGH']
 #define X_ENABLE_ON LOW
 #define Y_ENABLE_ON LOW
 #define Z_ENABLE_ON LOW
-#define E_ENABLE_ON LOW // For all extruders
+#define E_ENABLE_ON LOW // For all extruders //应用于所有挤出机（喷头电机）
 //#define I_ENABLE_ON LOW
 //#define J_ENABLE_ON LOW
 //#define K_ENABLE_ON LOW
@@ -2451,6 +2567,8 @@
 
 // Disable axis steppers immediately when they're not being stepped.
 // WARNING: When motors turn off there is a chance of losing position accuracy!
+// 当轴电机不工作时，立即关闭其电源。
+// 警告：电机断电后，有可能会丢失位置精度！
 //#define DISABLE_X
 //#define DISABLE_Y
 //#define DISABLE_Z
@@ -2461,13 +2579,13 @@
 //#define DISABLE_V
 //#define DISABLE_W
 
-// Turn off the display blinking that warns about possible accuracy reduction
+// Turn off the display blinking that warns about possible accuracy reduction  // 关闭显示屏上关于可能降低精度的警告闪烁
 //#define DISABLE_REDUCED_ACCURACY_WARNING
 
 // @section extruder
 
-//#define DISABLE_E               // Disable the extruder when not stepping
-#define DISABLE_OTHER_EXTRUDERS   // Keep only the active extruder enabled
+//#define DISABLE_E               // Disable the extruder when not stepping  //挤出机电机不转动时，关闭电机电源
+#define DISABLE_OTHER_EXTRUDERS   // Keep only the active extruder enabled  //仅保持当前活动挤出机启用，其他挤出机关闭
 
 // @section motion
 
