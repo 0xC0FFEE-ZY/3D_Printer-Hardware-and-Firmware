@@ -2590,6 +2590,8 @@
 // @section motion
 
 // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
+// 反转步进电机方向。
+// 如果某个轴移动方向反了，修改这里（或者反插电机线）即可。
 #define INVERT_X_DIR false
 #define INVERT_Y_DIR true
 #define INVERT_Z_DIR false
@@ -2603,6 +2605,7 @@
 // @section extruder
 
 // For direct drive extruder v9 set to true, for geared extruder set to false.
+// 直驱挤出机 v9 版本设置为 true，齿轮减速挤出机设置为 false。
 #define INVERT_E0_DIR false
 #define INVERT_E1_DIR false
 #define INVERT_E2_DIR false
@@ -2614,25 +2617,38 @@
 
 // @section homing
 
-//#define NO_MOTION_BEFORE_HOMING // Inhibit movement until all axes have been homed. Also enable HOME_AFTER_DEACTIVATE for extra safety.
-//#define HOME_AFTER_DEACTIVATE   // Require rehoming after steppers are deactivated. Also enable NO_MOTION_BEFORE_HOMING for extra safety.
+//#define NO_MOTION_BEFORE_HOMING // Inhibit movement until all axes have been homed. Also enable HOME_AFTER_DEACTIVATE for extra safety.  在所有轴完成归位（回零）之前，禁止任何移动。同时建议启用 HOME_AFTER_DEACTIVATE 以获得额外的安全性。
+//#define HOME_AFTER_DEACTIVATE   // Require rehoming after steppers are deactivated. Also enable NO_MOTION_BEFORE_HOMING for extra safety.  在步进电机断电后需要重新归位（回零）。同时建议启用 NO_MOTION_BEFORE_HOMING 以获得额外的安全性。
 
 /**
  * Set Z_IDLE_HEIGHT if the Z-Axis moves on its own when steppers are disabled.
  *  - Use a low value (i.e., Z_MIN_POS) if the nozzle falls down to the bed.
  *  - Use a large value (i.e., Z_MAX_POS) if the bed falls down, away from the nozzle.
+ * 
+ * 如果步进电机禁用时 Z 轴会自己移动，请设置 Z_IDLE_HEIGHT。
+ *  - 如果喷嘴会自己掉落到热床上，使用较小的值（例如 Z_MIN_POS）。
+ *  - 如果热床会自己向下远离喷嘴，使用较大的值（例如 Z_MAX_POS）。
+ * 注（译者注）：
+ * 如果你的打印机电机断电后热床自己往下掉，或者喷头自己往下压，请进行这些设置。
+ *
  */
 //#define Z_IDLE_HEIGHT Z_HOME_POS
 
 //#define Z_CLEARANCE_FOR_HOMING  4   // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
                                       // You'll need this much clearance above Z_MAX_POS to avoid grinding.
+                                      // (mm) 归位 (G28) 前的最小 Z 高度
+                                     // 确保喷嘴高于热床、夹子、支架等障碍物
+                                     // 必须高于 Z_MAX_POS 这个距离，避免齿轮摩擦、撞机
 
-//#define Z_AFTER_HOMING         10   // (mm) Height to move to after homing (if Z was homed)
-//#define XY_AFTER_HOMING { 10, 10 }  // (mm) Move to an XY position after homing (and raising Z)
+//#define Z_AFTER_HOMING         10   // (mm) Height to move to after homing (if Z was homed)  // 归位后（如果 Z 轴完成归位）移动到的高度（毫米）
+//#define XY_AFTER_HOMING { 10, 10 }  // (mm) Move to an XY position after homing (and raising Z)  // 归位后（并抬高 Z 轴）移动到的 XY 坐标（毫米）
 
-//#define EVENT_GCODE_AFTER_HOMING "M300 P440 S200"  // Commands to run after G28 (and move to XY_AFTER_HOMING)
+//#define EVENT_GCODE_AFTER_HOMING "M300 P440 S200"  // Commands to run after G28 (and move to XY_AFTER_HOMING)  // G28 后（并移动到 XY_AFTER_HOMING）执行的指令
 
 // Direction of endstops when homing; 1=MAX, -1=MIN
+// 轴回零的方向（限位开关位置）
+// 1 = 往 MAX 方向回零（最大位置/顶部）
+// -1 = 往 MIN 方向回零（最小位置/原点）
 // :[-1,1]
 #define X_HOME_DIR -1
 #define Y_HOME_DIR -1
@@ -2648,6 +2664,12 @@
  * Safety Stops
  * If an axis has endstops on both ends the one specified above is used for
  * homing, while the other can be used for things like SD_ABORT_ON_ENDSTOP_HIT.
+ * 
+ * 安全限位
+ * 如果一个轴的两端都有限位开关：
+ * 上面指定的那个（homing方向）用于回零，
+ * 另一个可以用于安全功能，例如触发 SD 卡打印中断等。
+ *
  */
 //#define X_SAFETY_STOP
 //#define Y_SAFETY_STOP
@@ -2661,11 +2683,16 @@
 
 // @section geometry
 
-// The size of the printable area
+// The size of the printable area  // 可打印区域的尺寸
 #define X_BED_SIZE 200
 #define Y_BED_SIZE 200
 
 // Travel limits (linear=mm, rotational=°) after homing, corresponding to endstop positions.
+// 回零后的运动限制（直线单位：mm，旋转单位：°），对应限位开关的位置。
+// 注（译者注）：
+// 它的意思是：
+// 下面的 X、Y、Z 坐标限制，是打印机回零后能移动到的 最远/最高/最低位置
+// 决定了喷头不能超出的安全范围，防止撞机、掉轴
 #define X_MIN_POS 0
 #define Y_MIN_POS 0
 #define Z_MIN_POS 0
@@ -2692,9 +2719,18 @@
  * - Individual axes can be disabled, if desired.
  * - X and Y only apply to Cartesian robots.
  * - Use 'M211' to set software endstops on/off or report current state
+ * 
+ * 软件限位开关
+ *
+ * - 防止移动超出设定的机器边界。
+ * - 可根据需要单独禁用某个轴。
+ * - X 和 Y 仅适用于笛卡尔结构打印机。
+ * - 使用指令 'M211' 来开启/关闭软件限位或查看当前状态。
+ *
  */
 
 // Min software endstops constrain movement within minimum coordinate bounds
+// 最小坐标软件限位：限制轴不能移动到最小坐标范围之外
 #define MIN_SOFTWARE_ENDSTOPS
 #if ENABLED(MIN_SOFTWARE_ENDSTOPS)
   #define MIN_SOFTWARE_ENDSTOP_X
@@ -2709,6 +2745,7 @@
 #endif
 
 // Max software endstops constrain movement within maximum coordinate bounds
+// 最大坐标软件限位：限制轴不能移动超出最大坐标范围
 #define MAX_SOFTWARE_ENDSTOPS
 #if ENABLED(MAX_SOFTWARE_ENDSTOPS)
   #define MAX_SOFTWARE_ENDSTOP_X
@@ -2723,7 +2760,9 @@
 #endif
 
 #if ANY(MIN_SOFTWARE_ENDSTOPS, MAX_SOFTWARE_ENDSTOPS)
-  //#define SOFT_ENDSTOPS_MENU_ITEM  // Enable/Disable software endstops from the LCD
+  //#define SOFT_ENDSTOPS_MENU_ITEM  // Enable/Disable software endstops from the LCD  
+  // 从 LCD 菜单启用/禁用软件限位
+  // 注（译者注）：开启后，能直接在打印机屏幕菜单里开关软件防撞限位，不用改固件重刷。
 #endif
 
 /**
@@ -2740,6 +2779,22 @@
  *
  * RAMPS-based boards use SERVO3_PIN for the first runout sensor.
  * For other boards you may need to define FIL_RUNOUT_PIN, FIL_RUNOUT2_PIN, etc.
+ * 
+ * 
+ * @section 耗材检测传感器
+ *
+ * 耗材检测传感器
+ * 机械或光电限位开关，用于检测耗材是否存在。
+ *
+ * 重要提示：仅当 Marlin 固件【识别到正在打印】时，断料检测才会触发。
+ * 固件判定正在打印的条件：
+ *  1. 通过 M24 指令开始从存储设备打印。
+ *  2. 通过 M75 指令启动了打印计时器。
+ *  3. 加热器已开启，且启用了 PRINTJOB_TIMER_AUTOSTART。
+ *
+ * RAMPS 系列主板使用 SERVO3_PIN 连接第一个断料传感器。
+ * 其他主板可能需要手动定义 FIL_RUNOUT_PIN、FIL_RUNOUT2_PIN 等引脚。
+ *
  */
 //#define FILAMENT_RUNOUT_SENSOR
 #if ENABLED(FILAMENT_RUNOUT_SENSOR)
