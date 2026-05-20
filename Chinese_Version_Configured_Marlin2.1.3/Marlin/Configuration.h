@@ -4504,23 +4504,23 @@
 #endif
 
 //
-// LCD for Malyan M200/M300 printers
+// LCD for Malyan M200/M300 printers  // Malyan M200 / M300 3D打印机 专用显示屏
 //
 //#define MALYAN_LCD
 
 //
-// Touch UI for FTDI EVE (FT800/FT810) displays
-// See Configuration_adv.h for all configuration options.
+// Touch UI for FTDI EVE (FT800/FT810) displays  // 适用于 FTDI EVE (FT800/FT810) 芯片显示屏的触摸界面
+// See Configuration_adv.h for all configuration options.  // 所有配置选项请查看 Configuration_adv.h 文件
 //
 //#define TOUCH_UI_FTDI_EVE
 
 //
-// Touch-screen LCD for Anycubic Chiron
+// Touch-screen LCD for Anycubic Chiron  // 纵维立方Chiron机型专用触摸液晶显示屏
 //
 //#define ANYCUBIC_LCD_CHIRON
 
 //
-// Touch-screen LCD for Anycubic i3 Mega
+// Touch-screen LCD for Anycubic i3 Mega  // 纵维立方i3 Mega机型专用触摸液晶显示屏
 //
 //#define ANYCUBIC_LCD_I3MEGA
 #if ENABLED(ANYCUBIC_LCD_I3MEGA)
@@ -4528,28 +4528,30 @@
 #endif
 
 //
-// Touch-screen LCD for Anycubic Vyper
+// Touch-screen LCD for Anycubic Vyper  // 纵维立方Vyper机型专用触摸液晶显示屏
 //
 //#define ANYCUBIC_LCD_VYPER
 
 //
-// Sovol SV-06 Resistive Touch Screen
+// Sovol SV-06 Resistive Touch Screen  // 索沃SV-06机型电阻式触摸屏
 //
 //#define SOVOL_SV06_RTS
 
 //
-// 320x240 Nextion 2.8" serial TFT Resistive Touch Screen NX3224T028
+// 320x240 Nextion 2.8" serial TFT Resistive Touch Screen NX3224T028  // 2.8英寸 Nextion 串口TFT电阻触摸屏，分辨率320×240，型号NX3224T028
 //
 //#define NEXTION_TFT
 
 //
 // Third-party or vendor-customized controller interfaces.
 // Sources should be installed in 'src/lcd/extui'.
+// 第三方或厂商定制的控制器界面。
+// 相关源文件应放置在 "src/lcd/extui" 目录下。
 //
 //#define EXTENSIBLE_UI
 
 #if ENABLED(EXTENSIBLE_UI)
-  //#define EXTUI_LOCAL_BEEPER // Enables use of local Beeper pin with external display
+  //#define EXTUI_LOCAL_BEEPER // Enables use of local Beeper pin with external display  //启用外接显示屏搭配本机蜂鸣器引脚使用
 #endif
 
 //=============================================================================
