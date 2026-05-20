@@ -3522,6 +3522,25 @@
  *       number of zig-zag triangles to do. "S" defines the number of strokes.
  *       Zig-zags are done in whichever is the narrower dimension.
  *       For example, "G12 P1 S1 T3" will execute:
+ * 
+ * * @section nozzle clean
+ *
+ * 喷嘴清洁功能
+ *
+ * 添加 G12 指令用于执行喷嘴清洁流程。
+ *
+ * 参数：
+ *   P  清洁模式
+ *   S  擦拭次数/重复次数
+ *   T  三角数量（仅 P1 模式可用）
+ *
+ * 模式说明：
+ *   P0  直线模式（默认）。该模式需要在热床固定位置安装海绵类清洁材料。
+ *       参数 S 用于设置在起点和终点之间的往返擦拭次数。
+ *
+ *   P1  在 (X0, Y0) 和 (X1, Y1) 之间的锯齿模式，参数 T 用于设置锯齿三角数量。
+ *       锯齿会在较窄的坐标轴方向上生成。
+ *       例如：指令 "G12 P1 S1 T3" 会执行：
  *
  *          --
  *         |  (X0, Y1) |     /\        /\        /\     | (X1, Y1)
@@ -3532,54 +3551,69 @@
  *          --         +--------------------------------+
  *                       |________|_________|_________|
  *                           T1        T2        T3
+ * 
+ * 注（译者注）：上图是 P1 模式下，T=3 时的锯齿清洁路径示例。喷头会在 (X0, Y0) 和 (X1, Y1) 之间来回移动，形成 3 个锯齿三角形，每个三角形包含一个往返擦拭动作（由参数 S 定义）。
+ *
  *
  *   P2  Circular pattern with middle at NOZZLE_CLEAN_CIRCLE_MIDDLE.
  *       "R" specifies the radius. "S" specifies the stroke count.
  *       Before starting, the nozzle moves to NOZZLE_CLEAN_START_POINT.
  *
  *   Caveats: The ending Z should be the same as starting Z.
+ * 
+ * *   P2  圆形清洁模式，圆心位于 NOZZLE_CLEAN_CIRCLE_MIDDLE（喷嘴清洁圆心）。
+ *       参数 "R" 指定清洁半径。参数 "S" 指定擦拭次数。
+ *       开始清洁前，喷嘴会先移动到 NOZZLE_CLEAN_START_POINT（喷嘴清洁起始点）。
+ *
+ *   注意事项：清洁结束时的Z高度必须与起始Z高度一致。
  */
 //#define NOZZLE_CLEAN_FEATURE
 
 #if ENABLED(NOZZLE_CLEAN_FEATURE)
-  #define NOZZLE_CLEAN_PATTERN_LINE     // Provide 'G12 P0' - a simple linear cleaning pattern
-  #define NOZZLE_CLEAN_PATTERN_ZIGZAG   // Provide 'G12 P1' - a zigzag cleaning pattern
-  #define NOZZLE_CLEAN_PATTERN_CIRCLE   // Provide 'G12 P2' - a circular cleaning pattern
+  #define NOZZLE_CLEAN_PATTERN_LINE     // Provide 'G12 P0' - a simple linear cleaning pattern //启用 G12 P0 —— 简易直线式喷嘴清洁轨迹
+  #define NOZZLE_CLEAN_PATTERN_ZIGZAG   // Provide 'G12 P1' - a zigzag cleaning pattern //启用G12 P1—— 锯齿形喷嘴清洁轨迹
+  #define NOZZLE_CLEAN_PATTERN_CIRCLE   // Provide 'G12 P2' - a circular cleaning pattern  //启用 G12 P2 —— 圆形喷嘴清洁轨迹
 
-  // Default pattern to use when 'P' is not provided to G12. One of the enabled options above.
+  // Default pattern to use when 'P' is not provided to G12. One of the enabled options above.  // 当 G12 指令未提供 'P' 参数时使用的默认清洁模式。必须是上面启用的选项之一。
   #define NOZZLE_CLEAN_DEFAULT_PATTERN 0
 
-  #define NOZZLE_CLEAN_STROKES     12   // Default number of pattern repetitions
+  #define NOZZLE_CLEAN_STROKES     12   // Default number of pattern repetitions  // 默认的清洁模式重复次数
 
   #if ENABLED(NOZZLE_CLEAN_PATTERN_ZIGZAG)
-    #define NOZZLE_CLEAN_TRIANGLES  3   // Default number of triangles
+    #define NOZZLE_CLEAN_TRIANGLES  3   // Default number of triangles  // 默认的锯齿三角数量
   #endif
 
   // Specify positions for each tool as { { X, Y, Z }, { X, Y, Z } }
   // Dual hotend system may use { {  -20, (Y_BED_SIZE / 2), (Z_MIN_POS + 1) },  {  420, (Y_BED_SIZE / 2), (Z_MIN_POS + 1) }}
+  // 为每个喷头指定位置，格式为 { { X, Y, Z }, { X, Y, Z } }
+  // 双喷头系统可使用以下配置示例：
+  // { { -20, (热床Y尺寸 / 2), (Z最小位置 + 1) }, { 420, (热床Y尺寸 / 2), (Z最小位置 + 1) }}
   #define NOZZLE_CLEAN_START_POINT { {  30, 30, (Z_MIN_POS + 1) } }
   #define NOZZLE_CLEAN_END_POINT   { { 100, 60, (Z_MIN_POS + 1) } }
 
   #if ENABLED(NOZZLE_CLEAN_PATTERN_CIRCLE)
-    #define NOZZLE_CLEAN_CIRCLE_RADIUS 6.5                      // (mm) Circular pattern radius
-    #define NOZZLE_CLEAN_CIRCLE_FN 10                           // Circular pattern circle number of segments
-    #define NOZZLE_CLEAN_CIRCLE_MIDDLE NOZZLE_CLEAN_START_POINT // Middle point of circle
+    #define NOZZLE_CLEAN_CIRCLE_RADIUS 6.5                      // (mm) Circular pattern radius  //（毫米）圆形清洁模式的半径
+    #define NOZZLE_CLEAN_CIRCLE_FN 10                           // Circular pattern circle number of segments  // 圆形清洁模式的圆周分段数量
+    #define NOZZLE_CLEAN_CIRCLE_MIDDLE NOZZLE_CLEAN_START_POINT // Middle point of circle  // 圆形清洁模式的圆心位置
   #endif
 
-  // Move the nozzle to the initial position after cleaning
+  // Move the nozzle to the initial position after cleaning  // 清洁完成后将喷头移回初始位置
   #define NOZZLE_CLEAN_GOBACK
 
   // For a purge/clean station that's always at the gantry height (thus no Z move)
+  // 适用于始终处于龙门架高度的清洗/清洁站（因此无需移动Z轴）
+  //注（译者注）：如果你的喷嘴清洁站设计成固定在龙门架高度，清洁过程中不需要移动Z轴，喷头直接过去擦就行，不用抬升 Z 轴，那么可以启用以下选项：
   //#define NOZZLE_CLEAN_NO_Z
 
   // For a purge/clean station mounted on the X axis
+  // 适用于安装在 X 轴上的耗材清洗/清洁站
   //#define NOZZLE_CLEAN_NO_Y
 
-  // Require a minimum hotend temperature for cleaning
+  // Require a minimum hotend temperature for cleaning  // 要求清洁时喷头达到最低温度
   #define NOZZLE_CLEAN_MIN_TEMP 170
-  //#define NOZZLE_CLEAN_HEATUP       // Heat up the nozzle instead of skipping wipe
+  //#define NOZZLE_CLEAN_HEATUP       // Heat up the nozzle instead of skipping wipe  // 加热喷头而不是跳过清洁
 
-  // Explicit wipe G-code script applies to a G12 with no arguments.
+  // Explicit wipe G-code script applies to a G12 with no arguments.  // 当 G12 指令没有参数时，执行以下预设的清洁 G 代码脚本。
   //#define WIPE_SEQUENCE_COMMANDS "G1 X-17 Y25 Z10 F4000\nG1 Z1\nM114\nG1 X-17 Y25\nG1 X-17 Y95\nG1 X-17 Y25\nG1 X-17 Y95\nG1 X-17 Y25\nG1 X-17 Y95\nG1 X-17 Y25\nG1 X-17 Y95\nG1 X-17 Y25\nG1 X-17 Y95\nG1 X-17 Y25\nG1 X-17 Y95\nG1 Z15\nM400\nG0 X-10.0 Y-9.0"
 
 #endif
