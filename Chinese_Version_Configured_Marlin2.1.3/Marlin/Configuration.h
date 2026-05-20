@@ -4787,26 +4787,29 @@
 //=============================================================================
 //============================  Other Controllers  ============================
 //=============================================================================
+// 其他控制器
 
 //
 // Ender-3 v2 OEM display. A DWIN display with Rotary Encoder.
+// Ender-3 V2 原厂显示屏。
+// 一款带旋转编码器的 DWIN 触摸屏。
 //
-//#define DWIN_CREALITY_LCD           // Creality UI
-//#define DWIN_LCD_PROUI              // Pro UI by MRiscoC
-//#define DWIN_CREALITY_LCD_JYERSUI   // Jyers UI by Jacob Myers
-//#define DWIN_MARLINUI_PORTRAIT      // MarlinUI (portrait orientation)
-//#define DWIN_MARLINUI_LANDSCAPE     // MarlinUI (landscape orientation)
+//#define DWIN_CREALITY_LCD           // Creality UI  // 创想三维原厂界面
+//#define DWIN_LCD_PROUI              // Pro UI by MRiscoC  // 由MRiscoC开发的专业增强界面
+//#define DWIN_CREALITY_LCD_JYERSUI   // Jyers UI by Jacob Myers  // 由Jacob Myers开发的Jyers定制界面
+//#define DWIN_MARLINUI_PORTRAIT      // MarlinUI (portrait orientation)  // Marlin 原生界面（竖屏显示模式）
+//#define DWIN_MARLINUI_LANDSCAPE     // MarlinUI (landscape orientation)  // Marlin 原生界面（横屏显示模式）
 
 //
-// Touch Screen Settings
+// Touch Screen Settings  // 触摸屏设置
 //
 //#define TOUCH_SCREEN
 #if ENABLED(TOUCH_SCREEN)
-  #define BUTTON_DELAY_EDIT      50 // (ms) Button repeat delay for edit screens
-  #define BUTTON_DELAY_MENU     250 // (ms) Button repeat delay for menus
+  #define BUTTON_DELAY_EDIT      50 // (ms) Button repeat delay for edit screens  // (毫秒) 编辑界面的按键重复延迟（当你长按旋钮 / 按键调节数值时（比如温度、速度）这个参数控制多久后开始连续快速增减
+  #define BUTTON_DELAY_MENU     250 // (ms) Button repeat delay for menus  // (毫秒) 菜单页面按键长按重复触发延迟 (长按按键浏览菜单时，等待多久开始自动连续翻页，单位毫秒)
 
   #if ANY(TFT_CLASSIC_UI, TFT_COLOR_UI)
-    //#define NO_BACK_MENU_ITEM     // Don't display a top menu item to go back to the parent menu
+    //#define NO_BACK_MENU_ITEM     // Don't display a top menu item to go back to the parent menu  // 关闭界面顶部的返回上级菜单快捷入口
   #endif
 
   #define TOUCH_SCREEN_CALIBRATION
@@ -4818,7 +4821,7 @@
   //#define TOUCH_ORIENTATION TOUCH_LANDSCAPE
 
   #if ALL(TOUCH_SCREEN_CALIBRATION, EEPROM_SETTINGS)
-    #define TOUCH_CALIBRATION_AUTO_SAVE // Auto save successful calibration values to EEPROM
+    #define TOUCH_CALIBRATION_AUTO_SAVE // Auto save successful calibration values to EEPROM  // 自动将校准成功后的参数保存至EEPROM
   #endif
 
   #if ENABLED(TFT_COLOR_UI)
@@ -4827,16 +4830,16 @@
 #endif
 
 //
-// RepRapWorld REPRAPWORLD_KEYPAD v1.1
+// RepRapWorld REPRAPWORLD_KEYPAD v1.1  // RepRapWorld 外接按键面板 REPRAPWORLD_KEYPAD v1.1
 // https://reprapworld.com/products/electronics/ramps/keypad_v1_0_fully_assembled/
 //
 //#define REPRAPWORLD_KEYPAD
 #if ENABLED(REPRAPWORLD_KEYPAD)
-  //#define REPRAPWORLD_KEYPAD_MOVE_STEP 10.0 // (mm) Distance to move per key-press
+  //#define REPRAPWORLD_KEYPAD_MOVE_STEP 10.0 // (mm) Distance to move per key-press  // (毫米) 每次按键时，移动的距离
 #endif
 
 //
-// EasyThreeD ET-4000+ with button input and status LED
+// EasyThreeD ET-4000+ with button input and status LED  // 适配EasyThreeD ET-4000+设备，支持按键输入与状态指示灯
 //
 //#define EASYTHREED_UI
 
