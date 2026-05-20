@@ -3643,6 +3643,33 @@
  *   M75 - Start the print job timer
  *   M76 - Pause the print job timer
  *   M77 - Stop the print job timer
+ * 
+ * * 打印任务计时器
+ *
+ * 通过加热指令 M104/M109/M140/M190/M141/M191 自动开始和停止打印计时。
+ * 仅当热床/机箱目标温度低于 BED_MINTEMP/CHAMBER_MINTEMP 时，计时器才会停止。
+ *
+ *   M104 (喷头, 不等待) - 高温 = 无操作, 低温 = 停止计时
+ *   M109 (喷头, 等待)   - 高温 = 开始计时, 低温 = 停止计时
+ *   M140 (热床, 不等待) - 高温 = 无操作, 低温 = 停止计时
+ *   M190 (热床, 等待)   - 高温 = 开始计时, 低温 = 无操作
+ *   M141 (机箱, 不等待) - 高温 = 无操作, 低温 = 停止计时
+ *   M191 (机箱, 等待)   - 高温 = 开始计时, 低温 = 无操作
+ *
+ * 对于 M104/M109，超过挤出最低温度的一半即为高温。
+ * 对于 M140/M190，超过热床最低温度即为高温。
+ * 对于 M141/M191，超过机箱最低温度即为高温。
+ *
+ * 计时器也可通过以下指令手动控制：
+ *
+ *   M75 - 开始打印计时
+ *   M76 - 暂停打印计时
+ *   M77 - 停止打印计时
+ * 
+ * 注（译者注）：这是打印机自带的打印计时功能，用来记录打印用了多久：
+ * 自动计时：你设置加热温度，打印机就自动开始计时；温度降回室温，自动停止。
+ * 手动控制：也能直接发 M75/M76/M77 指令开始 / 暂停 / 停止计时。
+ * 作用：在屏幕上显示本次打印已用时，方便你查看。
  */
 #define PRINTJOB_TIMER_AUTOSTART
 
@@ -3659,10 +3686,21 @@
  *  - Total time printing
  *
  * View the current statistics with M78.
+ * 
+ * * 打印统计计数器
+ *
+ * 可统计以下数据：
+ *
+ *  - 总打印任务次数
+ *  - 成功完成打印次数
+ *  - 打印失败次数
+ *  - 累计总打印时长
+ *
+ * 发送指令 M78 即可查看当前统计数据。
  */
 //#define PRINTCOUNTER
 #if ENABLED(PRINTCOUNTER)
-  #define PRINTCOUNTER_SAVE_INTERVAL 60 // (minutes) EEPROM save interval during print. A value of 0 will save stats at end of print.
+  #define PRINTCOUNTER_SAVE_INTERVAL 60 // (minutes) EEPROM save interval during print. A value of 0 will save stats at end of print.  //（分钟）打印过程中统计数据保存到 EEPROM 的间隔。设置为 0 则在打印结束时保存统计数据。
 #endif
 
 // @section security
@@ -3685,17 +3723,38 @@
  * If you forget the password and get locked out you'll need to re-flash
  * the firmware with the feature disabled, reset EEPROM, and (optionally)
  * re-flash the firmware again with this feature enabled.
+ * 
+ * // @section 安全设置
+
+
+ * 密码锁功能
+ *
+ * 为打印机设置数字密码，可在以下场景启用密码验证：
+ *
+ *  - 打印机开机时
+ *  - 打开“从存储设备打印”菜单时
+ *  - SD卡打印完成或中断时
+ *
+ * 可使用以下G代码指令：
+ *
+ *  M510 - 锁定打印机，屏蔽所有指令，仅允许 M511
+ *  M511 - 解锁打印机
+ *  M512 - 设置、修改、删除密码
+ *
+ * 若忘记密码导致被锁定，解决方法：
+ * 重新刷入关闭此功能的固件 → 重置EEPROM →（可选）再次刷入开启此功能的固件。
+ *
  */
 //#define PASSWORD_FEATURE
 #if ENABLED(PASSWORD_FEATURE)
-  #define PASSWORD_LENGTH 4                 // (#) Number of digits (1-9). 3 or 4 is recommended
+  #define PASSWORD_LENGTH 4                 // (#) Number of digits (1-9). 3 or 4 is recommended  //（数字）密码位数，范围 1-9。建议使用 3 位或 4 位密码。
   #define PASSWORD_ON_STARTUP
-  #define PASSWORD_UNLOCK_GCODE             // Unlock with the M511 P<password> command. Disable to prevent brute-force attack.
-  #define PASSWORD_CHANGE_GCODE             // Change the password with M512 P<old> S<new>.
-  //#define PASSWORD_ON_SD_PRINT_MENU       // This does not prevent G-codes from running
+  #define PASSWORD_UNLOCK_GCODE             // Unlock with the M511 P<password> command. Disable to prevent brute-force attack.  //通过 M511 P<password> 指令解锁。禁用此功能可防止暴力破解攻击。
+  #define PASSWORD_CHANGE_GCODE             // Change the password with M512 P<old> S<new>.  //通过 M512 P<old> S<new> 指令修改密码。
+  //#define PASSWORD_ON_SD_PRINT_MENU       // This does not prevent G-codes from running  //该功能无法阻止 G 代码指令运行
   //#define PASSWORD_AFTER_SD_PRINT_END
   //#define PASSWORD_AFTER_SD_PRINT_ABORT
-  //#include "Configuration_Secure.h"       // External file with PASSWORD_DEFAULT_VALUE
+  //#include "Configuration_Secure.h"       // External file with PASSWORD_DEFAULT_VALUE   // 外部文件，包含默认密码值
 #endif
 
 // @section media
