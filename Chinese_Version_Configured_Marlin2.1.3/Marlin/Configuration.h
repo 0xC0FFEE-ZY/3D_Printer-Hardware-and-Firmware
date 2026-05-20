@@ -3950,9 +3950,9 @@
 #endif
 
 //
-// Individual Axis Homing 
+// Individual Axis Homing  //独立轴回零
 //
-// Add individual axis homing items (Home X, Home Y, and Home Z) to the LCD menu.  
+// Add individual axis homing items (Home X, Home Y, and Home Z) to the LCD menu.  //在LCD菜单中添加独立的回零选项（回零X轴、回零Y轴、回零Z轴）。
 //
 //#define INDIVIDUAL_AXIS_HOMING_MENU
 //#define INDIVIDUAL_AXIS_HOMING_SUBMENU
@@ -3962,6 +3962,11 @@
 //
 // If you have a speaker that can produce tones, enable it here.
 // By default Marlin assumes you have a buzzer with a fixed frequency.
+
+// 扬声器 / 蜂鸣器
+//
+// 如果你的打印机带有扬声器，在这里启用。
+// 默认情况下，Marlin 固件认为你使用的是固定频率的蜂鸣器。
 //
 //#define SPEAKER
 
@@ -3971,6 +3976,12 @@
 //
 // Note: Test audio output with the G-Code:
 //  M300 S<frequency Hz> P<duration ms>
+
+// 界面操作提示音的时长与频率
+// 将两项均设为 0 可关闭 LCD 菜单中的声音反馈。
+//
+// 提示：使用以下 G-Code 测试声音输出：
+//  M300 S<频率 Hz> P<时长 毫秒>
 //
 //#define LCD_FEEDBACK_FREQUENCY_DURATION_MS 2
 //#define LCD_FEEDBACK_FREQUENCY_HZ 5000
@@ -3978,11 +3989,14 @@
 //
 // Tone queue size, used to keep beeps from blocking execution.
 // Default is 4, or override here. Costs 4 bytes of SRAM per entry.
+// 提示音队列长度，防止蜂鸣声阻塞程序运行
+// 默认值为 4，也可在此处修改
+// 每增加一个条目会占用 4 字节 内存
 //
 //#define TONE_QUEUE_LENGTH 4
 
 //
-// A sequence of tones to play at startup, in pairs of tone (Hz), duration (ms).
+// A sequence of tones to play at startup, in pairs of tone (Hz), duration (ms).  //开机启动提示音序列，格式为【音调(赫兹)、时长(毫秒)】成对设置
 // Silence in-between tones.
 //
 //#define STARTUP_TUNE { 698, 300, 0, 50, 523, 50, 0, 25, 494, 50, 0, 25, 523, 100, 0, 50, 554, 300, 0, 100, 523, 300 }
