@@ -3235,7 +3235,7 @@
    *  LF  Left-Front    RF  Right-Front
    *  LB  Left-Back     RB  Right-Back
    * 
-   * /**
+   * 
    * 四角调平顺序
    *
    * 可设置 2 个或 4 个点。
@@ -4380,14 +4380,14 @@
 //=============================================================================
 //==============================  OLED Displays  ==============================
 //=============================================================================
-
+// OLED显示屏
 //
-// SSD1306 OLED full graphics generic display
+// SSD1306 OLED full graphics generic display  // SSD1306 OLED 全图形通用显示屏
 //
 //#define U8GLIB_SSD1306
 
 //
-// SAV OLEd LCD module support using either SSD1306 or SH1106 based LCD modules
+// SAV OLEd LCD module support using either SSD1306 or SH1106 based LCD modules  // 支持 SSD1306 / SH1106 两种芯片的 OLED 显示模块
 //
 //#define SAV_3DGLCD
 #if ENABLED(SAV_3DGLCD)
@@ -4402,46 +4402,53 @@
 
 //
 // MKS OLED 1.3" 128×64 Full Graphics Controller
+// 这是 MKS（Makerbase）出的1.3 寸、128×64、SPI 接口、带编码器 / 按键的 OLED 面板。
 // https://reprap.org/wiki/MKS_12864OLED
 //
 // Tiny, but very sharp OLED display
 //
-//#define MKS_12864OLED          // Uses the SH1106 controller
-//#define MKS_12864OLED_SSD1306  // Uses the SSD1306 controller
+//#define MKS_12864OLED          // Uses the SH1106 controller  //SH1106 驱动主控芯片
+//#define MKS_12864OLED_SSD1306  // Uses the SSD1306 controller  // SSD1306 驱动主控芯片
 
 //
 // Zonestar OLED 128×64 Full Graphics Controller
+// Zonestar（卓星）OLED 128×64 全图形控制器屏，是 Zonestar 3D 打印机常用的I2C 接口、带编码器的 128×64 OLED 面板，
+// 和 TinyBoy2 高度兼容，驱动芯片分 SSD1306 / SH1106 两种。
 //
-//#define ZONESTAR_12864LCD           // Graphical (DOGM) with ST7920 controller
-//#define ZONESTAR_12864OLED          // 1.3" OLED with SH1106 controller
-//#define ZONESTAR_12864OLED_SSD1306  // 0.96" OLED with SSD1306 controller
+//#define ZONESTAR_12864LCD           // Graphical (DOGM) with ST7920 controller  //带 ST7920 控制器的图形化 (DOGM) 显示屏
+//#define ZONESTAR_12864OLED          // 1.3" OLED with SH1106 controller  // 1.3英寸 OLED 显示屏，采用 SH1106 驱动芯片
+//#define ZONESTAR_12864OLED_SSD1306  // 0.96" OLED with SSD1306 controller  // 0.96英寸 OLED 显示屏，采用 SSD1306 驱动芯片
 
 //
-// Einstart S OLED SSD1306
+// Einstart S OLED SSD1306  // Einstart S 机型专用 OLED 屏，SSD1306 控制器
 //
 //#define U8GLIB_SH1106_EINSTART
 
 //
-// Overlord OLED display/controller with i2c buzzer and LEDs
+// Overlord OLED display/controller with i2c buzzer and LEDs  // Overlord机型专用OLED显示控制器，搭载I2C蜂鸣器与状态指示灯
 //
 //#define OVERLORD_OLED
 
 //
-// FYSETC OLED 2.42" 128×64 Full Graphics Controller with WS2812 RGB
+// FYSETC OLED 2.42" 128×64 Full Graphics Controller with WS2812 RGB  // FYSETC 2.42英寸 OLED 全图形控制器，带 WS2812 RGB 氛围灯
 // Where to find : https://www.aliexpress.com/item/4000345255731.html
 //#define FYSETC_242_OLED_12864   // Uses the SSD1309 controller
 
 //
-// K.3D SSD1309 OLED 2.42" 128×64 Full Graphics Controller
+// K.3D SSD1309 OLED 2.42" 128×64 Full Graphics Controller  // K.3D 2.42英寸 OLED 全图形控制器，SSD1309 驱动芯片
 //
 //#define K3D_242_OLED_CONTROLLER   // Software SPI
 
 //=============================================================================
 //========================== Extensible UI Displays ===========================
 //=============================================================================
+// 可扩展用户界面显示屏
+// 注（译者注）：
+// Extensible UI（ExtUI） 是 Marlin 2.x 引入的可扩展显示框架，用于统一管理各类串行智能屏 / 串口屏 / 带独立控制器的屏幕（DWIN、DGUS、TFT 触摸、OLED 大屏等），
+// 与传统直接驱动的 LCD/OLED（U8GLIB、HD44780）完全分开。
 
 /**
- * DGUS Touch Display with DWIN OS. (Choose one.)
+ * DGUS Touch Display with DWIN OS. (Choose one.)  // 搭载迪文系统 (DWIN OS) 的 DGUS 触控显示屏（二者任选其一）
  *
  * ORIGIN (Marlin DWIN_SET)
  *  - Download https://github.com/coldtobi/Marlin_DGUS_Resources
@@ -4479,6 +4486,12 @@
  *  - Download files as specified for your type of display.
  *  - Plug the microSD card into the back of the display.
  *  - Boot the display and wait for the update to complete.
+ * 
+ * 为 Marlin 刷写搭载 DGUS 的界面程序
+ * 将 SD 卡格式化为FAT32 格式，分配单元大小设为4KB
+ * 根据你的屏幕型号下载对应固件文件
+ * 把 Micro SD 卡插入显示屏背面卡槽
+ * 上电启动屏幕，等待自动升级完成
  *
  * :[ 'ORIGIN', 'FYSETC', 'HYPRECY', 'MKS', 'RELOADED', 'IA_CREALITY', 'E3S1PRO' ]
  */
