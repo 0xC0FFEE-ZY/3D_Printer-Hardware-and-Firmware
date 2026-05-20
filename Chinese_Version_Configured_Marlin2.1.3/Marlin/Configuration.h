@@ -2798,16 +2798,18 @@
  */
 //#define FILAMENT_RUNOUT_SENSOR
 #if ENABLED(FILAMENT_RUNOUT_SENSOR)
-  #define FIL_RUNOUT_ENABLED_DEFAULT true // Enable the sensor on startup. Override with M412 followed by M500.
-  #define NUM_RUNOUT_SENSORS   1          // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.
+  #define FIL_RUNOUT_ENABLED_DEFAULT true // Enable the sensor on startup. Override with M412 followed by M500.  // 启动时启用传感器。可以通过 M412 指令（之后跟 M500 保存）来覆盖默认设置。
+  #define NUM_RUNOUT_SENSORS   1          // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.  // 传感器数量，每个挤出机最多一个。为每个传感器定义一个 FIL_RUNOUT#_PIN。
 
-  #define FIL_RUNOUT_STATE     LOW        // Pin state indicating that filament is NOT present.
-  #define FIL_RUNOUT_PULLUP               // Use internal pullup for filament runout pins.
-  //#define FIL_RUNOUT_PULLDOWN           // Use internal pulldown for filament runout pins.
+  #define FIL_RUNOUT_STATE     LOW        // Pin state indicating that filament is NOT present.  // 传感器引脚状态，表示没有耗材时的信号状态
+  #define FIL_RUNOUT_PULLUP               // Use internal pullup for filament runout pins.  // 使用内部上拉电阻连接断料传感器引脚
+  //#define FIL_RUNOUT_PULLDOWN           // Use internal pulldown for filament runout pins.  // 使用内部下拉电阻连接断料传感器引脚
   //#define WATCH_ALL_RUNOUT_SENSORS      // Execute runout script on any triggering sensor, not only for the active extruder.
                                           // This is automatically enabled for MIXING_EXTRUDERs.
+                                          // 任意一个断料传感器触发时，都执行断料处理程序，而不仅仅是当前工作的挤出机。
+                                          // 混合挤出机（多进一出）会自动启用此功能。
 
-  // Override individually if the runout sensors vary
+  // Override individually if the runout sensors vary  //// 如果各个断料传感器的状态不同，可单独覆盖设置
   //#define FIL_RUNOUT1_STATE LOW
   //#define FIL_RUNOUT1_PULLUP
   //#define FIL_RUNOUT1_PULLDOWN
@@ -2840,32 +2842,34 @@
   //#define FIL_RUNOUT8_PULLUP
   //#define FIL_RUNOUT8_PULLDOWN
 
-  // Commands to execute on filament runout.
-  // With multiple runout sensors use the %c placeholder for the current tool in commands (e.g., "M600 T%c")
-  // NOTE: After 'M412 H1' the host handles filament runout and this script does not apply.
+  // Commands to execute on filament runout.  //耗材断料时要执行的指令
+  // With multiple runout sensors use the %c placeholder for the current tool in commands (e.g., "M600 T%c")//当使用多个断料传感器时，可在指令中使用 %c 占位符表示当前触发断料的喷头/工具。示例："M600 T%c"
+  // NOTE: After 'M412 H1' the host handles filament runout and this script does not apply.  //注意：执行 'M412 H1' 后，主机将处理断料事件，此时此脚本不再适用。
   #define FILAMENT_RUNOUT_SCRIPT "M600"
 
-  // After a runout is detected, continue printing this length of filament
+  // After a runout is detected, continue printing this length of filament  
   // before executing the runout script. Useful for a sensor at the end of
   // a feed tube. Requires 4 bytes SRAM per sensor, plus 4 bytes overhead.
+   // 检测到断料后，继续打印这段长度的耗材，然后再执行断料处理程序。对于安装在送料管末端的传感器非常有用。每个传感器需要 4 字节 SRAM，加上 4 字节的开销。
   //#define FILAMENT_RUNOUT_DISTANCE_MM 25
 
   #ifdef FILAMENT_RUNOUT_DISTANCE_MM
     // Enable this option to use an encoder disc that toggles the runout pin
     // as the filament moves. (Be sure to set FILAMENT_RUNOUT_DISTANCE_MM
-    // large enough to avoid false positives.)
+    // large enough to avoid false positives.)  
+     // 启用此选项以使用编码盘，随着耗材移动切换断料引脚状态。（请确保将 FILAMENT_RUNOUT_DISTANCE_MM 设置得足够大，以避免误报。）
     //#define FILAMENT_MOTION_SENSOR
 
     #if ENABLED(FILAMENT_MOTION_SENSOR)
-      //#define FILAMENT_SWITCH_AND_MOTION      // Define separate pins below to sense motion
+      //#define FILAMENT_SWITCH_AND_MOTION      // Define separate pins below to sense motion  // 定义下面的单独引脚来检测运动
       #if ENABLED(FILAMENT_SWITCH_AND_MOTION)
 
-        #define FILAMENT_MOTION_DISTANCE_MM 3.0 // (mm) Missing distance required to trigger runout
+        #define FILAMENT_MOTION_DISTANCE_MM 3.0 // (mm) Missing distance required to trigger runout // (毫米) 触发断料检测所需的【空跑距离】
 
-        #define NUM_MOTION_SENSORS   1          // Number of sensors, up to one per extruder. Define a FIL_MOTION#_PIN for each.
+        #define NUM_MOTION_SENSORS   1          // Number of sensors, up to one per extruder. Define a FIL_MOTION#_PIN for each.  // 运动传感器数量，每个挤出机最多一个。为每个传感器定义一个 FIL_MOTION#_PIN。
         //#define FIL_MOTION1_PIN    -1
 
-        // Override individually if the motion sensors vary
+        // Override individually if the motion sensors vary  // 如果各个运动传感器的状态不同，可单独覆盖设置
         //#define FIL_MOTION1_STATE LOW
         //#define FIL_MOTION1_PULLUP
         //#define FIL_MOTION1_PULLDOWN
@@ -2905,6 +2909,7 @@
 //===========================================================================
 //=============================== Bed Leveling ==============================
 //===========================================================================
+// 热床调平相关配置
 // @section calibrate
 
 /**
@@ -2939,6 +2944,37 @@
  *   For machines without a probe, Mesh Bed Leveling provides a method to perform
  *   leveling in steps so you can manually adjust the Z height at each grid-point.
  *   With an LCD controller the process is guided step-by-step.
+ * 
+ * 
+ * 选择以下其中一种模式启用 G29 热床调平。
+ * G29 的参数和行为会根据你的选择而变化。
+ *
+ * 如果使用探头进行 Z 轴回零，还必须启用 Z_SAFE_HOMING！
+ *
+ * - AUTO_BED_LEVELING_3POINT
+ *   在热床上探测 3 个不共线的点
+ *   你需要指定这 3 个点的 XY 坐标
+ *   生成一个倾斜平面，适合**平整的热床**
+ *
+ * - AUTO_BED_LEVELING_LINEAR
+ *   网格探测多个点
+ *   你指定探测范围和点密度
+ *   生成一个倾斜平面，适合**平整的热床**
+ *
+ * - AUTO_BED_LEVELING_BILINEAR
+ *   网格探测多个点
+ *   你指定探测范围和点密度
+ *   生成网格补偿，适合**大尺寸/不平整热床**
+ *
+ * - AUTO_BED_LEVELING_UBL (统一调平系统)
+ *   最全面的调平系统，整合所有优点
+ *   包含网格生成、验证、编辑功能
+ *
+ * - MESH_BED_LEVELING
+ *   手动网格调平
+ *   生成网格补偿，适合**无自动探头**的机器
+ *   通过屏幕一步步手动调整每个点的 Z 高度
+ *
  */
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
@@ -2949,12 +2985,15 @@
 /**
  * Commands to execute at the start of G29 probing,
  * after switching to the PROBING_TOOL.
+ * // 在 G29 探测开始时、切换到探测工具后执行的指令
  */
 //#define EVENT_GCODE_BEFORE_G29 "M300 P440 S200"
 
 /**
  * Commands to execute at the end of G29 probing.
  * Useful to retract or move the Z probe out of the way.
+ * // G29调平探测结束后执行的指令
+ * // 适合用来回抽耗材、移动Z轴探头避开工作区域
  */
 //#define EVENT_GCODE_AFTER_G29 "G1 Z10 F12000\nG1 X15 Y330\nG1 Z0.5\nG1 Z10"
 
@@ -2962,16 +3001,23 @@
  * Normally G28 leaves leveling disabled on completion. Enable one of
  * these options to restore the prior leveling state or to always enable
  * leveling immediately after G28.
+ * 
+ * 通常 G28（回零）完成后会自动关闭热床调平功能。
+ * 启用以下任一选项，可以在 G28 结束后恢复之前的调平状态，
+ * 或者始终在回零后立即启用调平。
+ *
  */
 //#define RESTORE_LEVELING_AFTER_G28
 //#define ENABLE_LEVELING_AFTER_G28
 
 /**
- * Auto-leveling needs preheating
+ * Auto-leveling needs preheating  // 自动调平前需要提前预热
+ * 注（译者注）：
+ * 调平前需要加热热床，因为升温会导致热床产生形变。模拟实际打印温度环境，贴合真实打印工况
  */
 //#define PREHEAT_BEFORE_LEVELING
 #if ENABLED(PREHEAT_BEFORE_LEVELING)
-  #define LEVELING_NOZZLE_TEMP 120   // (°C) Only applies to E0 at this time
+  #define LEVELING_NOZZLE_TEMP 120   // (°C) Only applies to E0 at this time  // 调平前喷嘴的预热温度（摄氏度）。目前仅适用于 E0。
   #define LEVELING_BED_TEMP     50
 #endif
 
@@ -2979,12 +3025,17 @@
  * Enable detailed logging of G28, G29, M48, etc.
  * Turn on with the command 'M111 S32'.
  * NOTE: Requires a lot of flash!
+ * 
+ * 启用 G28、G29、M48 等指令的详细日志记录
+ * 使用指令 'M111 S32' 开启
+ * 注意：会占用大量闪存空间！
+ *
  */
 //#define DEBUG_LEVELING_FEATURE
 
 #if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL, PROBE_MANUALLY)
-  // Set a height for the start of manual adjustment
-  #define MANUAL_PROBE_START_Z 0.2  // (mm) Comment out to use the last-measured height
+  // Set a height for the start of manual adjustment  // 设置手动调整开始的高度
+  #define MANUAL_PROBE_START_Z 0.2  // (mm) Comment out to use the last-measured height  //（毫米）注释掉以使用上次测量的高度
 #endif
 
 #if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_BILINEAR, AUTO_BED_LEVELING_UBL)
@@ -2992,58 +3043,76 @@
    * Gradually reduce leveling correction until a set height is reached,
    * at which point movement will be level to the machine's XY plane.
    * The height can be set with M420 Z<height>
+   * 
+   * 逐渐减小调平补偿量，直到达到设定高度，
+   * 在该高度之后，打印机会完全按照机器的 XY 平面水平移动。
+   * 可以使用指令 M420 Z<高度> 来设置这个高度。
+   * 注（译者注）：
+   * 这是一个非常实用的功能，能让打印机在底层（首层）全力使用热床调平补偿，确保打印粘牢不刮床。
+   * 随着高度升高，补偿量慢慢变小，到达设定高度（比如 5mm）后，补偿完全消失，打印机按绝对水平打印。
+   * 这样能兼顾底层的粘附和后续层的精度，避免过度补偿导致的后续层错位。
+   *
    */
   #define ENABLE_LEVELING_FADE_HEIGHT
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-    #define DEFAULT_LEVELING_FADE_HEIGHT 10.0 // (mm) Default fade height.
+    #define DEFAULT_LEVELING_FADE_HEIGHT 10.0 // (mm) Default fade height. //（毫米）默认淡出高度。(设置为 0 可禁用淡出。)
   #endif
 
   /**
    * For Cartesian machines, instead of dividing moves on mesh boundaries,
    * split up moves into short segments like a Delta. This follows the
-   * contours of the bed more closely than edge-to-edge straight moves.
+   * contours of the bed more closely than edge-to-edge straight moves.  
+   * 对于笛卡尔结构的机器，不要在网格边界上分割移动，而是将移动分成短段，就像 Delta 结构一样。这比边到边的直线移动更贴合热床的轮廓。
+   * 注（译者注）：这是自动调平的高精度优化.
+   * 它可以：
+   * 普通网格调平：喷头在网格之间直线移动，可能跳变高度
+   * 开启后：把移动切成5mm 小段，平滑贴合热床曲面
+   * 让首层打印更平整、不刮床、不悬空
    */
   #define SEGMENT_LEVELED_MOVES
-  #define LEVELED_SEGMENT_LENGTH 5.0 // (mm) Length of all segments (except the last one)
+  #define LEVELED_SEGMENT_LENGTH 5.0 // (mm) Length of all segments (except the last one)  //（毫米）所有段的长度（最后一段除外）。设置为 0 可禁用分段。
 
   /**
-   * Enable the G26 Mesh Validation Pattern tool.
+   * Enable the G26 Mesh Validation Pattern tool. // 启用 G26 网格校验测试图案工具
+   * 注（译者注）：开启后可使用G26指令，打印专用测试纹路，直观检查热床网格调平效果，快速判断高低落差、首层贴合好坏。
    */
   //#define G26_MESH_VALIDATION
   #if ENABLED(G26_MESH_VALIDATION)
-    #define MESH_TEST_NOZZLE_SIZE    0.4  // (mm) Diameter of primary nozzle.
-    #define MESH_TEST_LAYER_HEIGHT   0.2  // (mm) Default layer height for G26.
-    #define MESH_TEST_HOTEND_TEMP  205    // (°C) Default nozzle temperature for G26.
-    #define MESH_TEST_BED_TEMP      60    // (°C) Default bed temperature for G26.
-    #define G26_XY_FEEDRATE         20    // (mm/s) Feedrate for G26 XY moves.
-    #define G26_XY_FEEDRATE_TRAVEL 100    // (mm/s) Feedrate for G26 XY travel moves.
-    #define G26_RETRACT_MULTIPLIER   1.0  // G26 Q (retraction) used by default between mesh test elements.
+    #define MESH_TEST_NOZZLE_SIZE    0.4  // (mm) Diameter of primary nozzle.  //（毫米）主喷嘴的直径。
+    #define MESH_TEST_LAYER_HEIGHT   0.2  // (mm) Default layer height for G26.  //（毫米）G26 的默认层高。
+    #define MESH_TEST_HOTEND_TEMP  205    // (°C) Default nozzle temperature for G26.  //（摄氏度）G26 的默认喷嘴温度。
+    #define MESH_TEST_BED_TEMP      60    // (°C) Default bed temperature for G26.  //（摄氏度）G26 的默认热床温度。
+    #define G26_XY_FEEDRATE         20    // (mm/s) Feedrate for G26 XY moves.  //（毫米/秒）G26 XY 移动的进给速度。
+    #define G26_XY_FEEDRATE_TRAVEL 100    // (mm/s) Feedrate for G26 XY travel moves.  //（毫米/秒）G26 XY 跳跃移动的进给速度。
+    #define G26_RETRACT_MULTIPLIER   1.0  // G26 Q (retraction) used by default between mesh test elements.  // G26 Q（回抽）默认用于网格测试元素之间。
   #endif
 
 #endif
 
 #if ANY(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
 
-  // Set the number of grid points per dimension.
+  // Set the number of grid points per dimension.  // 设置每个维度的网格点数量
   #define GRID_MAX_POINTS_X 3
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
-  // Probe along the Y axis, advancing X after each column
+  // Probe along the Y axis, advancing X after each column  // 沿 Y 轴探测，每列完成后前进 X 轴
   //#define PROBE_Y_FIRST
 
   #if ENABLED(AUTO_BED_LEVELING_BILINEAR)
 
-    // Beyond the probed grid, continue the implied tilt?
-    // Default is to maintain the height of the nearest edge.
+    // Beyond the probed grid, continue the implied tilt?  // 在探测网格之外，继续应用隐含的倾斜补偿吗？
+    // Default is to maintain the height of the nearest edge.  // 默认是保持最近边缘的高度。
     //#define EXTRAPOLATE_BEYOND_GRID
 
     //
     // Subdivision of the grid by Catmull-Rom method.
     // Synthesizes intermediate points to produce a more detailed mesh.
+    // 使用 Catmull-Rom 算法对网格进行细分
+    // 自动生成中间插值点，让调平网格更细腻、更精准
     //
     //#define ABL_BILINEAR_SUBDIVISION
     #if ENABLED(ABL_BILINEAR_SUBDIVISION)
-      // Number of subdivisions between probe points
+      // Number of subdivisions between probe points  // 探测点之间的细分数量
       #define BILINEAR_SUBDIVISIONS 3
     #endif
 
@@ -3054,35 +3123,41 @@
   //===========================================================================
   //========================= Unified Bed Leveling ============================
   //===========================================================================
+  // 统一热床调平系统（UBL）—— Marlin 里最强大、最完整的自动调平模式
 
-  //#define MESH_EDIT_GFX_OVERLAY   // Display a graphics overlay while editing the mesh
+  //#define MESH_EDIT_GFX_OVERLAY   // Display a graphics overlay while editing the mesh // 编辑调平网格时，屏幕显示图形可视化图层
 
-  #define MESH_INSET 1              // Set Mesh bounds as an inset region of the bed
-  #define GRID_MAX_POINTS_X 10      // Don't use more than 15 points per axis, implementation limited.
+  #define MESH_INSET 1              // Set Mesh bounds as an inset region of the bed  // 设置网格边界为热床内缩区域
+  #define GRID_MAX_POINTS_X 10      // Don't use more than 15 points per axis, implementation limited.  // 每轴不要使用超过 15 个点，受实现限制
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
-  //#define UBL_HILBERT_CURVE       // Use Hilbert distribution for less travel when probing multiple points
+  //#define UBL_HILBERT_CURVE       // Use Hilbert distribution for less travel when probing multiple points  // 使用 Hilbert 曲线分布，在探测多个点时减少移动距离
 
-  //#define UBL_TILT_ON_MESH_POINTS         // Use nearest mesh points with G29 J for better Z reference
-  //#define UBL_TILT_ON_MESH_POINTS_3POINT  // Use nearest mesh points with G29 J0 (3-point)
+  //#define UBL_TILT_ON_MESH_POINTS         // Use nearest mesh points with G29 J for better Z reference  // 使用 G29 J 指令时，使用最近的网格点作为更好的 Z 参考
+  //#define UBL_TILT_ON_MESH_POINTS_3POINT  // Use nearest mesh points with G29 J0 (3-point)  // 使用 G29 J0（3点）指令时，使用最近的网格点作为更好的 Z 参考
 
-  #define UBL_MESH_EDIT_MOVES_Z     // Sophisticated users prefer no movement of nozzle
-  #define UBL_SAVE_ACTIVE_ON_M500   // Save the currently active mesh in the current slot on M500
+  #define UBL_MESH_EDIT_MOVES_Z     // Sophisticated users prefer no movement of nozzle  // 资深用户偏好：编辑网格时不让喷嘴移动
+
+  #define UBL_SAVE_ACTIVE_ON_M500   // Save the currently active mesh in the current slot on M500  // 在 M500 时将当前活动的网格保存在当前槽位
 
   //#define UBL_Z_RAISE_WHEN_OFF_MESH 2.5 // When the nozzle is off the mesh, this value is used
                                           // as the Z-Height correction value.
+                                          // 当喷头移动到【调平网格以外区域】时，使用该值作为 Z 高度补偿
 
-  //#define UBL_MESH_WIZARD         // Run several commands in a row to get a complete mesh
+  //#define UBL_MESH_WIZARD         // Run several commands in a row to get a complete mesh  // 运行一系列命令来获得完整的网格
 
   /**
-   * Probing not allowed within the position of an obstacle.
+   * Probing not allowed within the position of an obstacle.  // 在障碍物位置不允许探测
+   * 注（译者注）：可划定热床上障碍物区域（如螺丝、接线柱、固定卡扣等），探头运行到这片区域时，自动跳过不进行测高，避免探头撞击硬物损坏、测量数据出错。
    */
   //#define AVOID_OBSTACLES
   #if ENABLED(AVOID_OBSTACLES)
-    #define CLIP_W  23  // Bed clip width, should be padded a few mm over its physical size
-    #define CLIP_H  14  // Bed clip height, should be padded a few mm over its physical size
+    #define CLIP_W  23  // Bed clip width, should be padded a few mm over its physical size  // 床夹宽度，应该比实际尺寸多预留几毫米的安全边距
+    #define CLIP_H  14  // Bed clip height, should be padded a few mm over its physical size  // 床夹高度，应该比实际尺寸多预留几毫米的安全边距
+    //注（译者注）：上面是给热床夹子（固定热床的夹子）设置的避障区域。
 
-    // Obstacle Rectangles defined as { X1, Y1, X2, Y2 }
+    // Obstacle Rectangles defined as { X1, Y1, X2, Y2 }// 障碍物矩形区域，格式定义为 { X1, Y1, X2, Y2 }
+    // 注（译者注）：下面是给热床四个角的夹子设置的避障区域。每个夹子占一个矩形区域。X1, Y1 = 矩形左上角坐标，X2, Y2 = 矩形右下角坐标
     #define OBSTACLE1 { (X_BED_SIZE) / 4     - (CLIP_W) / 2,                       0, (X_BED_SIZE) / 4     + (CLIP_W) / 2, CLIP_H }
     #define OBSTACLE2 { (X_BED_SIZE) * 3 / 4 - (CLIP_W) / 2,                       0, (X_BED_SIZE) * 3 / 4 + (CLIP_W) / 2, CLIP_H }
     #define OBSTACLE3 { (X_BED_SIZE) / 4     - (CLIP_W) / 2, (Y_BED_SIZE) - (CLIP_H), (X_BED_SIZE) / 4     + (CLIP_W) / 2, Y_BED_SIZE }
@@ -3090,6 +3165,14 @@
 
     // The probed grid must be inset for G29 J. This is okay, since it is
     // only used to compute a linear transformation for the mesh itself.
+    // 对于 G29 J 指令，探测网格必须向内缩进。
+    // 这是正常的，因为它仅用于计算网格自身的线性变换（倾斜校正）。
+    // 注（译者注）：G29J_MESH_TILT_MARGIN 定义了在网格边缘留出的安全距离。
+    // 简单说就是：
+    // G29 J = UBL 里的倾斜校正 / 整平指令
+    // 它工作时，会自动向内缩一点探测范围，不贴边
+    // 因为它只用来修正整体倾斜，不需要测边缘
+    // 缩进去是安全、正常、设计好的行为
     #define G29J_MESH_TILT_MARGIN ((CLIP_H) + 1)
   #endif
 
@@ -3098,39 +3181,49 @@
   //===========================================================================
   //=================================== Mesh ==================================
   //===========================================================================
+  // 热床调平网格相关配置
 
-  #define MESH_INSET 10          // Set Mesh bounds as an inset region of the bed
+  #define MESH_INSET 10          // Set Mesh bounds as an inset region of the bed  // 设置网格边界为热床内缩区域
   #define GRID_MAX_POINTS_X 3
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
-  //#define MESH_G28_REST_ORIGIN // After homing all axes ('G28' or 'G28 XYZ') rest Z at Z_MIN_POS
+  //#define MESH_G28_REST_ORIGIN // After homing all axes ('G28' or 'G28 XYZ') rest Z at Z_MIN_POS 
+  // 回零所有轴（G28 或 G28 XYZ）之后，将 Z 轴重新归零到 Z_MIN_POS 位置
+  // 注（译者注）：你发 G28 → XYZ 全部回零，探头触底 → 机械上找到 Z 最低点
 
-#endif // BED_LEVELING
+#endif // BED_LEVELING  //热床调平 / 平台自动调平
 
 /**
  * Add a bed leveling sub-menu for ABL or MBL.
  * Include a guided procedure if manual probing is enabled.
+ * 
+ * 为自动调平(ABL)或手动调平(MBL)添加一个【热床调平子菜单】
+ * 如果启用了手动探测，会包含引导式操作流程。
+ * 
+ * 注（译者注）：这是屏幕菜单功能，
+ * 在打印机液晶屏上，增加一个"热床调平"专用菜单
+ * 不用发 G 代码，直接操作屏幕就能进行调平
  */
 //#define LCD_BED_LEVELING
 
 #if ENABLED(LCD_BED_LEVELING)
-  #define MESH_EDIT_Z_STEP  0.025 // (mm) Step size while manually probing Z axis.
-  #define LCD_PROBE_Z_RANGE 4     // (mm) Z Range centered on Z_MIN_POS for LCD Z adjustment
-  //#define MESH_EDIT_MENU        // Add a menu to edit mesh points
+  #define MESH_EDIT_Z_STEP  0.025 // (mm) Step size while manually probing Z axis.  //（毫米）手动探测 Z 轴时的步进大小。设置得更小可以更精细地调整 Z 高度，但会增加调整时间。
+  #define LCD_PROBE_Z_RANGE 4     // (mm) Z Range centered on Z_MIN_POS for LCD Z adjustment  //（毫米）以 Z_MIN_POS 为中心的 LCD Z 调整范围。设置为 0 将使用整个 Z 轴范围。
+  //#define MESH_EDIT_MENU        // Add a menu to edit mesh points  // 添加一个菜单来编辑网格点
 #endif
 
-// Add a menu item to move between bed corners for manual bed adjustment
+// Add a menu item to move between bed corners for manual bed adjustment  // 添加一个菜单项，在手动调平时可以在热床四个角之间移动
 //#define LCD_BED_TRAMMING
 
 #if ENABLED(LCD_BED_TRAMMING)
-  #define BED_TRAMMING_INSET_LFRB { 30, 30, 30, 30 } // (mm) Left, Front, Right, Back insets
-  #define BED_TRAMMING_HEIGHT      0.0        // (mm) Z height of nozzle at tramming points
-  #define BED_TRAMMING_Z_HOP       4.0        // (mm) Z raise between tramming points
-  //#define BED_TRAMMING_INCLUDE_CENTER       // Move to the center after the last corner
+  #define BED_TRAMMING_INSET_LFRB { 30, 30, 30, 30 } // (mm) Left, Front, Right, Back insets  //（毫米）左、前、右、后边距。定义从热床边缘到调平点的距离，确保调平点在热床范围内，并避开夹具等障碍物。
+  #define BED_TRAMMING_HEIGHT      0.0        // (mm) Z height of nozzle at tramming points  //（毫米）调平点喷嘴的 Z 高度。设置为 0 将使用当前 Z 位置。
+  #define BED_TRAMMING_Z_HOP       4.0        // (mm) Z raise between tramming points  //（毫米）调平点之间的 Z 抬升高度。设置为 0 将禁用 Z 抬升。
+  //#define BED_TRAMMING_INCLUDE_CENTER       // Move to the center after the last corner  // 在最后一个角落之后移动到中心
   //#define BED_TRAMMING_USE_PROBE
   #if ENABLED(BED_TRAMMING_USE_PROBE)
     #define BED_TRAMMING_PROBE_TOLERANCE 0.1  // (mm)
-    #define BED_TRAMMING_VERIFY_RAISED        // After adjustment triggers the probe, re-probe to verify
+    #define BED_TRAMMING_VERIFY_RAISED        // After adjustment triggers the probe, re-probe to verify  // 调平后触发探针，重新探测以验证
     //#define BED_TRAMMING_AUDIO_FEEDBACK
   #endif
 
@@ -3141,8 +3234,18 @@
    *
    *  LF  Left-Front    RF  Right-Front
    *  LB  Left-Back     RB  Right-Back
+   * 
+   * /**
+   * 四角调平顺序
    *
-   * Examples:
+   * 可设置 2 个或 4 个点。
+   * 当只设置 2 个点时，第 3 个点会自动使用对边的中心点。
+   *
+   *  LF  左前    RF  右前
+   *  LB  左后    RB  右后
+ 
+   *
+   * Examples:(举例)
    *
    *      Default        {LF,RB,LB,RF}         {LF,RF}           {LB,LF}
    *  LB --------- RB   LB --------- RB    LB --------- RB   LB --------- RB
@@ -3156,11 +3259,13 @@
 
 // @section homing
 
-// The center of the bed is at (X=0, Y=0)
+// The center of the bed is at (X=0, Y=0)  // 热床中心位于 (X=0, Y=0)
 //#define BED_CENTER_AT_0_0
 
 // Manually set the home position. Leave these undefined for automatic settings.
 // For DELTA this is the top-center of the Cartesian print volume.
+// 手动设置原点（Home）位置。不定义这些参数则使用自动设置。
+// 对于三角洲（Delta）机型，原点是笛卡尔打印空间的正中心顶部。
 //#define MANUAL_X_HOME_POS 0
 //#define MANUAL_Y_HOME_POS 0
 //#define MANUAL_Z_HOME_POS 0
@@ -3177,22 +3282,30 @@
  * - Moves the Z probe (or nozzle) to a defined XY point before Z homing.
  * - Allows Z homing only when XY positions are known and trusted.
  * - If stepper drivers sleep, XY homing may be required again before Z homing.
+ * 
+ * 
+ * 启用Z轴安全回零，避免Z探针处于热床区域外时执行Z回零
+ *
+ * 1. 执行Z回零前，先将探针/喷头移动到指定安全XY坐标
+ * 2. 仅在XY坐标确定可靠时，才允许进行Z轴回零
+ * 3. 若步进电机休眠断电，再次Z回零前需重新完成XY回零
+ *
  */
 //#define Z_SAFE_HOMING
 
 #if ENABLED(Z_SAFE_HOMING)
-  #define Z_SAFE_HOMING_X_POINT X_CENTER  // (mm) X point for Z homing
-  #define Z_SAFE_HOMING_Y_POINT Y_CENTER  // (mm) Y point for Z homing
-  //#define Z_SAFE_HOMING_POINT_ABSOLUTE  // Ignore home offsets (M206) for Z homing position
+  #define Z_SAFE_HOMING_X_POINT X_CENTER  // (mm) X point for Z homing //Z 轴回零所用的 X 轴坐标点
+  #define Z_SAFE_HOMING_Y_POINT Y_CENTER  // (mm) Y point for Z homing //Z 轴回零所用的 Y 轴坐标点
+  //#define Z_SAFE_HOMING_POINT_ABSOLUTE  // Ignore home offsets (M206) for Z homing position // Z 轴回零位置不受 M206 设置的原点偏移影响，始终使用绝对坐标
 #endif
 
-// Homing speeds (linear=mm/min, rotational=°/min)
+// Homing speeds (linear=mm/min, rotational=°/min)  //回零速度（直线轴单位：毫米/分钟，旋转轴单位：度/分钟）
 #define HOMING_FEEDRATE_MM_M { (50*60), (50*60), (4*60) }
 
-// Edit homing feedrates with M210 and MarlinUI menu items
+// Edit homing feedrates with M210 and MarlinUI menu items  // 通过 M210 指令和 MarlinUI 屏幕菜单 编辑回零速度
 //#define EDITABLE_HOMING_FEEDRATE
 
-// Validate that endstops are triggered on homing moves
+// Validate that endstops are triggered on homing moves  // 校验：回零移动时，限位开关是否被正确触发
 #define VALIDATE_HOMING_ENDSTOPS
 
 // @section calibrate
@@ -3224,16 +3337,32 @@
  *    |  A-------D          |  A-------D          |  A-------D
  *    +-------------->X     +-------------->X     +-------------->Y
  *     XY_SKEW_FACTOR        XZ_SKEW_FACTOR        YZ_SKEW_FACTOR
+ * 
+ * 
+ * 
+ * 热床歪斜补偿（机架歪轴校正）
+ *
+ * 该功能用于修正 XYZ 三轴装配错位、机架不正带来的走位偏移。
+ *
+ * 获取 XY 平面歪斜参数步骤：
+ * 1. 打印方形校准测试件
+ * 2. 测量对角线AC长度 → 填入XY_DIAG_AC
+ * 3. 测量对角线BD长度 → 填入XY_DIAG_BD
+ * 4. 测量侧边AD边长 → 填入XY_SIDE_AD
+ *
+ * 固件可自动算出歪斜补偿系数，也可手动计算设置。
+ * 同理也可对 XZ、YZ 轴向做歪斜校正。
+ *
  */
 //#define SKEW_CORRECTION
 
 #if ENABLED(SKEW_CORRECTION)
-  // Input all length measurements here:
+  // Input all length measurements here: // 在这里输入所有测量得到的长度数值：
   #define XY_DIAG_AC 282.8427124746
   #define XY_DIAG_BD 282.8427124746
   #define XY_SIDE_AD 200
 
-  // Or, set the XY skew factor directly:
+  // Or, set the XY skew factor directly: // 或者，直接设置 XY 歪斜补偿系数：
   //#define XY_SKEW_FACTOR 0.0
 
   //#define SKEW_CORRECTION_FOR_Z
@@ -3244,18 +3373,20 @@
     #define YZ_DIAG_BD 282.8427124746
     #define YZ_SIDE_AD 200
 
-    // Or, set the Z skew factors directly:
+    // Or, set the Z skew factors directly:  // 或者，直接设置 Z 轴歪斜补偿系数：
     //#define XZ_SKEW_FACTOR 0.0
     //#define YZ_SKEW_FACTOR 0.0
   #endif
 
-  // Enable this option for M852 to set skew at runtime
+  // Enable this option for M852 to set skew at runtime  // 启用此选项以允许在运行时通过 M852 指令设置歪斜补偿
   //#define SKEW_CORRECTION_GCODE
 #endif
 
 //=============================================================================
 //============================= Additional Features ===========================
 //=============================================================================
+// 附加功能 / 拓展功能区
+// Marlin 固件里此板块存放各类非基础必备、可选开启的进阶实用功能
 
 // @section eeprom
 
