@@ -4005,77 +4005,85 @@
 //======================== LCD / Controller Selection =========================
 //========================   (Character-based LCDs)   =========================
 //=============================================================================
+// LCD / 控制器选择
+
+// 注（译者注）：以下是常见的字符屏 LCD 控制器选项，启用对应选项后，固件会包含适配该控制器的代码。
+// 请根据你的打印机实际使用的 LCD 类型，取消对应选项的注释来启用支持。
 // @section lcd
 
 //
-// RepRapDiscount Smart Controller.
+// RepRapDiscount Smart Controller.     //RepRapDiscount 智能控制器
 // https://reprap.org/wiki/RepRapDiscount_Smart_Controller
 //
-// Note: Usually sold with a white PCB.
+// Note: Usually sold with a white PCB.     //备注：通常是白色电路板的那款屏幕。
 //
 //#define REPRAP_DISCOUNT_SMART_CONTROLLER
 
 //
-// GT2560 (YHCB2004) LCD Display
+// GT2560 (YHCB2004) LCD Display      //GT2560 (YHCB2004) 型号 LCD 显示屏
 //
 // Requires Testato, Koepel softwarewire library and
-// Andriy Golovnya's LiquidCrystal_AIP31068 library.
+// Andriy Golovnya's LiquidCrystal_AIP31068 library.      //需要依赖两个库：Testato、Koepel 的 softwarewire 库以及 Andriy Golovnya 的 LiquidCrystal_AIP31068 库
 //
 //#define YHCB2004
 
 //
-// Original RADDS LCD Display+Encoder+SDCardReader
+// Original RADDS LCD Display+Encoder+SDCardReader     // 原版RADDS配套显示屏+编码器旋钮+SD卡读卡器
 // https://web.archive.org/web/20200719145306/doku.radds.org/dokumentation/lcd-display/
 //
 //#define RADDS_DISPLAY
 
 //
-// ULTIMAKER Controller.
+// ULTIMAKER Controller.      // ULTIMAKAKER 控制器
 //
 //#define ULTIMAKERCONTROLLER
 
 //
-// ULTIPANEL as seen on Thingiverse.
+// ULTIPANEL as seen on Thingiverse.      // Thingiverse平台开源的ULTIPANEL控制面板
 //
 //#define ULTIPANEL
 
 //
-// PanelOne from T3P3 (via RAMPS 1.4 AUX2/AUX3)
+// PanelOne from T3P3 (via RAMPS 1.4 AUX2/AUX3)      // T3P3 公司的 PanelOne 显示屏（通过 RAMPS 1.4 的 AUX2/AUX3 接口连接）
 // https://reprap.org/wiki/PanelOne
 //
 //#define PANEL_ONE
 
 //
-// GADGETS3D G3D LCD/SD Controller
+// GADGETS3D G3D LCD/SD Controller      // GADGETS3D G3D 液晶显示屏/SD卡控制器
 // https://reprap.org/wiki/RAMPS_1.3/1.4_GADGETS3D_Shield_with_Panel
 //
-// Note: Usually sold with a blue PCB.
+// Note: Usually sold with a blue PCB.      // 备注：该款屏幕电路板通常为蓝色PCB板
 //
 //#define G3D_PANEL
 
 //
-// RigidBot Panel V1.0
+// RigidBot Panel V1.0      // RigidBot V1.0 专用控制面板
 //
 //#define RIGIDBOT_PANEL
 
 //
-// Makeboard 3D Printer Parts 3D Printer Mini Display 1602 Mini Controller
+// Makeboard 3D Printer Parts 3D Printer Mini Display 1602 Mini Controller        // Makeboard 3D打印机配件 1602迷你显示屏 迷你控制器
 // https://www.aliexpress.com/item/32765887917.html
 //
 //#define MAKEBOARD_MINI_2_LINE_DISPLAY_1602
 
 /**
  * ANET and Tronxy 20x4 Controller
- * LCD2004 display with 5 analog buttons.
+ * LCD2004 display with 5 analog buttons.       // ANET爱能特、创星元Tronxy 2004控制面板    2004液晶显示屏，搭配5个模拟按键
  *
  * NOTE: Requires ADC_KEYPAD_PIN to be assigned to an analog pin.
  * This LCD is known to be susceptible to electrical interference which
  * scrambles the display. Press any button to clear it up.
+ * 
+ *  注意：需要将 ADC_KEYPAD_PIN 分配给一个模拟引脚。
+ * 已知这款 LCD 容易受到电磁干扰导致屏幕花屏、乱码。
+ * 按任意按键即可恢复正常显示。
  */
 //#define ZONESTAR_LCD
 
 //
-// Generic 16x2, 16x4, 20x2, or 20x4 character-based LCD.
+// Generic 16x2, 16x4, 20x2, or 20x4 character-based LCD.  // 通用型 16x2、16x4、20x2 或 20x4 字符 LCD 显示屏。
 //
 //#define ULTRA_LCD
 
@@ -4083,16 +4091,18 @@
 //======================== LCD / Controller Selection =========================
 //=====================   (I2C and Shift-Register LCDs)   =====================
 //=============================================================================
+// I2C 总线 和 移位寄存器 型 LCD 显示屏
 
 //
-// CONTROLLER TYPE: I2C
+// CONTROLLER TYPE: I2C  // 控制器类型：I2C
 //
 // Note: These controllers require the installation of Arduino's LiquidCrystal_I2C
 // library. For more info: https://github.com/kiyoshigawa/LiquidCrystal_I2C
+// 注意：使用这类控制器，必须先安装 Arduino 的 LiquidCrystal_I2C 库。
 //
 
 //
-// Elefu RA Board Control Panel
+// Elefu RA Board Control Panel  // Elefu RA 主板配套控制面板
 // https://web.archive.org/web/20140823033947/www.elefu.com/index.php?route=product/product&product_id=53
 //
 //#define RA_CONTROL_PANEL
@@ -4108,25 +4118,34 @@
 //#define LCD_SAINSMART_I2C_2004
 
 //
-// Generic LCM1602 LCD adapter
+// Generic LCM1602 LCD adapter  // 通用 LCM1602 液晶显示屏转接板
 //
 //#define LCM1602
 
 //
 // PANELOLU2 LCD with status LEDs,
 // separate encoder and click inputs.
+// PANELOLU2 LCD 显示屏（带状态指示灯）
+// 独立编码器与点击按键输入。
 //
 // Note: This controller requires Arduino's LiquidTWI2 library v1.2.3 or later.
 // For more info: https://github.com/lincomatic/LiquidTWI2
+// 注意：此控制器需要安装 Arduino 的 LiquidTWI2 库 v1.2.3 或更高版本。
+// 详细信息：https://github.com/lincomatic/LiquidTWI2
 //
 // Note: The PANELOLU2 encoder click input can either be directly connected to
 // a pin (if BTN_ENC defined to != -1) or read through I2C (when BTN_ENC == -1).
+// 注意：PANELOLU2 编码器的点击按键输入有两种连接方式：
+// 1. 直接连接到一个引脚（当 BTN_ENC 定义为不等于 -1 时）
+// 2. 通过 I2C 总线读取（当 BTN_ENC 等于 -1 时）
 //
 //#define LCD_I2C_PANELOLU2
 
 //
 // Panucatt VIKI LCD with status LEDs,
 // integrated click & L/R/U/D buttons, separate encoder inputs.
+// Panucatt VIKI LCD 显示屏（带状态指示灯）
+// 集成确认/上/下/左/右按键，独立编码器输入。
 //
 //#define LCD_I2C_VIKI
 
@@ -4150,6 +4169,8 @@
 //
 // TFT GLCD Panel with Marlin UI
 // Panel connected to main board by SPI or I2C interface.
+// TFT GLCD 显示屏（带 Marlin 图形界面）
+// 通过 SPI 或 I2C 接口连接到主板。
 // See https://github.com/Serhiy-K/TFTGLCDAdapter
 //
 //#define TFTGLCD_PANEL_SPI
@@ -4159,60 +4180,63 @@
 //=======================   LCD / Controller Selection  =======================
 //=========================      (Graphical LCDs)      ========================
 //=============================================================================
+// 图形液晶显示器
 
 //
-// CONTROLLER TYPE: Graphical 128x64 (DOGM)
+// CONTROLLER TYPE: Graphical 128x64 (DOGM)  // 控制器类型：图形屏 128x64 (DOGM)
 //
 // IMPORTANT: The U8glib library is required for Graphical Display!
 //            https://github.com/olikraus/U8glib_Arduino
+// 重要提示：图形显示器必须安装 U8glib 库！
+// 库地址：https://github.com/olikraus/U8glib_Arduino
 //
-// NOTE: If the LCD is unresponsive you may need to reverse the plugs.
+// NOTE: If the LCD is unresponsive you may need to reverse the plugs.  // 注意：若液晶屏幕无任何反应，可尝试调换排线插头正反方向
 //
 
 //
-// RepRapDiscount FULL GRAPHIC Smart Controller
+// RepRapDiscount FULL GRAPHIC Smart Controller  // RepRapDiscount 全图形智能控制面板
 // https://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller
 //
 //#define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
 
 //
-// K.3D Full Graphic Smart Controller
+// K.3D Full Graphic Smart Controller  // K.3D 全图形智能控制面板
 //
 //#define K3D_FULL_GRAPHIC_SMART_CONTROLLER
 
 //
-// ReprapWorld Graphical LCD
+// ReprapWorld Graphical LCD  // ReprapWorld 图形液晶显示屏 (128x64 SPI)
 // https://reprapworld.com/electronics/3d-printer-modules/autonomous-printing/graphical-lcd-screen-v1-0/
 //
 //#define REPRAPWORLD_GRAPHICAL_LCD
 
 //
 // Activate one of these if you have a Panucatt Devices
-// Viki 2.0 or mini Viki with Graphic LCD
+// Viki 2.0 or mini Viki with Graphic LCD  // 若使用Panucatt品牌的Viki 2.0或迷你Viki图形屏，请启用以下对应选项之一
 // https://www.panucatt.com
 //
 //#define VIKI2
 //#define miniVIKI
 
 //
-// Alfawise Ex8 printer LCD marked as WYH L12864 COG
+// Alfawise Ex8 printer LCD marked as WYH L12864 COG  // Alfawise Ex8 原厂屏 WYH L12864 COG（ST7565/ST7567 SPI）
 //
 //#define WYH_L12864
 
 //
-// MakerLab Mini Panel with graphic
+// MakerLab Mini Panel with graphic  // MakerLab Mini Panel 迷你图形控制面板
 // controller and SD support - https://reprap.org/wiki/Mini_panel
 //
 //#define MINIPANEL
 
 //
-// MaKr3d Makr-Panel with graphic controller and SD support.
+// MaKr3d Makr-Panel with graphic controller and SD support.  // MaKr3d Makr-Panel 图形控制面板，支持SD卡读取
 // https://reprap.org/wiki/MaKrPanel
 //
 //#define MAKRPANEL
 
 //
-// Adafruit ST7565 Full Graphic Controller.
+// Adafruit ST7565 Full Graphic Controller.  // Adafruit ST7565 全图形控制面板
 // https://github.com/eboston/Adafruit-ST7565-Full-Graphic-Controller/
 //
 //#define ELB_FULL_GRAPHIC_CONTROLLER
@@ -4220,6 +4244,8 @@
 //
 // BQ LCD Smart Controller shipped by
 // default with the BQ Hephestos 2 and Witbox 2.
+// BQ液晶智能控制面板
+// 为BQ Hephestos 2、Witbox 2机型原厂标配屏幕
 //
 //#define BQ_LCD_SMART_CONTROLLER
 
@@ -4230,29 +4256,35 @@
 //#define CARTESIO_UI
 
 //
-// LCD for Melzi Card with Graphical LCD
+// LCD for Melzi Card with Graphical LCD  // 适配Melzi主控板的图形液晶显示屏
 //
 //#define LCD_FOR_MELZI
 
 //
 // Original Ulticontroller from Ultimaker 2 printer with SSD1309 I2C display and encoder
+// 适用于Ultimaker 2打印机原装Ulticontroller控制面板
+// 搭载SSD1309 I2C显示屏与旋转编码器
 // https://github.com/Ultimaker/Ultimaker2/tree/master/1249_Ulticontroller_Board_(x1)
 //
 //#define ULTI_CONTROLLER
 
 //
-// MKS MINI12864 with graphic controller and SD support
+// MKS MINI12864 with graphic controller and SD support  // MKS MINI12864 图形控制面板 带SD卡支持
 // https://reprap.org/wiki/MKS_MINI_12864
 //
 //#define MKS_MINI_12864
 
 //
 // MKS MINI12864 V3 is an alias for FYSETC_MINI_12864_2_1. Type A/B. NeoPixel RGB Backlight.
+// MKS MINI12864 V3 等同 FYSETC_MINI_12864_2_1
+// 分A/B版本，搭载NeoPixel RGB彩色背光
 //
 //#define MKS_MINI_12864_V3
 
 //
 // MKS LCD12864A/B with graphic controller and SD support. Follows MKS_MINI_12864 pinout.
+// MKS LCD12864A/B 图形控制面板 带SD卡支持
+// 引脚定义与 MKS_MINI_12864 完全一致
 // https://www.aliexpress.com/item/33018110072.html
 //
 //#define MKS_LCD12864A
@@ -4260,62 +4292,87 @@
 
 //
 // FYSETC variant of the MINI12864 graphic controller with SD support
+// FYSETC 版 MINI12864 图形控制面板（带SD卡支持）
 // https://wiki.fysetc.com/Mini12864_Panel/
 //
-//#define FYSETC_MINI_12864_X_X    // Type C/D/E/F. No tunable RGB Backlight by default
-//#define FYSETC_MINI_12864_1_2    // Type C/D/E/F. Simple RGB Backlight (always on)
-//#define FYSETC_MINI_12864_2_0    // Type A/B. Discreet RGB Backlight
-//#define FYSETC_MINI_12864_2_1    // Type A/B. NeoPixel RGB Backlight
-//#define FYSETC_GENERIC_12864_1_1 // Larger display with basic ON/OFF backlight.
+//#define FYSETC_MINI_12864_X_X    // Type C/D/E/F. No tunable RGB Backlight by default  // Type C/D/E/F 版本默认无可调 RGB 背光
+//#define FYSETC_MINI_12864_1_2    // Type C/D/E/F. Simple RGB Backlight (always on)  // C/D/E/F版本：简易RGB背光，默认常亮不可调
+//#define FYSETC_MINI_12864_2_0    // Type A/B. Discreet RGB Backlight  // A/B版本：独立可控式RGB背光
+//#define FYSETC_MINI_12864_2_1    // Type A/B. NeoPixel RGB Backlight  // 搭载 NeoPixel RGB 可编程背光
+//#define FYSETC_GENERIC_12864_1_1 // Larger display with basic ON/OFF backlight.  // 大屏款，仅支持背光基础开关，无调色功能
 
 //
 // BigTreeTech Mini 12864 V1.0 / V2.0 is an alias for FYSETC_MINI_12864_2_1. Type A/B. NeoPixel RGB Backlight.
+// BigTreeTech (BTT) Mini 12864 V1.0 / V2.0
+// 等同于 FYSETC_MINI_12864_2_1
+// Type A/B 版本，带 NeoPixel RGB 背光
 // https://github.com/bigtreetech/MINI-12864
 //
 //#define BTT_MINI_12864
 
 //
 // BEEZ MINI 12864 is an alias for FYSETC_MINI_12864_2_1. Type A/B. NeoPixel RGB Backlight.
+// BEEZ MINI 12864 等效 FYSETC_MINI_12864_2_1
+// A/B型，搭载NeoPixel RGB可编程背光
 //
 //#define BEEZ_MINI_12864
 
 //
 // Factory display for Creality CR-10 / CR-7 / Ender-3
+// Creality CR-10 / CR-7 / Ender-3 原厂屏
+// 型号：Creality 12864 OEM LCD (非RGB，仅单色背光)
+// 无NeoPixel，不可调色，仅基础开/关背光
 // https://marlinfw.org/docs/hardware/controllers.html#cr10_stockdisplay
 //
-// Connect to EXP1 on RAMPS and compatible boards.
+// Connect to EXP1 on RAMPS and compatible boards.  // 连接至 RAMPS 主板及兼容版型的 EXP1 接口
 //
 //#define CR10_STOCKDISPLAY
 
 //
-// Ender-2 OEM display, a variant of the MKS_MINI_12864
+// Ender-2 OEM display, a variant of the MKS_MINI_12864  
+// Ender-2 OEM 原厂屏
+// 属于 MKS_MINI_12864 的衍生变体
+// 驱动：UC1701，SPI 接口，单色背光（无 RGB）
 //
 //#define ENDER2_STOCKDISPLAY
 
 //
 // ANET and Tronxy 128×64 Full Graphics Controller as used on Anet A6
+// ANET / Tronxy 128×64 全图形控制器 (Anet A6 原厂屏)
+// 别名：ANET_FULL_GRAPHICS_LCD
+// 驱动：ST7565，接口：并行（EXP1），单色背光，带旋转编码器
 //
 //#define ANET_FULL_GRAPHICS_LCD
 
 //
 // GUCOCO CTC 128×64 Full Graphics Controller as used on GUCOCO CTC A10S
+// GUCOCO CTC 128×64 Full Graphics Controller (CTC A10S 原厂屏)
+// 别名：CTC_A10S_FULL_GRAPHICS_LCD / 与 ANET A6/Tronxy 同源
+// 驱动：ST7565，接口：并行（EXP1），单色背光，带旋转编码器
 //
 //#define CTC_A10S_A13
 
 //
 // AZSMZ 12864 LCD with SD
+// 接口：SPI（软件/硬件），驱动：ST7565，带板载SD卡、编码器
+// Marlin 宏：AZSMZ_12864（与 VIKI2 共用引脚）
 // https://www.aliexpress.com/item/32837222770.html
 //
 //#define AZSMZ_12864
 
 //
 // Silvergate GLCD controller
+// 接口：并行(EXP1)，驱动：ST7920，128×64，带编码器、蜂鸣器、SD
+// Marlin 宏：SILVER_GATE_GLCD_CONTROLLER
 // https://github.com/android444/Silvergate
 //
 //#define SILVER_GATE_GLCD_CONTROLLER
 
 //
 // eMotion Tech LCD with SD
+// 专用图形LCD控制器，带SD卡、编码器
+// 接口：并行 / SPI，适配 eMotion Tech 主板
+// Marlin 宏：EMOTION_TECH_LCD
 // https://www.reprap-france.com/produit/1234568748-ecran-graphique-128-x-64-points-2-1
 //
 //#define EMOTION_TECH_LCD
