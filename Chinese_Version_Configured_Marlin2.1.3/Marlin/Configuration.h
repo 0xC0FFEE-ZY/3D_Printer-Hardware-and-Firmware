@@ -4846,17 +4846,25 @@
 //=============================================================================
 //=============================== Extra Features ==============================
 //=============================================================================
+// 拓展功能
 
 // @section fans
 
 // Set number of user-controlled fans. Disable to use all board-defined fans.
 // :[1,2,3,4,5,6,7,8]
+// 设置用户可控风扇的数量。
+// 禁用此项以使用主板定义的所有风扇。
+// 可选值：[1,2,3,4,5,6,7,8]
 //#define NUM_M106_FANS 1
 
 /**
  * Use software PWM to drive the fan, as for the heaters. This uses a very low frequency
  * which is not as annoying as with the hardware PWM. On the other hand, if this frequency
  * is too low, you should also increment SOFT_PWM_SCALE.
+ * 
+ * 使用软件 PWM（脉冲宽度调制）来驱动风扇，与加热头控制方式相同。
+ * 这种方式使用非常低的频率，不会像硬件 PWM 那样产生刺耳的噪音。
+ * 另一方面，如果这个频率过低，你也需要增加 SOFT_PWM_SCALE 的值。
  */
 //#define FAN_SOFT_PWM
 
@@ -4865,6 +4873,19 @@
  * the fan if FAN_SOFT_PWM is enabled. However, control resolution will be halved for each
  * increment; at zero value, there are 128 effective control positions.
  * :[0,1,2,3,4,5,6,7]
+ * 
+ * 将该值每增加 1，软件 PWM 频率就会翻倍，
+ * 会影响加热设备，以及启用了 FAN_SOFT_PWM 的风扇。
+ * 但是，每增加一级，控制精度就会减半；
+ * 当值为 0 时，拥有 128 个有效控制档位。
+ * 可选值：[0,1,2,3,4,5,6,7]
+ * 
+ * 注（译者注）：
+ * SOFT_PWM_SCALE = 软件 PWM 频率档位
+ * 数字越大 → 风扇 / 加热控制频率越高 → 不抖、不嗡嗡响
+ * 数字越大 → 控制精度越低（比如调风速没那么细腻）
+ * 默认 0 → 精度最高，但频率最低
+ * 
  */
 #define SOFT_PWM_SCALE 0
 
@@ -4872,12 +4893,21 @@
  * If SOFT_PWM_SCALE is set to a value higher than 0, dithering can be used to mitigate the
  * associated resolution loss. If enabled, some of the PWM cycles are stretched so on average
  * the desired duty cycle is attained.
+ * 
+ * 当 SOFT_PWM_SCALE 设置大于 0 时，可以使用  抖动算法（dithering）来弥补由此带来的控制精度下降问题。
+ * 启用后，系统会自动微调部分 PWM 周期的时长，
+ * 让平均输出功率达到你想要的精准值。
+ * 
  */
 //#define SOFT_PWM_DITHER
 
 // @section extras
 
-// Support for the BariCUDA Paste Extruder
+// Support for the BariCUDA Paste Extruder  // 支持 BariCUDA 膏状物料挤出机
+
+// 注（译者注）：
+// BariCUDA：一种气压驱动的特殊挤出机，专门用来挤膏状 / 糊状材料（巧克力、糖霜、陶泥、生物凝胶等）。
+// 普通 3D 打印机是电机 + 齿轮推丝；BariCUDA 是用气泵 + 电磁阀控制压力挤出材料。
 //#define BARICUDA
 
 // @section lights
@@ -4886,16 +4916,21 @@
  * Temperature status LEDs that display the hotend and bed temperature.
  * If all hotends, bed temperature, and target temperature are under 54C
  * the BLUE led is on. Otherwise the RED led is on. (1C hysteresis)
+ * 
+ * 温度状态指示灯，用于显示热端与热床温度
+ * 若所有热端、热床实际温度及目标温度均低于54摄氏度
+ * 蓝色灯亮起；反之则红灯亮起，带有1摄氏度回差阈值
+ * 
  */
 //#define TEMP_STAT_LEDS
 
-// Support for BlinkM/CyzRgb
+// Support for BlinkM/CyzRgb  // 支持 BlinkM / CyzRgb 可编程 RGB 彩灯模块
 //#define BLINKM
 
-// Support for PCA9632 PWM LED driver
+// Support for PCA9632 PWM LED driver  // 支持 PCA9632 PWM LED 驱动芯片
 //#define PCA9632
 
-// Support for PCA9533 PWM LED driver
+// Support for PCA9533 PWM LED driver  // 支持 PCA9533 PWM LED 驱动芯片
 //#define PCA9533
 
 /**
@@ -4919,9 +4954,31 @@
  *
  *  Requires PWM frequency between 50 <> 100Hz (Check HAL or variant)
  *  Use FAST_PWM_FAN, if possible, to reduce fan noise.
+ * 
+ * RGB 彩灯 / LED 灯带控制
+ *
+ * 启用对连接在 5V 数字引脚的 RGB LED 的支持，
+ * 或通过 MOS 管控制的 RGB 灯带。
+ *
+ * 添加 M150 指令用于设置 LED（灯带）颜色。
+ * 如果引脚支持 PWM（如 4、5、6、11），
+ * 亮度可在 0~255 之间调节。
+ * 对于 NeoPixel 彩灯，还可设置整体亮度。
+ *
+ *  === 注意事项 ===
+ *  LED 灯带必须在 PWM 信号线与灯带之间加 MOS 管，
+ *  因为 Arduino 无法直接驱动 LED 所需的大电流。
+ *  不这样做可能会烧毁 Arduino！
+ *
+ *  注意：需要独立 5V 供电！
+ *  NeoPixel 所需电流超过 Arduino 板载 5V 供电能力。
+ *
+ *  需要 PWM 频率在 50~100Hz 之间（查看 HAL 或主板配置）
+ *  尽量开启 FAST_PWM_FAN 以降低风扇噪音。
+ * 
  */
 
-// LED Type. Enable only one of the following two options:
+// LED Type. Enable only one of the following two options:  // LED 类型。以下两个选项**只能开启一个**：
 //#define RGB_LED
 //#define RGBW_LED
 
@@ -4933,42 +4990,42 @@
 #endif
 
 #if ANY(RGB_LED, RGBW_LED, PCA9632)
-  //#define RGB_STARTUP_TEST              // For PWM pins, fade between all colors
+  //#define RGB_STARTUP_TEST              // For PWM pins, fade between all colors  // 对于 PWM 控制的引脚，启用“颜色渐变/淡入淡出”效果
   #if ENABLED(RGB_STARTUP_TEST)
-    #define RGB_STARTUP_TEST_INNER_MS 10  // (ms) Reduce or increase fading speed
+    #define RGB_STARTUP_TEST_INNER_MS 10  // (ms) Reduce or increase fading speed  // 单位：毫秒，调节灯光颜色渐变快慢
   #endif
 #endif
 
-// Support for Adafruit NeoPixel LED driver
+// Support for Adafruit NeoPixel LED driver  // 支持 Adafruit NeoPixel LED 驱动（WS2812 / WS2812B 智能灯珠）
 //#define NEOPIXEL_LED
 #if ENABLED(NEOPIXEL_LED)
-  #define NEOPIXEL_TYPE          NEO_GRBW // NEO_GRBW, NEO_RGBW, NEO_GRB, NEO_RBG, etc.
+  #define NEOPIXEL_TYPE          NEO_GRBW // NEO_GRBW, NEO_RGBW, NEO_GRB, NEO_RBG, etc.  // 选择你的 NeoPixel 灯珠的颜色通道顺序（必须匹配硬件，否则颜色显示错误）
                                           // See https://github.com/adafruit/Adafruit_NeoPixel/blob/master/Adafruit_NeoPixel.h
-  //#define NEOPIXEL_PIN                4 // LED driving pin
+  //#define NEOPIXEL_PIN                4 // LED driving pin  // LED 驱动引脚（控制灯条的信号输出引脚）
   //#define NEOPIXEL2_TYPE  NEOPIXEL_TYPE
   //#define NEOPIXEL2_PIN               5
-  #define NEOPIXEL_PIXELS              30 // Number of LEDs in the strip. (Longest strip when NEOPIXEL2_SEPARATE is disabled.)
-  #define NEOPIXEL_IS_SEQUENTIAL          // Sequential display for temperature change - LED by LED. Disable to change all LEDs at once.
-  #define NEOPIXEL_BRIGHTNESS         127 // Initial brightness (0-255)
-  //#define NEOPIXEL_STARTUP_TEST         // Cycle through colors at startup
+  #define NEOPIXEL_PIXELS              30 // Number of LEDs in the strip. (Longest strip when NEOPIXEL2_SEPARATE is disabled.)  // 灯带中的 LED 灯珠数量。（当 NEOPIXEL2_SEPARATE 未开启时，填写最长那串灯的数量）
+  #define NEOPIXEL_IS_SEQUENTIAL          // Sequential display for temperature change - LED by LED. Disable to change all LEDs at once.  // 温度变化时逐颗LED依次显示（流水灯效果）。禁用此项则所有LED同时变色。
+  #define NEOPIXEL_BRIGHTNESS         127 // Initial brightness (0-255)  // 初始亮度（取值范围：0 ～ 255）
+  //#define NEOPIXEL_STARTUP_TEST         // Cycle through colors at startup  // 开机时自动循环显示所有颜色（彩虹渐变/跑马灯效果）
 
-  // Support for second Adafruit NeoPixel LED driver controlled with M150 S1 ...
+  // Support for second Adafruit NeoPixel LED driver controlled with M150 S1 ...  // 支持第二路 Adafruit NeoPixel LED 驱动，通过指令 M150 S1 控制
   //#define NEOPIXEL2_SEPARATE
   #if ENABLED(NEOPIXEL2_SEPARATE)
-    #define NEOPIXEL2_PIXELS           15 // Number of LEDs in the second strip
-    #define NEOPIXEL2_BRIGHTNESS      127 // Initial brightness (0-255)
-    #define NEOPIXEL2_STARTUP_TEST        // Cycle through colors at startup
-    #define NEOPIXEL_M150_DEFAULT      -1 // Default strip for M150 without 'S'. Use -1 to set all by default.
+    #define NEOPIXEL2_PIXELS           15 // Number of LEDs in the second strip  // 第二串 LED 灯带的灯珠数量
+    #define NEOPIXEL2_BRIGHTNESS      127 // Initial brightness (0-255)  // 第二串 LED 灯带的**初始亮度**（范围：0 ～ 255）
+    #define NEOPIXEL2_STARTUP_TEST        // Cycle through colors at startup  // 第二串 LED 开机时自动循环彩虹色
+    #define NEOPIXEL_M150_DEFAULT      -1 // Default strip for M150 without 'S'. Use -1 to set all by default.  // 当使用 M150 指令不带 S 参数时，默认控制哪一路灯。设置为 -1 表示默认同时控制所有灯。
   #else
-    //#define NEOPIXEL2_INSERIES          // Default behavior is NeoPixel 2 in parallel
+    //#define NEOPIXEL2_INSERIES          // Default behavior is NeoPixel 2 in parallel  // 默认行为：第二路 NeoPixel 与第一路“同步并联控制”（一起亮、同颜色）
   #endif
 
-  // Use some of the NeoPixel LEDs for static (background) lighting
-  //#define NEOPIXEL_BKGD_INDEX_FIRST   0 // Index of the first background LED
-  //#define NEOPIXEL_BKGD_INDEX_LAST    5 // Index of the last background LED
+  // Use some of the NeoPixel LEDs for static (background) lighting  // 将一部分 NeoPixel LED 用作**静态背景灯**（常亮、不随温度/状态变化）
+  //#define NEOPIXEL_BKGD_INDEX_FIRST   0 // Index of the first background LED  // 第一个背景灯的起始索引号
+  //#define NEOPIXEL_BKGD_INDEX_LAST    5 // Index of the last background LED  // 最后一颗背景灯的索引号
   //#define NEOPIXEL_BKGD_COLOR         { 255, 255, 255, 0 }  // R, G, B, W
   //#define NEOPIXEL_BKGD_TIMEOUT_COLOR {  25,  25,  25, 0 }  // R, G, B, W
-  //#define NEOPIXEL_BKGD_ALWAYS_ON       // Keep the backlight on when other NeoPixels are off
+  //#define NEOPIXEL_BKGD_ALWAYS_ON       // Keep the backlight on when other NeoPixels are off  // 当其他 NeoPixel 状态灯关闭时，"保持背景灯常亮"
 #endif
 
 /**
@@ -4981,6 +5038,16 @@
  *  - Change to white to illuminate work surface
  *  - Change to green once print has finished
  *  - Turn off after the print has finished and the user has pushed a button
+ * 
+ *  打印机事件灯光
+ * - 打印过程中，LED 灯带会同步显示打印机运行状态：
+ * - 热床升温至目标温度时，灯光由蓝色逐渐变为紫色
+ * - 喷头升温至设定温度时，灯光由紫色逐渐变为红色
+ * - 打印作业中切换为白光，照亮打印工作面
+ * - 打印完成后灯光变为绿色
+ * - 打印结束并按下按键后，灯光自动熄灭
+ * 
+ * 
  */
 #if ANY(BLINKM, RGB_LED, RGBW_LED, PCA9632, PCA9533, NEOPIXEL_LED)
   #define PRINTER_EVENT_LEDS
@@ -4994,19 +5061,28 @@
  * For some servo-related options NUM_SERVOS will be set automatically.
  * Set this manually if there are extra servos needing manual control.
  * Set to 0 to turn off servo support.
+ * 
+ * 舵机数量
+ * 对于某些与舵机相关的配置项，NUM_SERVOS（舵机数量）会被自动设置。
+ * 如果有额外的舵机需要手动控制，请自行设置该值。
+ * 设置为 0 表示关闭舵机功能支持。
+ * 
  */
-//#define NUM_SERVOS 3 // Note: Servo index starts with 0 for M280-M282 commands
+//#define NUM_SERVOS 3 // Note: Servo index starts with 0 for M280-M282 commands  注意：在 M280、M281、M282 指令中，舵机编号从 0 开始计数。
 
 // (ms) Delay before the next move will start, to give the servo time to reach its target angle.
 // 300ms is a good value but you can try less delay.
 // If the servo can't reach the requested position, increase it.
+// (ms) 下一次移动开始前的延时，用于给舵机时间到达目标角度。
+// 300ms 是个很合适的值，你也可以尝试更短的延时。
+// 如果舵机无法到达指定位置，请加大这个值。
 #define SERVO_DELAY { 300 }
 
-// Only power servos during movement, otherwise leave off to prevent jitter
+// Only power servos during movement, otherwise leave off to prevent jitter  // 仅在舵机运动时供电，其他时间断电以防止抖动、异响
 //#define DEACTIVATE_SERVOS_AFTER_MOVE
 
-// Edit servo angles with M281 and save to EEPROM with M500
+// Edit servo angles with M281 and save to EEPROM with M500  // 使用 M281 指令编辑舵机角度，并用 M500 指令保存到 EEPROM（主板闪存）
 //#define EDITABLE_SERVO_ANGLES
 
-// Disable servo with M282 to reduce power consumption, noise, and heat when not in use
+// Disable servo with M282 to reduce power consumption, noise, and heat when not in use  // 使用 M282 指令禁用舵机（断电），以在不使用时降低功耗、减少噪音和热量
 //#define SERVO_DETACH_GCODE
