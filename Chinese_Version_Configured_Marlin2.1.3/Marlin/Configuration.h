@@ -3754,7 +3754,7 @@
   //#define PASSWORD_ON_SD_PRINT_MENU       // This does not prevent G-codes from running  //该功能无法阻止 G 代码指令运行
   //#define PASSWORD_AFTER_SD_PRINT_END
   //#define PASSWORD_AFTER_SD_PRINT_ABORT
-  //#include "Configuration_Secure.h"       // External file with PASSWORD_DEFAULT_VALUE   // 外部文件，包含默认密码值
+  //#include "Configuration_Secure.h"       // External file with PASSWORD_DEFAULT_VALUE  // 外部文件，包含默认密码值
 #endif
 
 // @section media
@@ -3764,13 +3764,29 @@
  *
  * SD Card support is disabled by default. If your controller has an SD slot,
  * you must uncomment the following option or it won't work.
+ * 
+ * 存储卡功能
+ * 固件默认关闭 SD 卡支持。若你的主控板带有 SD 卡槽，
+ * 必须取消下方对应配置的注释，该功能才能正常使用。
+ * 
+ * 注（译者注）：SD卡作用：
+ * 脱机打印（最主要）
+     电脑不用一直连着打印机，把打印文件拷进 SD 卡，插打印机上直接打印。
+ * 存固件、配置文件
+     部分主板靠 SD 卡刷固件、保存参数。
+ * 存打印日志、截图
+     部分机型存打印记录、屏幕截图。
+ * 离线运行脚本
+     存放批量 G 代码脚本离线执行。
  */
 //#define SDSUPPORT
 
 /**
  * SD CARD: ENABLE CRC
  *
- * Use CRC checks and retries on the SD communication.
+ * Use CRC checks and retries on the SD communication. //SD 卡通信启用 CRC 校验与重连重试机制
+ * 注（译者注）：启用后，SD 卡通信会使用 CRC 校验来验证数据完整性，并在通信失败时自动重试。这可以提高 SD 卡读取的可靠性，尤其是在电磁干扰较大的环境中。
+ * 不过启用此功能可能会略微降低 SD 卡的读写速度，因为每次通信都需要进行 CRC 计算和验证。
  */
 #if ENABLED(SDSUPPORT)
   //#define SD_CHECK_AND_RETRY
