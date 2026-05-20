@@ -3803,6 +3803,12 @@
  *   jp_kana, ko_KR, nl, pl, pt, pt_br, ro, ru, sk, sv, tr, uk, vi, zh_CN, zh_TW
  *
  * :{ 'en':'English', 'an':'Aragonese', 'bg':'Bulgarian', 'ca':'Catalan', 'cz':'Czech', 'da':'Danish', 'de':'German', 'el':'Greek (Greece)', 'el_CY':'Greek (Cyprus)', 'es':'Spanish', 'eu':'Basque-Euskera', 'fi':'Finnish', 'fr':'French', 'gl':'Galician', 'hr':'Croatian', 'hu':'Hungarian', 'it':'Italian', 'jp_kana':'Japanese', 'ko_KR':'Korean (South Korea)', 'nl':'Dutch', 'pl':'Polish', 'pt':'Portuguese', 'pt_br':'Portuguese (Brazilian)', 'ro':'Romanian', 'ru':'Russian', 'sk':'Slovak', 'sv':'Swedish', 'tr':'Turkish', 'uk':'Ukrainian', 'vi':'Vietnamese', 'zh_CN':'Chinese (Simplified)', 'zh_TW':'Chinese (Traditional)' }
+ * 
+ * 显示屏语言设置
+ * 选择液晶显示屏显示的语言，可用语种如下：
+ * en 英文、阿拉贡语、保加利亚语、加泰罗尼亚语、捷克语、丹麦语、德语、希腊语、塞浦路斯希腊语、西班牙语、巴斯克语、芬兰语、法语、
+ * 加利西亚语、克罗地亚语、匈牙利语、意大利语、日语假名、韩语、荷兰语、波兰语、葡萄牙语、巴西葡语、罗马尼亚语、俄语、斯洛伐克语、
+ * 瑞典语、土耳其语、乌克兰语、越南语、简体中文、繁体中文
  */
 #define LCD_LANGUAGE en
 
@@ -3827,6 +3833,19 @@
  * See https://marlinfw.org/docs/development/lcd_language.html
  *
  * :['JAPANESE', 'WESTERN', 'CYRILLIC']
+ * 
+ * 液晶屏字符集设置
+ * 注意：该选项不适用于图形彩屏。
+ * 所有字符屏除基础 ASCII 字符外，还自带以下其中一种语言扩展字符集：
+ * JAPANESE 日式字符集（最常用）
+ * WESTERN 西欧字符集（含更多重音字母）
+ * CYRILLIC 西里尔字符集（适配俄语）
+ * 查看你的主板内置字符集方法：
+ * 将显示屏语言临时设为 test 后编译刷入固件
+ * 查看屏幕菜单显示文字样式
+ * 即可判断是日式、西欧还是西里尔字符集
+ * 参考文档：https://marlinfw.org/docs/development/lcd_language.html
+ * 可选值：日式 / 西欧 / 西里尔
  */
 #define DISPLAY_CHARSET_HD44780 JAPANESE
 
@@ -3834,6 +3853,8 @@
  * Info Screen Style (0:Classic, 1:Průša, 2:CNC)
  *
  * :[0:'Classic', 1:'Průša', 2:'CNC']
+ * 
+ * 信息界面样式（0：经典样式，1：普鲁沙机型风格，2：数控机床风格）
  */
 #define LCD_INFO_SCREEN_STYLE 0
 
@@ -3842,6 +3863,8 @@
  *
  * Disable all menus and only display the Status Screen, or
  * just remove some extraneous menu items to recover space.
+ * 液晶显示屏菜单项目
+ * 可关闭全部菜单，仅保留状态主页；也可删减多余菜单项，节省屏幕显示空间。
  */
 //#define NO_LCD_MENUS
 //#define SLIM_LCD_MENUS
@@ -3851,12 +3874,25 @@
 //
 // This option overrides the default number of encoder pulses needed to
 // produce one step. Should be increased for high-resolution encoders.
+
+// 编码器设置
+//
+// 该选项用于覆盖默认的编码器脉冲数（每产生一步所需的脉冲）。
+// 高分辨率编码器需要增大这个数值。
+
+// 注（译者注）：编码器是旋转式输入设备，常用于 LCD 控制器上作为旋钮。
+// 这个参数是调旋钮灵敏度的，
+// 编码器转一格，屏幕跳多少个选项
+
 //
 //#define ENCODER_PULSES_PER_STEP 4
 
 //
 // Use this option to override the number of step signals required to
 // move between next/prev menu items.
+
+// 使用此选项，可自定义切换菜单上一个/下一个项目
+// 所需要的步进信号数量。
 //
 //#define ENCODER_STEPS_PER_MENU_ITEM 1
 
@@ -3868,35 +3904,45 @@
  *  Reversed Value Edit and Menu Nav? Enable REVERSE_ENCODER_DIRECTION.
  *  Reversed Menu Navigation only?    Enable REVERSE_MENU_DIRECTION.
  *  Reversed Value Editing only?      Enable BOTH options.
+ * 
+ * * 编码器方向设置
+ *
+ * 先关闭这两个选项，测试你的旋钮实际转向是否正常。
+ *
+ *  数值调节 和 菜单上下 都反了？启用 REVERSE_ENCODER_DIRECTION。
+ *  只有 菜单上下 反了？          启用 REVERSE_MENU_DIRECTION。
+ *  只有 数值调节 反了？          两个选项 都启用。
  */
 
 //
-// This option reverses the encoder direction everywhere.
+// This option reverses the encoder direction everywhere. // 该选项会 全局反转编码器方向。
 //
-//  Set this option if CLOCKWISE causes values to DECREASE
+//  Set this option if CLOCKWISE causes values to DECREASE  //如果顺时针旋转旋钮时，数值反而**减小**，就启用这个选项。
 //
 //#define REVERSE_ENCODER_DIRECTION
 
 //
-// This option reverses the encoder direction for navigating LCD menus.
+// This option reverses the encoder direction for navigating LCD menus.  // 该选项仅 反转LCD菜单中编码器的方向。
 //
-//  If CLOCKWISE normally moves DOWN this makes it go UP.
-//  If CLOCKWISE normally moves UP this makes it go DOWN.
+//  If CLOCKWISE normally moves DOWN this makes it go UP.  // 如果顺时针旋转原本是向下移动，开启后会变为向上移动。
+//  If CLOCKWISE normally moves UP this makes it go DOWN.  // 如果顺时针旋转原本是向上移动，开启后会变为向下移动。
 //
 //#define REVERSE_MENU_DIRECTION
 
 //
-// This option reverses the encoder direction for Select Screen.
+// This option reverses the encoder direction for Select Screen.  //此选项反转选择界面里旋钮的转动方向
 //
-//  If CLOCKWISE normally moves LEFT this makes it go RIGHT.
-//  If CLOCKWISE normally moves RIGHT this makes it go LEFT.
+//  If CLOCKWISE normally moves LEFT this makes it go RIGHT.  //  如果顺时针旋转原本是向左移动，开启后会变为向右移动。
+//  If CLOCKWISE normally moves RIGHT this makes it go LEFT.  //  如果顺时针旋转原本是向右移动，开启后会变为向左移动。
 //
 //#define REVERSE_SELECT_DIRECTION
 
 //
-// Encoder EMI Noise Filter
+// Encoder EMI Noise Filter  // 旋钮电磁干扰噪声滤波
 //
 // This option increases encoder samples to filter out phantom encoder clicks caused by EMI noise.
+// 该选项通过增加编码器信号采样次数，过滤由 EMI 电磁干扰引起的
+// 编码器“幻影点击”（误触发、乱跳、虚转）。
 //
 //#define ENCODER_NOISE_FILTER
 #if ENABLED(ENCODER_NOISE_FILTER)
@@ -3904,9 +3950,9 @@
 #endif
 
 //
-// Individual Axis Homing
+// Individual Axis Homing 
 //
-// Add individual axis homing items (Home X, Home Y, and Home Z) to the LCD menu.
+// Add individual axis homing items (Home X, Home Y, and Home Z) to the LCD menu.  
 //
 //#define INDIVIDUAL_AXIS_HOMING_MENU
 //#define INDIVIDUAL_AXIS_HOMING_SUBMENU
