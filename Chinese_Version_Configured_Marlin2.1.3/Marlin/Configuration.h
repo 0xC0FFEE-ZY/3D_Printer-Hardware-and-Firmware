@@ -3398,14 +3398,23 @@
  *   M500 - Store settings to EEPROM.
  *   M501 - Read settings from EEPROM. (i.e., Throw away unsaved changes)
  *   M502 - Revert settings to "factory" defaults. (Follow with M500 to init the EEPROM.)
+ * 
+ * EEPROM 存储器
+ *
+ * 用于保存配置参数，断电/重启后不会丢失。
+ *
+ *   M500 - 保存当前设置到 EEPROM（永久保存）
+ *   M501 - 从 EEPROM 读取设置（丢弃未保存的修改）
+ *   M502 - 恢复设置为固件默认值（之后用 M500 初始化）
+ *
  */
-//#define EEPROM_SETTINGS     // Persistent storage with M500 and M501
-//#define DISABLE_M503        // Saves ~2700 bytes of flash. Disable for release!
-#define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save flash.
-#define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load
+//#define EEPROM_SETTINGS     // Persistent storage with M500 and M501  //通过 M500 / M501 实现参数持久化存储（断电不丢设置）
+//#define DISABLE_M503        // Saves ~2700 bytes of flash. Disable for release! //节省大约 2700 字节的闪存空间。正式发布固件时建议关闭！
+#define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save flash.  //执行 EEPROM 指令（M500/M501/M502）时，给出提示信息。关闭它可以节省一点点闪存空间。
+#define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load  //让 M503 指令输出保持静默，只在首次加载时显示错误信息。
 #if ENABLED(EEPROM_SETTINGS)
-  //#define EEPROM_AUTO_INIT  // Init EEPROM automatically on any errors.
-  //#define EEPROM_INIT_NOW   // Init EEPROM on first boot after a new build.
+  //#define EEPROM_AUTO_INIT  // Init EEPROM automatically on any errors.  //在发生任何错误时自动初始化 EEPROM。
+  //#define EEPROM_INIT_NOW   // Init EEPROM on first boot after a new build.  //在新固件构建后第一次启动时初始化 EEPROM。
 #endif
 
 // @section host
@@ -3415,39 +3424,42 @@
 //
 // When enabled Marlin will send a busy status message to the host
 // every couple of seconds when it can't accept commands.
+
+// 启用后，当打印机无法接收指令时
+// 会每隔几秒向主机（电脑/上位机）发送忙碌状态消息
 //
-#define HOST_KEEPALIVE_FEATURE        // Disable this if your host doesn't like keepalive messages
-#define DEFAULT_KEEPALIVE_INTERVAL 2  // Number of seconds between "busy" messages. Set with M113.
-#define BUSY_WHILE_HEATING            // Some hosts require "busy" messages even during heating
+#define HOST_KEEPALIVE_FEATURE        // Disable this if your host doesn't like keepalive messages  //如果你的主机不喜欢接收 keepalive 消息，请禁用此功能
+#define DEFAULT_KEEPALIVE_INTERVAL 2  // Number of seconds between "busy" messages. Set with M113.  // "busy" 消息之间的秒数。可以通过 M113 指令设置。
+#define BUSY_WHILE_HEATING            // Some hosts require "busy" messages even during heating  // 一些主机要求在加热过程中也发送 "busy" 消息
 
 // @section units
 
 //
-// G20/G21 Inch mode support
+// G20/G21 Inch mode support  // G20/G21 英寸模式支持(注：G20 = 切换到英寸单位，G21 = 切换回毫米单位)
 //
 //#define INCH_MODE_SUPPORT
 
 //
-// M149 Set temperature units support
+// M149 Set temperature units support  // M149 设置温度单位支持(摄氏度和华氏度)
 //
 //#define TEMPERATURE_UNITS_SUPPORT
 
 // @section temperature
 
 //
-// Preheat Constants - Up to 10 are supported without changes
+// Preheat Constants - Up to 10 are supported without changes  //预热参数配置区 —— 最多可直接设置 10 种预热模式，无需修改代码。
 //
 #define PREHEAT_1_LABEL       "PLA"
 #define PREHEAT_1_TEMP_HOTEND 180
 #define PREHEAT_1_TEMP_BED     70
 #define PREHEAT_1_TEMP_CHAMBER 35
-#define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
+#define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255  // 风扇速度，范围从 0 到 255
 
 #define PREHEAT_2_LABEL       "ABS"
 #define PREHEAT_2_TEMP_HOTEND 240
 #define PREHEAT_2_TEMP_BED    110
 #define PREHEAT_2_TEMP_CHAMBER 35
-#define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
+#define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255  // 风扇速度，范围从 0 到 255
 
 /**
  * @section nozzle park
@@ -3461,16 +3473,32 @@
  *    P0  (Default) If Z is below park Z raise the nozzle.
  *    P1  Raise the nozzle always to Z-park height.
  *    P2  Raise the nozzle by Z-park amount, limited to Z_MAX_POS.
+ * 
+ * * 喷嘴停靠功能
+ *
+ * 空闲状态或执行 G27 指令时，将喷头移动至设定的XYZ停靠坐标。
+ *
+ * 参数 P 用于控制Z轴的抬升动作：
+ *
+ *    P0（默认）：若当前Z轴高度低于停靠高度，才向上抬升至停靠高度。
+ *    P1：无论当前位置如何，一律抬升至设定的Z轴停靠高度。
+ *    P2：按设定数值向上抬升固定距离，最大不超过Z轴行程上限。
  */
 //#define NOZZLE_PARK_FEATURE
 
 #if ENABLED(NOZZLE_PARK_FEATURE)
-  // Specify a park position as { X, Y, Z_raise }
+  // Specify a park position as { X, Y, Z_raise }  // 以 { X, Y, Z抬升高度 } 的格式指定停靠位置
   #define NOZZLE_PARK_POINT { (X_MIN_POS + 10), (Y_MAX_POS - 10), 20 }
   #define NOZZLE_PARK_MOVE          0   // Park motion: 0 = XY Move, 1 = X Only, 2 = Y Only, 3 = X before Y, 4 = Y before X
-  #define NOZZLE_PARK_Z_RAISE_MIN   2   // (mm) Always raise Z by at least this distance
-  #define NOZZLE_PARK_XY_FEEDRATE 100   // (mm/s) X and Y axes feedrate (also used for delta Z axis)
-  #define NOZZLE_PARK_Z_FEEDRATE    5   // (mm/s) Z axis feedrate (not used for delta printers)
+ // 上方配置喷嘴停靠移动模式：
+ // 0 = 同时移动 XY 轴
+ // 1 = 仅移动 X 轴
+ // 2 = 仅移动 Y 轴
+ // 3 = 先移动 X 轴，再移动 Y 轴
+ // 4 = 先移动 Y 轴，再移动 X 轴
+  #define NOZZLE_PARK_Z_RAISE_MIN   2   // (mm) Always raise Z by at least this distance  //(毫米) Z 轴 至少 必须抬升的距离
+  #define NOZZLE_PARK_XY_FEEDRATE 100   // (mm/s) X and Y axes feedrate (also used for delta Z axis)  //(毫米/秒) X 轴和 Y 轴的移动速度（也用于三角洲机型的 Z 轴）
+  #define NOZZLE_PARK_Z_FEEDRATE    5   // (mm/s) Z axis feedrate (not used for delta printers)  //(毫米/秒) Z 轴的移动速度（不适用于三角洲机型）
 #endif
 
 /**
