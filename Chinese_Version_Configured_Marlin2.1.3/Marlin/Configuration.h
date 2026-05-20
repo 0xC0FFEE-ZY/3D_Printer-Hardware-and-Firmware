@@ -4557,10 +4557,13 @@
 //=============================================================================
 //=============================== Graphical TFTs ==============================
 //=============================================================================
+// 图形化 TFT 彩屏
 
 /**
  * Specific TFT Model Presets. Enable one of the following options
  * or enable TFT_GENERIC and set sub-options.
+ * 指定 TFT 屏幕型号预设。启用下列选项中的其中一个，
+ * 或者启用 TFT_GENERIC 并设置子选项。
  */
 
 //
@@ -4568,93 +4571,118 @@
 // Usually paired with MKS Robin Nano V2 & V3
 // https://github.com/makerbase-mks/MKS-TFT-Hardware/tree/master/MKS%20TS35
 //
+// MKS出品 3.5英寸480×320分辨率SPI接口显示屏，自带旋转编码器
+// 常搭配MKS Robin Nano V2、V3主板使用
+// https://github.com/makerbase-mks/MKS-TFT-Hardware/tree/master/MKS%20TS35
+// 硬件资料参考上方链接（MKS TS35屏幕）
+//
 //#define MKS_TS35_V2_0
 
 //
 // 320x240, 2.4", FSMC Display From MKS
 // Usually paired with MKS Robin Nano V1.2
+// MKS 出品 2.4英寸 320×240分辨率 FSMC接口显示屏
+// 通常搭配 MKS Robin Nano V1.2 主板使用
 //
 //#define MKS_ROBIN_TFT24
 
 //
 // 320x240, 2.8", FSMC Display From MKS
 // Usually paired with MKS Robin Nano V1.2
+// MKS 出品 2.8英寸 320×240分辨率 FSMC接口显示屏
+// 通常搭配 MKS Robin Nano V1.2 主板使用
 //
 //#define MKS_ROBIN_TFT28
 
 //
 // 320x240, 3.2", FSMC Display From MKS
 // Usually paired with MKS Robin Nano V1.2
+// MKS 出品 3.2英寸 320×240分辨率 FSMC接口显示屏
+// 通常搭配 MKS Robin Nano V1.2 主板使用
 //
 //#define MKS_ROBIN_TFT32
 
 //
 // 480x320, 3.5", FSMC Display From MKS
 // Usually paired with MKS Robin Nano V1.2
+// MKS 出品 3.5英寸 480×320分辨率 FSMC接口显示屏
+// 通常搭配 MKS Robin Nano V1.2 主板使用
 //
 //#define MKS_ROBIN_TFT35
 
 //
 // 480x272, 4.3", FSMC Display From MKS
+// MKS 出品 4.3英寸 480×272分辨率 FSMC接口显示屏
 //
 //#define MKS_ROBIN_TFT43
 
 //
 // 320x240, 3.2", FSMC Display From MKS
 // Usually paired with MKS Robin
+// MKS 出品 3.2英寸 320×240分辨率 FSMC接口显示屏
+// 通常搭配 MKS Robin 系列主板使用
 //
 //#define MKS_ROBIN_TFT_V1_1R
 
 //
 // 480x320, 3.5", FSMC Stock Display from Tronxy
+// 创星（Tronxy）原厂标配 3.5英寸 480×320分辨率 FSMC接口显示屏
 //
 //#define TFT_TRONXY_X5SA
 
 //
 // 480x320, 3.5", FSMC Stock Display from AnyCubic
+// 纵维立方（AnyCubic）原厂标配 3.5英寸 480×320分辨率 FSMC接口显示屏
 //
 //#define ANYCUBIC_TFT35
 
 //
 // 320x240, 2.8", FSMC Stock Display from Longer/Alfawise
+// 朗果（Longer）/ Alfawise 原厂标配 2.8英寸 320×240分辨率 FSMC接口显示屏
 //
 //#define LONGER_LK_TFT28
 
 //
 // 320x240, 2.8", FSMC Stock Display from ET4
+// 极光尔沃ET4原厂标配 2.8英寸 320×240分辨率 FSMC接口显示屏
 //
 //#define ANET_ET4_TFT28
 
 //
 // 480x320, 3.5", FSMC Stock Display from ET5
+// 极光尔沃ET5原厂标配 3.5英寸 480×320分辨率 FSMC接口显示屏
 //
 //#define ANET_ET5_TFT35
 
 //
 // 1024x600, 7", RGB Stock Display with Rotary Encoder from BIQU BX
+// BIQU BX 原厂标配 7英寸 1024×600分辨率 RGB彩色显示屏，带旋转编码器
 // https://github.com/bigtreetech/BIQU-BX/tree/master/Hardware
 //
 //#define BIQU_BX_TFT70
 
 //
 // 480x320, 3.5", SPI Stock Display with Rotary Encoder from BIQU B1 SE Series
+// BIQU B1 SE 系列原厂标配 3.5英寸 480×320分辨率 SPI接口显示屏，带旋转编码器
 // https://github.com/bigtreetech/TFT35-SPI/tree/master/v1
 //
 //#define BTT_TFT35_SPI_V1_0
 
 //
-// Generic TFT with detailed options
+// Generic TFT with detailed options   // 通用型 TFT 显示屏（含详细配置选项）
+// 注（译者注）：
+// 如果你用的屏幕不在上面的型号列表里，就启用这个，然后自己手动设置分辨率、接口等参数。
 //
 //#define TFT_GENERIC
 #if ENABLED(TFT_GENERIC)
   // :[ 'AUTO', 'ST7735', 'ST7789', 'ST7796', 'R61505', 'ILI9328', 'ILI9341', 'ILI9488' ]
   #define TFT_DRIVER AUTO
 
-  // Interface. Enable one of the following options:
+  // Interface. Enable one of the following options:  // 接口类型。请启用以下选项中的其中一项：
   //#define TFT_INTERFACE_FSMC
   //#define TFT_INTERFACE_SPI
 
-  // TFT Resolution. Enable one of the following options:
+  // TFT Resolution. Enable one of the following options:  // TFT 分辨率。请启用以下选项中的其中一项：
   //#define TFT_RES_320x240
   //#define TFT_RES_480x272
   //#define TFT_RES_480x320
@@ -4670,6 +4698,15 @@
  *
  *   For LVGL_UI also copy the 'assets' folder from the build directory to the
  *   root of your SD card, together with the compiled firmware.
+ * 
+ * * 显示屏界面样式选择，仅启用以下其中一种：
+ *
+ *   TFT_CLASSIC_UI - 经典复古界面，模拟DOGM屏样式，128×64分辨率放大显示
+ *   TFT_COLOR_UI   - Marlin原生彩色菜单界面，适配触摸操作，完整发挥显示屏性能
+ *   TFT_LVGL_UI    - 基于LVGL框架的现代化高清触控界面
+ *
+ *   若使用LVGL界面，需把编译目录里的assets资源文件夹
+ *   和编译完成的固件一同拷贝至内存卡根目录
  */
 //#define TFT_CLASSIC_UI
 //#define TFT_COLOR_UI
@@ -4682,6 +4719,12 @@
    * NOTOSANS  - Default font with anti-aliasing. Supports Latin Extended and non-Latin characters.
    * UNIFONT   - Lightweight font, no anti-aliasing. Supports Latin Extended and non-Latin characters.
    * HELVETICA - Lightweight font, no anti-aliasing. Supports Basic Latin (0x0020-0x007F) and Latin-1 Supplement (0x0080-0x00FF) characters only.
+   * 
+   * * 彩色界面（Color UI）使用的字体，选择以下其中一种：
+   *
+   * NOTOSANS  - 默认字体，带平滑抗锯齿效果。支持扩展拉丁字符和非拉丁字符。
+   * UNIFONT   - 轻量字体，无抗锯齿。支持扩展拉丁字符和非拉丁字符。
+   * HELVETICA - 轻量字体，无抗锯齿。仅支持基础拉丁字符和拉丁-1补充字符。
    */
   #define TFT_FONT  NOTOSANS
 
@@ -4691,12 +4734,21 @@
    * BLUE_MARLIN  - Default theme with 'midnight blue' background
    * BLACK_MARLIN - Theme with 'black' background
    * ANET_BLACK   - Theme used for Anet ET4/5
+   * 
+   * * 彩色界面（Color UI）使用的主题，选择以下其中一种，
+   * 或在 'Marlin/src/lcd/tft/themes' 文件夹中添加自定义主题
+   *
+   * BLUE_MARLIN  - 默认主题，使用「午夜蓝」背景
+   * BLACK_MARLIN - 主题，使用「纯黑」背景
+   * ANET_BLACK   - 极光尔沃（Anet）ET4/5 打印机专用主题
    */
   #define TFT_THEME BLACK_MARLIN
 
   //#define TFT_SHARED_IO   // I/O is shared between TFT display and other devices. Disable async data transfer.
+  // TFT 显示屏与其他设备共用 I/O 引脚。
+  // 请禁用异步数据传输功能。
 
-  #define COMPACT_MARLIN_BOOT_LOGO  // Use compressed data to save Flash space
+  #define COMPACT_MARLIN_BOOT_LOGO  // Use compressed data to save Flash space  // 使用压缩数据以节省闪存（Flash）空间
 #endif
 
 #if ENABLED(TFT_LVGL_UI)
@@ -4712,6 +4764,23 @@
  *   TFT_MIRROR_X, TFT_MIRROR_Y, TFT_NO_ROTATION
  *
  * :{ 'TFT_NO_ROTATION':'None', 'TFT_ROTATE_90':'90°', 'TFT_ROTATE_90_MIRROR_X':'90° (Mirror X)', 'TFT_ROTATE_90_MIRROR_Y':'90° (Mirror Y)', 'TFT_ROTATE_180':'180°', 'TFT_ROTATE_180_MIRROR_X':'180° (Mirror X)', 'TFT_ROTATE_180_MIRROR_Y':'180° (Mirror Y)', 'TFT_ROTATE_270':'270°', 'TFT_ROTATE_270_MIRROR_X':'270° (Mirror X)', 'TFT_ROTATE_270_MIRROR_Y':'270° (Mirror Y)', 'TFT_MIRROR_X':'Mirror X', 'TFT_MIRROR_Y':'Mirror Y' }
+ * 
+ * 显示屏旋转方向。设置为以下其中一项：
+ *
+ *   TFT_ROTATE_90      旋转90度
+ *   TFT_ROTATE_90_MIRROR_X   旋转90度 + X轴镜像
+ *   TFT_ROTATE_90_MIRROR_Y   旋转90度 + Y轴镜像
+ *   TFT_ROTATE_180     旋转180度（倒置）
+ *   TFT_ROTATE_180_MIRROR_X  旋转180度 + X轴镜像
+ *   TFT_ROTATE_180_MIRROR_Y  旋转180度 + Y轴镜像
+ *   TFT_ROTATE_270     旋转270度
+ *   TFT_ROTATE_270_MIRROR_X  旋转270度 + X轴镜像
+ *   TFT_ROTATE_270_MIRROR_Y  旋转270度 + Y轴镜像
+ *   TFT_MIRROR_X       X轴镜像（左右翻转）
+ *   TFT_MIRROR_Y       Y轴镜像（上下翻转）
+ *   TFT_NO_ROTATION    不旋转（默认）
+ * 
+ * 
  */
 //#define TFT_ROTATION TFT_NO_ROTATION
 
