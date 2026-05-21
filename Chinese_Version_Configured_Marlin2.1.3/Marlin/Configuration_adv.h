@@ -1023,51 +1023,62 @@
 #define FANMUX1_PIN -1
 #define FANMUX2_PIN -1
 
+
+//=========================================== 机箱氛围灯 / 机箱照明设置区 =============================================
 /**
  * @section caselight
- * M355 Case Light on-off / brightness
+ * M355 Case Light on-off / brightness  // M355 指令：机箱灯开关控制与亮度调节
  */
 //#define CASE_LIGHT_ENABLE
 #if ENABLED(CASE_LIGHT_ENABLE)
-  //#define CASE_LIGHT_PIN 4                  // Override the default pin if needed
-  #define INVERT_CASE_LIGHT false             // Set true if Case Light is ON when pin is LOW
-  #define CASE_LIGHT_DEFAULT_ON true          // Set default power-up state on
-  #define CASE_LIGHT_DEFAULT_BRIGHTNESS 105   // Set default power-up brightness (0-255, requires PWM pin)
-  //#define CASE_LIGHT_NO_BRIGHTNESS          // Disable brightness control. Enable for non-PWM lighting.
-  //#define CASE_LIGHT_MAX_PWM 128            // Limit PWM duty cycle (0-255)
-  //#define CASE_LIGHT_MENU                   // Add Case Light options to the LCD menu
+  //#define CASE_LIGHT_PIN 4                  // Override the default pin if needed                        // 如果需要，可以在这里重新定义（覆盖）默认的机箱灯引脚
+  #define INVERT_CASE_LIGHT false             // Set true if Case Light is ON when pin is LOW              // 如果机箱灯在引脚为 LOW（低电平）时点亮，请设置为 true
+  #define CASE_LIGHT_DEFAULT_ON true          // Set default power-up state on                             // 设置机箱灯-开机默认状态为开启
+  #define CASE_LIGHT_DEFAULT_BRIGHTNESS 105   // Set default power-up brightness (0-255, requires PWM pin) // 设置开机默认亮度（0-255，需要使用 PWM 引脚）
+  //#define CASE_LIGHT_NO_BRIGHTNESS          // Disable brightness control. Enable for non-PWM lighting.  // 关闭亮度调节功能，非PWM普通灯光请开启此项
+  //#define CASE_LIGHT_MAX_PWM 128            // Limit PWM duty cycle (0-255)                              // 限制 PWM 占空比（0-255）
+  //#define CASE_LIGHT_MENU                   // Add Case Light options to the LCD menu                    // 将机箱灯控制选项添加到 LCD 屏幕菜单中
   #if ENABLED(NEOPIXEL_LED)
-    //#define CASE_LIGHT_USE_NEOPIXEL         // Use NeoPixel LED as case light
+    //#define CASE_LIGHT_USE_NEOPIXEL         // Use NeoPixel LED as case light                            // 使用 NeoPixel LED 灯条作为机箱照明灯
   #endif
   #if ANY(RGB_LED, RGBW_LED)
-    //#define CASE_LIGHT_USE_RGB_LED          // Use RGB / RGBW LED as case light
+    //#define CASE_LIGHT_USE_RGB_LED          // Use RGB / RGBW LED as case light                          // 使用 RGB / RGBW LED 作为机箱照明灯
   #endif
   #if ANY(CASE_LIGHT_USE_NEOPIXEL, CASE_LIGHT_USE_RGB_LED)
-    #define CASE_LIGHT_DEFAULT_COLOR { 255, 255, 255, 255 } // { Red, Green, Blue, White }
+    #define CASE_LIGHT_DEFAULT_COLOR { 255, 255, 255, 255 } // { Red, Green, Blue, White }                 // {红，绿，蓝，白}
   #endif
 #endif
+
+
+//============================================ 限位开关配置 =========================================================
 
 // @section endstops
 
 // If you want endstops to stay on (by default) even when not homing
 // enable this option. Override at any time with M120, M121.
+// 如果你希望限位开关**即使不在回零过程中也保持生效（默认开启）**
+// 启用此选项。可随时通过 M120 / M121 指令覆盖此设置。
 //#define ENDSTOPS_ALWAYS_ON_DEFAULT
 
+
+//================================================ 附加功能 / 扩展功能配置区 ===========================================
 // @section extras
 
-//#define Z_LATE_ENABLE // Enable Z the last moment. Needed if your Z driver overheats.
+//#define Z_LATE_ENABLE // Enable Z the last moment. Needed if your Z driver overheats. // 临近运动结束时再启用Z轴驱动，Z轴驱动易过热需开启此项
 
-// Employ an external closed loop controller. Override pins here if needed.
+// Employ an external closed loop controller. Override pins here if needed.             // 使用外部闭环控制器。如需自定义引脚可在此处覆盖。
 //#define EXTERNAL_CLOSED_LOOP_CONTROLLER
 #if ENABLED(EXTERNAL_CLOSED_LOOP_CONTROLLER)
   //#define CLOSED_LOOP_ENABLE_PIN        -1
   //#define CLOSED_LOOP_MOVE_COMPLETE_PIN -1
 #endif
 
+
+//================================================== IDEX 独立双喷头配置区==============================================
 // @section idex
 
 /**
- * Dual X Carriage
+ * Dual X Carriage  // 双X滑座 / 双X托架结构
  *
  * This setup has two X carriages that can move independently, each with its own hotend.
  * The carriages can be used to print an object with two colors or materials, or in
@@ -1093,25 +1104,55 @@
  *       the movement of the first except the second extruder is reversed in the X axis.
  *       Set the initial X offset and temperature differential with M605 S2 X[offs] R[deg] and
  *       follow with M605 S3 to initiate mirrored movement.
+ * 
+ * 这种结构有两个可以**独立移动**的X轴滑座，每个滑座都带一个独立喷头。
+ * 你可以用它打印双色/双材料模型，或者开启
+ * "复制模式" 同时打印两个完全一样、或X轴镜像的模型。
+ * 不工作的喷头会**自动归位停靠**，防止漏料。
+ * X1 = 左边滑座，X2 = 右边滑座。它们分别在X轴两端回零、停靠。
+ * 默认情况下，X2 步进电机接在主板上**第一个空闲的E（挤出）接口**。
+ *
+ * 可以用指令 M605 S<模式> 切换以下双X滑座模式：
+ *
+ * 0 : (FULL_CONTROL) 切片软件完全控制两个滑座，
+ *     只要切片支持双X轴，就能达到最佳运动效果。(M605 S0)
+ *
+ * 1 : (AUTO_PARK) 固件在切换喷头时**自动停靠/启用**滑座，
+ *     切片软件不需要特殊支持。(M605 S1)
+ *
+ * 2 : (DUPLICATION) 固件同步控制第二个滑座，
+ *     同时打印**两个一模一样**的模型。
+ *     用 M605 S2 X[偏移] R[温差] 设置间距和温度，
+ *     再发 M605 S2 启动复制打印。
+ *
+ * 3 : (MIRRORED) 镜像模式，
+ *     第二个喷头和第一个动作完全一样，只是**X轴方向相反**。
+ *     用 M605 S2 X[偏移] R[温差] 设置初始间距，
+ *     再发 M605 S3 启动镜像打印。
  */
 //#define DUAL_X_CARRIAGE
 #if ENABLED(DUAL_X_CARRIAGE)
-  #define X1_MIN_POS X_MIN_POS    // Set to X_MIN_POS
-  #define X1_MAX_POS X_BED_SIZE   // A max coordinate so the X1 carriage can't hit the parked X2 carriage
-  #define X2_MIN_POS    80        // A min coordinate so the X2 carriage can't hit the parked X1 carriage
-  #define X2_MAX_POS   353        // The max position of the X2 carriage, typically also the home position
-  #define X2_HOME_POS X2_MAX_POS  // Default X2 home position. Set to X2_MAX_POS.
+  #define X1_MIN_POS X_MIN_POS    // Set to X_MIN_POS                                                       // 设置为 X_MIN_POS 的值
+  #define X1_MAX_POS X_BED_SIZE   // A max coordinate so the X1 carriage can't hit the parked X2 carriage   // 设置一个最大坐标限制，让 X1 滑座不会撞到停靠状态的 X2 滑座
+  #define X2_MIN_POS    80        // A min coordinate so the X2 carriage can't hit the parked X1 carriage   // 设置一个最小坐标限制，让 X2 滑座不会撞到停靠状态的 X1 滑座
+  #define X2_MAX_POS   353        // The max position of the X2 carriage, typically also the home position  // X2 滑座的最大位置，通常也是它的回零（原点）位置
+  #define X2_HOME_POS X2_MAX_POS  // Default X2 home position. Set to X2_MAX_POS.                           // 默认 X2 回零位置。设置为 X2_MAX_POS 的值。
                                   // NOTE: For Dual X Carriage use M218 T1 Xn to override the X2_HOME_POS.
                                   // This allows recalibration of endstops distance without a rebuild.
                                   // Remember to set the second extruder's X-offset to 0 in your slicer.
+                                  // 注意：对于双X滑座结构，请使用指令 M218 T1 Xn 来覆盖 X2_HOME_POS。
+                                  // 这样可以**无需重新编译固件**就能重新校准两个限位开关之间的距离。
+                                  // 记得在切片软件里，将第二个挤出机的 X 偏移量设置为 0。
 
-  // This is the default power-up mode which can be changed later using M605 S<mode>.
+  // This is the default power-up mode which can be changed later using M605 S<mode>. // 这是开机默认的工作模式，后续可通过指令 M605 S<模式> 随时修改。
   #define DEFAULT_DUAL_X_CARRIAGE_MODE DXC_AUTO_PARK_MODE
 
-  // Default x offset in duplication mode (typically set to half print bed width)
+  // Default x offset in duplication mode (typically set to half print bed width)     // 复制模式下的默认 X 轴偏移量（通常设置为打印平台宽度的一半）
   #define DEFAULT_DUPLICATION_X_OFFSET 100
 
   // Default action to execute following M605 mode change commands. Typically G28X to apply new mode.
+  // 切换 M605 双X轴模式后，默认执行的动作。
+  // 通常设置为 G28X（X轴回零），使新模式生效。
   //#define EVENT_GCODE_IDEX_AFTER_MODECHANGE "G28X"
 #endif
 
