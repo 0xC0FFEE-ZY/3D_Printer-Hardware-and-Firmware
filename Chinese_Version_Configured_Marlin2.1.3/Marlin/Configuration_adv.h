@@ -1300,6 +1300,8 @@
 
 // @section bltouch
 
+//========================================= BLTouch自动调平探头配置区 =============================================
+
 #if ENABLED(BLTOUCH)
   /**
    * Either: Use the defaults (recommended) or: For special purposes, use the following DEFINES
@@ -1314,18 +1316,29 @@
    *       like they would be with a real switch. So please check the wiring first.
    *
    * Settings for all BLTouch and clone probes:
+   * 
+   * 两种选择：使用默认配置（推荐）；若有特殊需求，可使用下方自定义宏定义
+   * 切勿启用探头不兼容的配置，仿制版探头大概率无法识别高阶指令
+   * 注意：探头无法伸出时，先执行复位与自检，再检查棕、红、橙三色接线
+   * 注意：探头无法识别触发信号，大多是黑白线接反所致。这两根线不像普通限位开关可随意互换，务必优先核对接线
+   * 以下为所有正版及仿制 BLTouch 探头通用配置项
    */
 
   // Safety: The probe needs time to recognize the command.
   //         Minimum command delay (ms). Enable and increase if needed.
+  // 安全项：探头需要时间来识别指令
+  // 最小指令延迟时间（毫秒）。如出现异常可启用并增大该值。
   //#define BLTOUCH_DELAY 500
 
   /**
    * Settings for BLTOUCH Classic 1.2, 1.3 or BLTouch Smart 1.0, 2.0, 2.2, 3.0, 3.1, and most clones:
+   * 适用于经典版BLTouch 1.2、1.3，以及智能版BLTouch 1.0、2.0、2.2、3.0、3.1，同时兼容绝大多数仿制探头的通用配置。
    */
 
   // Feature: Switch into SW mode after a deploy. It makes the output pulse longer. Can be useful
   //          in special cases, like noisy or filtered input configurations.
+  // 功能：探头伸出后切换到 SW 模式，延长信号输出脉冲的时长。
+  // 在某些特殊场景下很有用，例如信号有干扰、经过滤波电路的输入配置。
   //#define BLTOUCH_FORCE_SW_MODE
 
   /**
@@ -1334,6 +1347,13 @@
    *   - Voltage modes: 5V and OD (open drain - "logic voltage free") output modes
    *   - High-Speed mode
    *   - Disable LCD voltage options
+   * 
+   * 以下是 BLTouch Smart 3.0 和 3.1 专用设置
+   * 功能概览：
+   *   - 电压模式：5V 模式 和 OD 开漏模式（兼容任意逻辑电压）
+   *   - 高速模式
+   *   - 禁用 LCD 屏幕上的电压选项
+   *
    */
 
   /**
@@ -1343,10 +1363,17 @@
    * On startup, Marlin will compare its EEPROM to this value. If the selected mode
    * differs, a mode set EEPROM write will be completed at initialization.
    * Use the option below to force an EEPROM write to a V3.1 probe regardless.
+   * 
+   * 危险：除非你的控制器**支持5V电压**，否则绝对不要开启5V模式！
+   * V3.0 / 3.1 版本：在 Marlin 启动时将默认模式设为 5V 模式。
+   * 如果关闭此选项，3.0 版本探头将默认使用 OD 模式。
+   * 启动时，Marlin 会将 EEPROM 中的设置与此值对比。
+   * 如果模式不一致，初始化时会自动更新 EEPROM。
+   * 可使用下方选项强制将 V3.1 探头写入 EEPROM 模式。
    */
   //#define BLTOUCH_SET_5V_MODE
 
-  // Safety: Enable voltage mode settings in the LCD menu.
+  // Safety: Enable voltage mode settings in the LCD menu.  // 安全设置：在液晶显示屏菜单中开放电压模式调节选项
   //#define BLTOUCH_LCD_VOLTAGE_MENU
 
   /**
@@ -1354,6 +1381,12 @@
    * V3.0: Set a probe into mode selected above at Marlin startup. Required for 5V mode on 3.0
    * V3.1: Force a probe with unknown mode into selected mode at Marlin startup ( = Probe EEPROM write )
    * To preserve the life of the probe, use this once then turn it off and re-flash.
+   * 
+   * 安全功能：当连接的探头电压模式未知时启用。
+   * V3.0 版本：在 Marlin 启动时，将探头设置为上方选择的模式。
+   *          若要在 3.0 上使用 5V 模式，此项必须开启。
+   * V3.1 版本：在 Marlin 启动时强制将未知模式的探头设为选定模式（= 写入探头 EEPROM）。
+   * 为延长探头寿命：仅使用一次，成功后关闭此项并重新刷固件。
    */
   //#define BLTOUCH_FORCE_MODE_SET
 
@@ -1364,6 +1397,15 @@
    * might be able to use it. If the machine can't raise Z fast enough the BLTouch may go into ALARM.
    *
    * Set the default state here, change with 'M401 S' or UI, use M500 to save, M502 to reset.
+   * 
+   * 启用探头的“高速模式”
+   * 危险警告：如果你的探头偶尔失效，请关闭此功能。仅适合稳定、调试良好的设备。
+   * 此功能专为 Z 轴移动极快的三角洲（Delta）机型设计；
+   * 不过速度较高的笛卡尔结构机型也可能使用。
+   * 如果机器 Z 轴抬升速度不够快，BLTouch 可能会触发报警。
+   *
+   * 在此处设置默认状态，可通过指令 M401 S 或屏幕界面修改，
+   * 使用 M500 保存，M502 重置。
    */
   //#define BLTOUCH_HS_MODE true
 
@@ -1371,7 +1413,18 @@
     // The probe Z offset (M851 Z) is the height at which the probe triggers.
     // This must be large enough to keep the probe pin off the bed and prevent
     // it from snagging on the bed clips.
-    #define BLTOUCH_HS_EXTRA_CLEARANCE    7 // Extra Z Clearance
+    // 探头 Z 偏移值（M851 Z）是探头触发时的高度。
+    // 该值必须足够大，确保探针针脚不会碰到热床，
+    // 并避免针脚勾到床夹、打印件边缘等障碍物。
+
+    // （译者注）：
+    // 这是在说 BLTouch 的 Z 偏移（Z Offset）：
+    // Z 偏移 = 探头触发高度
+    // 必须设置得足够大，保证：
+    // 探针不会刮到热床
+    // 移动时不会勾到夹子、打印件
+    // 设太小 → 探针撞床、勾坏、报警
+    #define BLTOUCH_HS_EXTRA_CLEARANCE    7 // Extra Z Clearance  // 额外 Z 安全间隙 / 抬升余量
   #endif
 
 #endif // BLTOUCH
