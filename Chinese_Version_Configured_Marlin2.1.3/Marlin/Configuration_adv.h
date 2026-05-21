@@ -21,6 +21,27 @@
  */
 #pragma once
 
+
+/*
+==============================================================================================================
+===============================================   前   言   ==================================================
+==============================================================================================================
+
+*本工程为Marlin 2.1.3-beta3的中文翻译版本，由0xC0FFEE_ZY翻译。原版工程来自https://github.com/MarlinFirmware/Marlin
+*本工程各项参数已配置完成，适用于本人自制的3D打印机（基于UM架构），
+*该3D打印机设计图纸，硬件原理图，PCB已全部开源,未来预计更新制作教程至抖音/B站。
+*开源项目见本人Github主页：https://github.com/0xC0FFEE-ZY
+*欢迎关注本人抖音：（抖音号:Technophilic)，昵称：0xC0FFEE_ZY，里面有一些电子科技创作相关的视频，欢迎大家点赞关注！谢谢！
+*B站UID:481302692，昵称：0xC0FFEE_ZY
+*up为2024级本科生，热爱电子科技，欢迎和我一起进行讨论和交流！
+
+本页为Marlin固件进阶配置
+
+                                                                                  2026.5.21     By 0xC0FFEE_ZY
+
+==============================================================================================================
+*/
+
 /**
  * Configuration_adv.h
  *
@@ -29,6 +50,12 @@
  * Some of these settings can damage your printer if improperly set!
  *
  * Basic settings can be found in Configuration.h
+ * 
+ * 高级设置文件。
+ * 仅在你完全清楚自己在做什么时，才修改这些参数。
+ * 其中部分参数如果设置不当，可能会损坏你的打印机！
+ *
+ * 基础设置请在 Configuration_h 文件中查找。
  */
 #define CONFIGURATION_ADV_H_VERSION 02010300
 
@@ -48,12 +75,28 @@
  *  3 = schema.json - The entire configuration schema. (13 = pattern groups)
  *  4 = schema.yml - The entire configuration schema.
  *  5 = Config.h - Minimal configuration by popular demand.
+ * 
+ * *配置导出
+ *
+ * 在编译固件时，将当前配置参数一起导出保存。（查看 signature.py）
+ * 导出的文件会保存在固件编译目录中（例如：.pio/build/mega2560）。
+ *
+ * 参考 build_all_examples --ini 可查看 config.ini 归档示例。
+ *
+ *  1 = marlin_config.json - 包含完整配置参数的字典文件
+ *      开启 CONFIGURATION_EMBEDDING 时也会生成此文件
+ *  2 = config.ini - 用于 PlatformIO 预处理的配置文件格式
+ *  3 = schema.json - 完整的配置参数规则定义（13 = 带分组模式）
+ *  4 = schema.yml - 完整的配置参数规则定义
+ *  5 = Config.h - 按常用需求生成的精简配置文件
+ * 
  */
 //#define CONFIG_EXPORT 105 // :[1:'JSON', 2:'config.ini', 3:'schema.json', 4:'schema.yml', 5:'Config.h']
 
 //===========================================================================
 //============================= Thermal Settings ============================
 //===========================================================================
+// 温度相关设置
 // @section temperature
 
 /**
@@ -66,133 +109,146 @@
  * stream of errors from the sensor.
  *
  * Set this value to 0 to fail on the first error to occur.
+ * 
+ * 热电偶传感器对干扰非常敏感。
+ * 传感器线路中产生的任何干扰（例如，步进电机电线与传感器线并行布线）
+ * 都可能导致热电偶传感器报告虚假错误。
+ * 该数值表示：在报告错误之前，允许**连续**发生多少次错误。
+ * 这使我们能够忽略间歇性的干扰，同时仍能检测到真正的传感器故障
+ * （真正的故障会导致传感器持续输出一连串错误）。
+ *
+ * 将此值设置为 0 表示：只要发生第一次错误就立即停机。
  */
 #define THERMOCOUPLE_MAX_ERRORS 15
 
 //
-// Custom Thermistor 1000 parameters
+// Custom Thermistor 1000 parameters  // 自定义热敏电阻 1000 参数
 //
 #if TEMP_SENSOR_0 == 1000
-  #define HOTEND0_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor
-  #define HOTEND0_RESISTANCE_25C_OHMS   100000 // Resistance at 25C
-  #define HOTEND0_BETA                    3950 // Beta value
-  #define HOTEND0_SH_C_COEFF                 0 // Steinhart-Hart C coefficient
+  #define HOTEND0_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor  // 上拉电阻
+  #define HOTEND0_RESISTANCE_25C_OHMS   100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define HOTEND0_BETA                    3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define HOTEND0_SH_C_COEFF                 0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_1 == 1000
-  #define HOTEND1_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor
-  #define HOTEND1_RESISTANCE_25C_OHMS   100000 // Resistance at 25C
-  #define HOTEND1_BETA                    3950 // Beta value
-  #define HOTEND1_SH_C_COEFF                 0 // Steinhart-Hart C coefficient
+  #define HOTEND1_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor  // 上拉电阻
+  #define HOTEND1_RESISTANCE_25C_OHMS   100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define HOTEND1_BETA                    3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define HOTEND1_SH_C_COEFF                 0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_2 == 1000
-  #define HOTEND2_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor
-  #define HOTEND2_RESISTANCE_25C_OHMS   100000 // Resistance at 25C
-  #define HOTEND2_BETA                    3950 // Beta value
-  #define HOTEND2_SH_C_COEFF                 0 // Steinhart-Hart C coefficient
+  #define HOTEND2_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor  // 上拉电阻
+  #define HOTEND2_RESISTANCE_25C_OHMS   100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define HOTEND2_BETA                    3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define HOTEND2_SH_C_COEFF                 0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_3 == 1000
-  #define HOTEND3_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor
-  #define HOTEND3_RESISTANCE_25C_OHMS   100000 // Resistance at 25C
-  #define HOTEND3_BETA                    3950 // Beta value
-  #define HOTEND3_SH_C_COEFF                 0 // Steinhart-Hart C coefficient
+  #define HOTEND3_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor  // 上拉电阻
+  #define HOTEND3_RESISTANCE_25C_OHMS   100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define HOTEND3_BETA                    3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define HOTEND3_SH_C_COEFF                 0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_4 == 1000
-  #define HOTEND4_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor
-  #define HOTEND4_RESISTANCE_25C_OHMS   100000 // Resistance at 25C
-  #define HOTEND4_BETA                    3950 // Beta value
-  #define HOTEND4_SH_C_COEFF                 0 // Steinhart-Hart C coefficient
+  #define HOTEND4_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor  // 上拉电阻
+  #define HOTEND4_RESISTANCE_25C_OHMS   100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define HOTEND4_BETA                    3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define HOTEND4_SH_C_COEFF                 0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_5 == 1000
-  #define HOTEND5_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor
-  #define HOTEND5_RESISTANCE_25C_OHMS   100000 // Resistance at 25C
-  #define HOTEND5_BETA                    3950 // Beta value
-  #define HOTEND5_SH_C_COEFF                 0 // Steinhart-Hart C coefficient
+  #define HOTEND5_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor  // 上拉电阻
+  #define HOTEND5_RESISTANCE_25C_OHMS   100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define HOTEND5_BETA                    3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define HOTEND5_SH_C_COEFF                 0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_6 == 1000
-  #define HOTEND6_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor
-  #define HOTEND6_RESISTANCE_25C_OHMS   100000 // Resistance at 25C
-  #define HOTEND6_BETA                    3950 // Beta value
-  #define HOTEND6_SH_C_COEFF                 0 // Steinhart-Hart C coefficient
+  #define HOTEND6_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor  // 上拉电阻
+  #define HOTEND6_RESISTANCE_25C_OHMS   100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define HOTEND6_BETA                    3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define HOTEND6_SH_C_COEFF                 0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_7 == 1000
-  #define HOTEND7_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor
-  #define HOTEND7_RESISTANCE_25C_OHMS   100000 // Resistance at 25C
-  #define HOTEND7_BETA                    3950 // Beta value
-  #define HOTEND7_SH_C_COEFF                 0 // Steinhart-Hart C coefficient
+  #define HOTEND7_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor  // 上拉电阻
+  #define HOTEND7_RESISTANCE_25C_OHMS   100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define HOTEND7_BETA                    3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define HOTEND7_SH_C_COEFF                 0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_BED == 1000
-  #define BED_PULLUP_RESISTOR_OHMS        4700 // Pullup resistor
-  #define BED_RESISTANCE_25C_OHMS       100000 // Resistance at 25C
-  #define BED_BETA                        3950 // Beta value
-  #define BED_SH_C_COEFF                     0 // Steinhart-Hart C coefficient
+  #define BED_PULLUP_RESISTOR_OHMS        4700 // Pullup resistor  // 上拉电阻
+  #define BED_RESISTANCE_25C_OHMS       100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define BED_BETA                        3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define BED_SH_C_COEFF                     0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_CHAMBER == 1000
-  #define CHAMBER_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor
-  #define CHAMBER_RESISTANCE_25C_OHMS   100000 // Resistance at 25C
-  #define CHAMBER_BETA                    3950 // Beta value
-  #define CHAMBER_SH_C_COEFF                 0 // Steinhart-Hart C coefficient
+  #define CHAMBER_PULLUP_RESISTOR_OHMS    4700 // Pullup resistor  // 上拉电阻
+  #define CHAMBER_RESISTANCE_25C_OHMS   100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define CHAMBER_BETA                    3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define CHAMBER_SH_C_COEFF                 0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_COOLER == 1000
-  #define COOLER_PULLUP_RESISTOR_OHMS     4700 // Pullup resistor
-  #define COOLER_RESISTANCE_25C_OHMS    100000 // Resistance at 25C
-  #define COOLER_BETA                     3950 // Beta value
-  #define COOLER_SH_C_COEFF                  0 // Steinhart-Hart C coefficient
+  #define COOLER_PULLUP_RESISTOR_OHMS     4700 // Pullup resistor  // 上拉电阻
+  #define COOLER_RESISTANCE_25C_OHMS    100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define COOLER_BETA                     3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define COOLER_SH_C_COEFF                  0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_PROBE == 1000
-  #define PROBE_PULLUP_RESISTOR_OHMS      4700 // Pullup resistor
-  #define PROBE_RESISTANCE_25C_OHMS     100000 // Resistance at 25C
-  #define PROBE_BETA                      3950 // Beta value
-  #define PROBE_SH_C_COEFF                   0 // Steinhart-Hart C coefficient
+  #define PROBE_PULLUP_RESISTOR_OHMS      4700 // Pullup resistor  // 上拉电阻
+  #define PROBE_RESISTANCE_25C_OHMS     100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define PROBE_BETA                      3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define PROBE_SH_C_COEFF                   0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_BOARD == 1000
-  #define BOARD_PULLUP_RESISTOR_OHMS      4700 // Pullup resistor
-  #define BOARD_RESISTANCE_25C_OHMS     100000 // Resistance at 25C
-  #define BOARD_BETA                      3950 // Beta value
-  #define BOARD_SH_C_COEFF                   0 // Steinhart-Hart C coefficient
+  #define BOARD_PULLUP_RESISTOR_OHMS      4700 // Pullup resistor  // 上拉电阻
+  #define BOARD_RESISTANCE_25C_OHMS     100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define BOARD_BETA                      3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define BOARD_SH_C_COEFF                   0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 #if TEMP_SENSOR_REDUNDANT == 1000
-  #define REDUNDANT_PULLUP_RESISTOR_OHMS  4700 // Pullup resistor
-  #define REDUNDANT_RESISTANCE_25C_OHMS 100000 // Resistance at 25C
-  #define REDUNDANT_BETA                  3950 // Beta value
-  #define REDUNDANT_SH_C_COEFF               0 // Steinhart-Hart C coefficient
+  #define REDUNDANT_PULLUP_RESISTOR_OHMS  4700 // Pullup resistor  // 上拉电阻
+  #define REDUNDANT_RESISTANCE_25C_OHMS 100000 // Resistance at 25C  // 25摄氏度时的电阻值
+  #define REDUNDANT_BETA                  3950 // Beta value  // Beta 值 (是温度探头（热敏电阻）最重要的参数之一)
+  #define REDUNDANT_SH_C_COEFF               0 // Steinhart-Hart C coefficient  // 斯坦哈特-哈特 C 系数(高级温度曲线参数，用于让温度探头读数极度准确)
 #endif
 
 /**
- * Thermocouple Options — for MAX6675 (-2), MAX31855 (-3), and MAX31865 (-5).
+ * Thermocouple Options — for MAX6675 (-2), MAX31855 (-3), and MAX31865 (-5).  // 热电偶选项 —— 适用于 MAX6675（型号-2）、MAX31855（型号-3）和 MAX31865（型号-5）。
  */
-//#define TEMP_SENSOR_FORCE_HW_SPI                // Ignore SCK/MOSI/MISO pins; use CS and the default SPI bus.
-//#define MAX31865_SENSOR_WIRES_0   2             // (2-4) Number of wires for the probe connected to a MAX31865 board.
+//#define TEMP_SENSOR_FORCE_HW_SPI                // Ignore SCK/MOSI/MISO pins; use CS and the default SPI bus.  // 忽略 SCK/MOSI/MISO 引脚定义；直接使用 CS 引脚和默认 SPI 总线。
+//#define MAX31865_SENSOR_WIRES_0   2             // (2-4) Number of wires for the probe connected to a MAX31865 board.  // (2-4) 连接到 MAX31865 模块的探头 引线数量。
 //#define MAX31865_SENSOR_WIRES_1   2
 //#define MAX31865_SENSOR_WIRES_2   2
 //#define MAX31865_SENSOR_WIRES_BED 2
 
-//#define MAX31865_50HZ_FILTER                    // Use a 50Hz filter instead of the default 60Hz.
-//#define MAX31865_USE_READ_ERROR_DETECTION       // Treat value spikes (20°C delta in under 1s) as read errors.
+//#define MAX31865_50HZ_FILTER                    // Use a 50Hz filter instead of the default 60Hz.  // 使用 50Hz 滤波器，替代默认的 60Hz 滤波器。
+// 注（译者注）：上面是温度传感器的抗干扰滤波设置，和你所在国家的市电频率有关。
 
-//#define MAX31865_USE_AUTO_MODE                  // Read faster and more often than 1-shot; bias voltage always on; slight effect on RTD temperature.
-//#define MAX31865_MIN_SAMPLING_TIME_MSEC     100 // (ms) 1-shot: minimum read interval. Reduces bias voltage effects by leaving sensor unpowered for longer intervals.
-//#define MAX31865_IGNORE_INITIAL_FAULTY_READS 10 // Ignore some read faults (keeping the temperature reading) to work around a possible issue (#23439).
+//#define MAX31865_USE_READ_ERROR_DETECTION       // Treat value spikes (20°C delta in under 1s) as read errors.  // 将温度值突变（1秒内变化20°C）视为读取错误。
 
-//#define MAX31865_WIRE_OHMS_0              0.95f // For 2-wire, set the wire resistances for more accurate readings.
-//#define MAX31865_WIRE_OHMS_1              0.0f
+//#define MAX31865_USE_AUTO_MODE                  // Read faster and more often than 1-shot; bias voltage always on; slight effect on RTD temperature.  // 比单次读取模式更快、更频繁地读取温度；偏置电压始终开启；对 RTD 温度测量有轻微影响。
+// 注（译者注）：上面是 MAX31865 + PT100/PT1000 高温探头 的专用设置：读取更快、更频繁：温度采样速度提升，反应更灵敏；偏置电压始终开启：电路一直保持通电状态；轻微影响 RTD 温度：会让温度读数稍微偏高一点点（可以忽略）
+
+//#define MAX31865_MIN_SAMPLING_TIME_MSEC     100 // (ms) 1-shot: minimum read interval. Reduces bias voltage effects by leaving sensor unpowered for longer intervals.// (毫秒) 单次读取模式：最小读取间隔。通过延长传感器断电时间来减少偏置电压带来的误差。
+//#define MAX31865_IGNORE_INITIAL_FAULTY_READS 10 // Ignore some read faults (keeping the temperature reading) to work around a possible issue (#23439).  // 忽略部分读取故障（继续读取温度），以规避一个已知问题（#23439）。
+
+//#define MAX31865_WIRE_OHMS_0              0.95f // For 2-wire, set the wire resistances for more accurate readings.  // 对于两线制探头，设置导线电阻以获得更准确的读数。
+//#define MAX31865_WIRE_OHMS_1              0.0f                                                                       // （译者注）：两线制探头因为线比较长，电线本身会有电阻，这会让测出来的温度偏高、不准。在这里填入你探头电线的实际电阻值，就能修正误差，让温度更准
 //#define MAX31865_WIRE_OHMS_2              0.0f
 //#define MAX31865_WIRE_OHMS_BED            0.0f
 
 /**
- * Hephestos 2 24V heated bed upgrade kit.
+ * Hephestos 2 24V heated bed upgrade kit.  // Hephestos 2 24V 热床升级套件
  * https://www.en3dstudios.com/product/bq-hephestos-2-heated-bed-kit/
  */
 //#define HEPHESTOS2_HEATED_BED_KIT
@@ -201,53 +257,58 @@
 #endif
 
 //
-// Heated Bed Bang-Bang options
+// Heated Bed Bang-Bang options  // 热床位式控温（通断式）相关选项(Bang-Bang控制)
 //
 #if DISABLED(PIDTEMPBED)
-  #define BED_CHECK_INTERVAL 5000   // (ms) Interval between checks in bang-bang control
+  #define BED_CHECK_INTERVAL 5000   // (ms) Interval between checks in bang-bang control  // (毫秒) 开关式（bang-bang）控温的 温度检测间隔
   #if ANY(BED_LIMIT_SWITCHING, PELTIER_BED)
-    #define BED_HYSTERESIS 2        // (°C) Only set the relevant heater state when ABS(T-target) > BED_HYSTERESIS
-  #endif
+    #define BED_HYSTERESIS 2        // (°C) Only set the relevant heater state when ABS(T-target) > BED_HYSTERESIS  // (°C) 仅当 绝对值(当前温度 - 目标温度) > 热床回差值 时，才切换加热器状态
+  #endif                            // 这是热床开关控温（Bang-Bang）的防抖动参数，叫回差 / 滞后值。假设你热床设 60℃，回差设 2℃，温度降到 58℃ 才开始加热，温度升到 60℃ 才停止加热,不会在 60℃ 附近频繁开关、哒哒响。
 #endif
 
 //
-// Heated Chamber options
+// Heated Chamber options  // 恒温腔室加热相关配置
 //
 
 #if TEMP_SENSOR_CHAMBER
-  //#define HEATER_CHAMBER_PIN      P2_04   // Required heater on/off pin (example: SKR 1.4 Turbo HE1 plug)
+  //#define HEATER_CHAMBER_PIN      P2_04   // Required heater on/off pin (example: SKR 1.4 Turbo HE1 plug)  // 加热设备通断控制引脚（例：SKR 1.4 Turbo 主板HE1接口）
   //#define HEATER_CHAMBER_INVERTING false
-  //#define FAN1_PIN                   -1   // Remove the fan signal on pin P2_04 (example: SKR 1.4 Turbo HE1 plug)
+  //#define FAN1_PIN                   -1   // Remove the fan signal on pin P2_04 (example: SKR 1.4 Turbo HE1 plug)  // 禁用（移除）引脚 P2_04 上的风扇信号（例：SKR 1.4 Turbo 主板 HE1 接口）
 
   #if DISABLED(PIDTEMPCHAMBER)
-    #define CHAMBER_CHECK_INTERVAL 5000   // (ms) Interval between checks in bang-bang control
+    #define CHAMBER_CHECK_INTERVAL 5000   // (ms) Interval between checks in bang-bang control  // (毫秒) 通断式控温的温度检测间隔  （译者注）：这是设置腔体加热器每隔多久检测一次温度，判断启停
     #if ENABLED(CHAMBER_LIMIT_SWITCHING)
-      #define CHAMBER_HYSTERESIS 2        // (°C) Only set the relevant heater state when ABS(T-target) > CHAMBER_HYSTERESIS
+      #define CHAMBER_HYSTERESIS 2        // (°C) Only set the relevant heater state when ABS(T-target) > CHAMBER_HYSTERESIS  // (°C) 仅当 绝对值(当前温度 - 目标温度) > 腔体回差值 时，才切换加热器状态
     #endif
   #endif
 
-  //#define CHAMBER_FAN               // Enable a fan on the chamber
+  //#define CHAMBER_FAN               // Enable a fan on the chamber  // 启用腔体散热/循环风扇
   #if ENABLED(CHAMBER_FAN)
-    //#define CHAMBER_FAN_INDEX   2   // Index of a fan to repurpose as the chamber fan. (Default: first unused fan)
+    //#define CHAMBER_FAN_INDEX   2   // Index of a fan to repurpose as the chamber fan. (Default: first unused fan)  // 重新指定一个风扇作为腔体风扇使用。（默认：第一个未被使用的风扇）
     #define CHAMBER_FAN_MODE      2   // Fan control mode: 0=Static; 1=Linear increase when temp is higher than target; 2=V-shaped curve; 3=similar to 1 but fan is always on.
+    // 上面为风扇控制模式：
+    // 0 = 固定转速（静态）
+    // 1 = 温度超过目标值后线性提速
+    // 2 = V型曲线（两头快、中间慢）
+    // 3 = 和模式1类似，但风扇始终保持运转
     #if CHAMBER_FAN_MODE == 0
-      #define CHAMBER_FAN_BASE  255   // Chamber fan PWM (0-255)
+      #define CHAMBER_FAN_BASE  255   // Chamber fan PWM (0-255)  // 腔体风扇 PWM 转速值（范围 0-255）
     #elif CHAMBER_FAN_MODE == 1
-      #define CHAMBER_FAN_BASE  128   // Base chamber fan PWM (0-255); turns on when chamber temperature is above the target
-      #define CHAMBER_FAN_FACTOR 25   // PWM increase per °C above target
+      #define CHAMBER_FAN_BASE  128   // Base chamber fan PWM (0-255); turns on when chamber temperature is above the target  // 腔体风扇基础 PWM 转速 (0-255)；当腔体温度超过目标温度时启动
+      #define CHAMBER_FAN_FACTOR 25   // PWM increase per °C above target  // 温度每超出目标 1°C，PWM 增加的数值
     #elif CHAMBER_FAN_MODE == 2
-      #define CHAMBER_FAN_BASE  128   // Minimum chamber fan PWM (0-255)
-      #define CHAMBER_FAN_FACTOR 25   // PWM increase per °C difference from target
+      #define CHAMBER_FAN_BASE  128   // Minimum chamber fan PWM (0-255)  // 腔体风扇最小 PWM 转速 (0-255)
+      #define CHAMBER_FAN_FACTOR 25   // PWM increase per °C difference from target  // 温度与目标值每相差 1°C，PWM 增加的数值
     #elif CHAMBER_FAN_MODE == 3
-      #define CHAMBER_FAN_BASE  128   // Base chamber fan PWM (0-255)
-      #define CHAMBER_FAN_FACTOR 25   // PWM increase per °C above target
+      #define CHAMBER_FAN_BASE  128   // Base chamber fan PWM (0-255)  // 腔体风扇基础 PWM 转速 (0-255)
+      #define CHAMBER_FAN_FACTOR 25   // PWM increase per °C above target  // 温度每超出目标 1°C，PWM 增加的数值
     #endif
   #endif
 
-  //#define CHAMBER_VENT              // Enable a servo-controlled vent on the chamber
+  //#define CHAMBER_VENT              // Enable a servo-controlled vent on the chamber  // 启用舵机控制的腔体通风口
   #if ENABLED(CHAMBER_VENT)
-    #define CHAMBER_VENT_SERVO_NR  1  // Index of the vent servo
-    #define HIGH_EXCESS_HEAT_LIMIT 5  // How much above target temp to consider there is excess heat in the chamber
+    #define CHAMBER_VENT_SERVO_NR  1  // Index of the vent servo  // 通风口所用舵机的编号
+    #define HIGH_EXCESS_HEAT_LIMIT 5  // How much above target temp to consider there is excess heat in the chamber  // 腔体温度超出目标值多少度，判定为热量过剩
     #define LOW_EXCESS_HEAT_LIMIT  3
     #define MIN_COOLING_SLOPE_TIME_CHAMBER_VENT 20
     #define MIN_COOLING_SLOPE_DEG_CHAMBER_VENT 1.5
@@ -261,15 +322,15 @@
   #define COOLER_MINTEMP           8  // (°C)
   #define COOLER_MAXTEMP          26  // (°C)
   #define COOLER_DEFAULT_TEMP     16  // (°C)
-  #define TEMP_COOLER_HYSTERESIS   1  // (°C) Temperature proximity considered "close enough" to the target
-  #define COOLER_PIN               8  // Laser cooler on/off pin used to control power to the cooling element (e.g., TEC, External chiller via relay)
+  #define TEMP_COOLER_HYSTERESIS   1  // (°C) Temperature proximity considered "close enough" to the target  // (℃) 判定温度已接近目标值的误差范围
+  #define COOLER_PIN               8  // Laser cooler on/off pin used to control power to the cooling element (e.g., TEC, External chiller via relay)  // 激光冷却器通断控制引脚,用于控制制冷元件供电（如半导体制冷TEC、继电器控制的外部冷水机）
   #define COOLER_INVERTING     false
-  #define TEMP_COOLER_PIN         15  // Laser/Cooler temperature sensor pin. ADC is required.
-  #define COOLER_FAN                  // Enable a fan on the cooler, Fan# 0,1,2,3 etc.
-  #define COOLER_FAN_INDEX         0  // FAN number 0, 1, 2 etc. e.g.
+  #define TEMP_COOLER_PIN         15  // Laser/Cooler temperature sensor pin. ADC is required.  // 激光/冷却器温度传感器引脚。必须支持 ADC 模拟输入。
+  #define COOLER_FAN                  // Enable a fan on the cooler, Fan# 0,1,2,3 etc.  // 启用冷却器风扇，指定风扇编号 0、1、2、3 等
+  #define COOLER_FAN_INDEX         0  // FAN number 0, 1, 2 etc. e.g.  // 风扇编号：0、1、2 等（示例）
   #if ENABLED(COOLER_FAN)
-    #define COOLER_FAN_BASE      100  // Base Cooler fan PWM (0-255); turns on when Cooler temperature is above the target
-    #define COOLER_FAN_FACTOR     25  // PWM increase per °C above target
+    #define COOLER_FAN_BASE      100  // Base Cooler fan PWM (0-255); turns on when Cooler temperature is above the target  // 冷却器风扇基础 PWM 转速 (0-255)；当冷却器温度超过目标温度时启动
+    #define COOLER_FAN_FACTOR     25  // PWM increase per °C above target  // 温度每超出目标 1°C，PWM 增加的数值
   #endif
 #endif
 
@@ -277,17 +338,17 @@
 // Motherboard Sensor options
 //
 #if TEMP_SENSOR_BOARD
-  #define THERMAL_PROTECTION_BOARD   // Halt the printer if the board sensor leaves the temp range below.
+  #define THERMAL_PROTECTION_BOARD   // Halt the printer if the board sensor leaves the temp range below.  // 如果主板温度传感器检测到温度超出下方设定的范围，立即停止打印机
   #define BOARD_MINTEMP           8  // (°C)
   #define BOARD_MAXTEMP          70  // (°C)
-  //#define TEMP_BOARD_PIN -1        // Board temp sensor pin override.
+  //#define TEMP_BOARD_PIN -1        // Board temp sensor pin override.  // 主板温度传感器引脚 强制覆盖/重定义
 #endif
 
 //
 // SoC Sensor options
 //
 #if TEMP_SENSOR_SOC
-  #define THERMAL_PROTECTION_SOC     // Halt the printer if the SoC sensor leaves the temp range below.
+  #define THERMAL_PROTECTION_SOC     // Halt the printer if the SoC sensor leaves the temp range below.  // 若系统主控芯片(SoC)温度超出下述范围，打印机立即停机
   #define SOC_MAXTEMP            85  // (°C)
 #endif
 
@@ -306,16 +367,30 @@
  *
  * If you get false positives for "Thermal Runaway", increase
  * THERMAL_PROTECTION_HYSTERESIS and/or THERMAL_PROTECTION_PERIOD
+ * 
+ * 热保护功能为你的打印机提供额外防护，避免损坏和火灾风险。
+ * Marlin 固件内置了安全的最低/最高温度范围，
+ * 用于保护因热敏电阻断线、接触不良导致的故障。
+ *
+ * 问题所在：如果热敏电阻脱落，它会检测到室温（远低于打印温度），
+ * 固件就会**一直加热**，导致喷头/热床持续升温、过热甚至起火。
+ *
+ * 解决方法：当温度达到目标值后，固件开始监控。
+ * 如果温度**长时间（period）低于目标值太多（hysteresis）**，
+ * 固件会强制停机，作为安全防护。
+ *
+ * 如果你遇到“误报热失控”的情况，
+ * 请增大 THERMAL_PROTECTION_HYSTERESIS 和/或 THERMAL_PROTECTION_PERIOD
  */
 #if ALL(HAS_HOTEND, THERMAL_PROTECTION_HOTENDS)
   #define THERMAL_PROTECTION_PERIOD        40 // (seconds)
   #define THERMAL_PROTECTION_HYSTERESIS     4 // (°C)
 
-  //#define ADAPTIVE_FAN_SLOWING              // Slow down the part-cooling fan if the temperature drops
+  //#define ADAPTIVE_FAN_SLOWING              // Slow down the part-cooling fan if the temperature drops  // 当温度下降时，自动降低模型冷却风扇（part-cooling fan）的转速
   #if ENABLED(ADAPTIVE_FAN_SLOWING)
-    //#define REPORT_ADAPTIVE_FAN_SLOWING     // Report fan slowing activity to the console
+    //#define REPORT_ADAPTIVE_FAN_SLOWING     // Report fan slowing activity to the console  // 将风扇减速动作输出到控制台（日志/调试窗口）
     #if ANY(MPCTEMP, PIDTEMP)
-      //#define TEMP_TUNING_MAINTAIN_FAN      // Don't slow down the fan speed during M303 or M306 T
+      //#define TEMP_TUNING_MAINTAIN_FAN      // Don't slow down the fan speed during M303 or M306 T  // 在执行 M303 或 M306 T 命令期间，不执行风扇减速功能
     #endif
   #endif
 
@@ -330,48 +405,63 @@
    * If you get false positives for "Heating failed", increase WATCH_TEMP_PERIOD
    * and/or decrease WATCH_TEMP_INCREASE. WATCH_TEMP_INCREASE should not be set
    * below 2.
+   * 
+   * 
+   * 每当使用 M104、M109 或 M303 命令提高目标温度时，
+   * 固件会开始计时等待 WATCH_TEMP_PERIOD（秒）。
+   * 如果在这段时间内，温度**没有上升达到 WATCH_TEMP_INCREASE（度）**，
+   * 机器会立即停机，并需要手动硬重启才能恢复。
+   *
+   * 每次执行 M104/M109/M303 时，这个检测都会重新开始。
+   * 但仅当当前温度远低于目标温度时，才会执行可靠检测。
+   *
+   * 如果你遇到 **“Heating failed”（加热失败）误报**，
+   * 请增大 WATCH_TEMP_PERIOD（时间），和/或 **减小** WATCH_TEMP_INCREASE（温升）。
+   * WATCH_TEMP_INCREASE 数值**不能低于 2**。
+   * 
+   * （译者注）：这个功能是防止加热器坏了、加热不工作，主控却一直发出继续加热指令。
    */
   #define WATCH_TEMP_PERIOD  40               // (seconds)
   #define WATCH_TEMP_INCREASE 2               // (°C)
 #endif
 
 /**
- * Thermal Protection parameters for the bed are just as above for hotends.
+ * Thermal Protection parameters for the bed are just as above for hotends.  // 热床的热保护参数规则，和上述喷头热保护参数完全一致。
  */
 #if TEMP_SENSOR_BED && ENABLED(THERMAL_PROTECTION_BED)
   #define THERMAL_PROTECTION_BED_PERIOD        20 // (seconds)
   #define THERMAL_PROTECTION_BED_HYSTERESIS     2 // (°C)
 
   /**
-   * As described above, except for the bed (M140/M190/M303).
+   * As described above, except for the bed (M140/M190/M303).  // 规则与上文一致，仅适配热床相关指令：M140/M190/M303
    */
   #define WATCH_BED_TEMP_PERIOD                60 // (seconds)
   #define WATCH_BED_TEMP_INCREASE               2 // (°C)
 #endif
 
 /**
- * Thermal Protection parameters for the heated chamber.
+ * Thermal Protection parameters for the heated chamber.  // 恒温仓保温腔专用热保护参数
  */
 #if TEMP_SENSOR_CHAMBER && ENABLED(THERMAL_PROTECTION_CHAMBER)
   #define THERMAL_PROTECTION_CHAMBER_PERIOD    20 // (seconds)
   #define THERMAL_PROTECTION_CHAMBER_HYSTERESIS 2 // (°C)
 
   /**
-   * Heated chamber watch settings (M141/M191).
+   * Heated chamber watch settings (M141/M191).  // 加热恒温仓升温监测配置，对应指令：M141 / M191
    */
   #define WATCH_CHAMBER_TEMP_PERIOD            60 // (seconds)
   #define WATCH_CHAMBER_TEMP_INCREASE           2 // (°C)
 #endif
 
 /**
- * Thermal Protection parameters for the laser cooler.
+ * Thermal Protection parameters for the laser cooler.  // 激光冷却器专属热保护参数
  */
 #if TEMP_SENSOR_COOLER && ENABLED(THERMAL_PROTECTION_COOLER)
   #define THERMAL_PROTECTION_COOLER_PERIOD     10 // (seconds)
   #define THERMAL_PROTECTION_COOLER_HYSTERESIS  3 // (°C)
 
   /**
-   * Laser cooling watch settings (M143/M193).
+   * Laser cooling watch settings (M143/M193).  // 激光冷却系统升温监测配置，对应指令：M143 / M193
    */
   #define WATCH_COOLER_TEMP_PERIOD             60 // (seconds)
   #define WATCH_COOLER_TEMP_INCREASE            3 // (°C)
@@ -401,21 +491,49 @@
    * Be careful to distinguish false positives from real sensor issues before disabling this feature. If the
    * heater's temperature appears even slightly higher than expected after restarting, you may have a real
    * thermal malfunction. Check the temperature graph in your host for any unusual bumps.
+   * 
+   * 温度偏差监测热保护 —— 实验性功能
+   * 检测到温度传感器卡死不动时，直接紧急停机
+   *
+   * 该功能可能导致温控极度稳定的设备误停机，务必在多种工况下充分测试，
+   * 出现频繁误报可直接关闭。
+   *
+   * 作用原理：确保所有温度传感器数据在持续刷新。
+   * 一旦探头损坏、信号卡死、固件停止读取测温数据，温度数值会彻底静止，
+   * 但加热元件仍可能持续通电加热，极易引发危险。 
+   * 本功能只监测温度是否发生变动，软硬层面的测温异常都能精准捕获。
+   *
+   * 默认沿用上文各类热保护的**PERIOD监测时长**作为判定窗口，
+   * 规定时长内温度必须出现至少微小波动，代表传感器正常轮询读数。
+   * 若任意一路受控加热设备温度全程完全不变（无丝毫数值变动），
+   * 立即触发温控故障报错并停机锁机。
+   *
+   * 加热工况过于平稳的设备容易触发误判停机，
+   * 遇到此情况可适当加长对应类别的热保护监测时长。
+   * 切记：失控加热状态绝对不能放任持续一两分钟以上。
+   *
+   * 关闭该功能前务必分清是误报还是真传感器故障；
+   * 重启后若实际温度明显偏高，即为真实温控故障，优先排查硬件，
+   * 可在上位机温度曲线图里查看异常温度波动佐证问题。
    */
   //#define THERMAL_PROTECTION_VARIANCE_MONITOR
   #if ENABLED(THERMAL_PROTECTION_VARIANCE_MONITOR)
     // Variance detection window to override the THERMAL_PROTECTION...PERIOD settings above.
     // Keep in mind that some heaters heat up faster than others.
-    //#define THERMAL_PROTECTION_VARIANCE_MONITOR_PERIOD 30  // (s) Override all watch periods
+    // 温度变化监测时间窗口（用于覆盖/替换上面的 THERMAL_PROTECTION...PERIOD 设置）
+    // 注意：不同加热器的加热速度不一样（有的快、有的慢）。
+    //#define THERMAL_PROTECTION_VARIANCE_MONITOR_PERIOD 30  // (s) Override all watch periods  // (秒) 覆盖【所有】加热区的监测周期
   #endif
 #endif
 
 #if ENABLED(PIDTEMP)
   // Add an additional term to the heater power, proportional to the extrusion speed.
   // A well-chosen Kc value should add just enough power to melt the increased material volume.
+  // 向加热器功率添加一个额外项，该值与挤出速度成正比。
+  // 选择合适的 Kc 值，应刚好补充足够的功率，以熔化更多体积的材料。 （译者注）：Kc值是补偿强度
   //#define PID_EXTRUSION_SCALING
   #if ENABLED(PID_EXTRUSION_SCALING)
-    #define DEFAULT_Kc (100) // heating power = Kc * e_speed
+    #define DEFAULT_Kc (100) // heating power = Kc * e_speed  // 加热功率 = Kc × 挤出速度
     #define LPQ_MAX_LEN 50
   #endif
 
@@ -446,26 +564,58 @@
    * 4. Repeat step 1. and 2. for this fan speed.
    * 5. Enable PID_FAN_SCALING_ALTERNATIVE_DEFINITION and enter the two identified Kf-values in
    *    PID_FAN_SCALING_AT_FULL_SPEED and PID_FAN_SCALING_AT_MIN_SPEED. Enter the minimum speed in PID_FAN_SCALING_MIN_SPEED
+   * 
+   * 向加热器功率添加一个额外项，该值与风扇转速成正比。
+   * 选择合适的 Kf 值，应刚好补充足够的功率，以补偿冷却风扇带走的热量。
+   * 你可以直接使用 DEFAULT_Kf 值进行固定补偿，
+   * 或按照下面的说明设置随风扇转速变化的动态补偿。
+   *
+   * 固定补偿（仅在风扇 0% 和 100% 两档使用）
+   * ---------------------------------------------------------------------
+   * Kf 值推荐初始计算公式：
+   *   kf = (风扇功率 * 风扇效率) / 加热头功率 * 255
+   * 其中 eff_fan（风扇效率）在 0.0~1.0 之间，取决于风扇效率和吹向喷头的风量。
+   *
+   * 示例：
+   *   加热头：40W，风扇：0.1A * 24V = 2.4W，eff_fan = 0.8
+   *   Kf = (2.4W * 0.8) / 40W * 255 = 12.24
+   *
+   * 随风扇转速动态补偿
+   * --------------------------------
+   * 1. 设置喷头温度，等待稳定，然后开启风扇（100%）。
+   *    确保 PID_FAN_SCALING_LIN_FACTOR = 0，PID_FAN_SCALING_ALTERNATIVE_DEFINITION 未开启。
+   *    如果温度下降，慢慢增大 Kf，直到温度不再下降。
+   *    如果开启风扇后温度冲太高，说明 Kf 太大。
+   * 2. 记录 100% 风扇转速下的最佳 Kf 值。
+   * 3. 设置 PID_FAN_SCALING_MIN_SPEED（风扇开始转动的最低转速）。
+   * 4. 对这个最低转速重复步骤 1 和 2。
+   * 5. 开启 PID_FAN_SCALING_ALTERNATIVE_DEFINITION，
+   *    把两个 Kf 值填入对应参数，最低转速也填入。
+   * 
+   * （译者注）：功能简介：
+   * 风扇吹喷头 → 喷头温度会掉 → 打印质量变差
+      这个功能让固件：
+      风扇转得越快 → 自动给喷头加越多加热功率
    */
   //#define PID_FAN_SCALING
   #if ENABLED(PID_FAN_SCALING)
     //#define PID_FAN_SCALING_ALTERNATIVE_DEFINITION
     #if ENABLED(PID_FAN_SCALING_ALTERNATIVE_DEFINITION)
-      // The alternative definition is used for an easier configuration.
-      // Just figure out Kf at full speed (255) and PID_FAN_SCALING_MIN_SPEED.
-      // DEFAULT_Kf and PID_FAN_SCALING_LIN_FACTOR are calculated accordingly.
+      // The alternative definition is used for an easier configuration.  // 使用这种替代定义方式可以让配置更简单。
+      // Just figure out Kf at full speed (255) and PID_FAN_SCALING_MIN_SPEED.  // 只需要算出【风扇全速(255)】和【最低风扇转速(PID_FAN_SCALING_MIN_SPEED)】对应的 Kf 值即可。
+      // DEFAULT_Kf and PID_FAN_SCALING_LIN_FACTOR are calculated accordingly.  // DEFAULT_Kf 和 PID_FAN_SCALING_LIN_FACTOR 会自动计算出来。
 
-      #define PID_FAN_SCALING_AT_FULL_SPEED 13.0        //=PID_FAN_SCALING_LIN_FACTOR*255+DEFAULT_Kf
-      #define PID_FAN_SCALING_AT_MIN_SPEED   6.0        //=PID_FAN_SCALING_LIN_FACTOR*PID_FAN_SCALING_MIN_SPEED+DEFAULT_Kf
-      #define PID_FAN_SCALING_MIN_SPEED     10.0        // Minimum fan speed at which to enable PID_FAN_SCALING
+      #define PID_FAN_SCALING_AT_FULL_SPEED 13.0        //=PID_FAN_SCALING_LIN_FACTOR*255+DEFAULT_Kf  // 计算公式 = PID_FAN_SCALING_LIN_FACTOR * 255 + DEFAULT_Kf
+      #define PID_FAN_SCALING_AT_MIN_SPEED   6.0        //=PID_FAN_SCALING_LIN_FACTOR*PID_FAN_SCALING_MIN_SPEED+DEFAULT_Kf  // 计算公式 = PID_FAN_SCALING_LIN_FACTOR * PID_FAN_SCALING_MIN_SPEED + DEFAULT_Kf
+      #define PID_FAN_SCALING_MIN_SPEED     10.0        // Minimum fan speed at which to enable PID_FAN_SCALING  // 启用 PID 风扇散热补偿功能的【最低风扇转速阈值】
 
       #define DEFAULT_Kf (255.0*PID_FAN_SCALING_AT_MIN_SPEED-PID_FAN_SCALING_AT_FULL_SPEED*PID_FAN_SCALING_MIN_SPEED)/(255.0-PID_FAN_SCALING_MIN_SPEED)
       #define PID_FAN_SCALING_LIN_FACTOR (PID_FAN_SCALING_AT_FULL_SPEED-DEFAULT_Kf)/255.0
 
     #else
-      #define PID_FAN_SCALING_LIN_FACTOR (0)             // Power-loss due to cooling = Kf * (fan_speed)
-      #define DEFAULT_Kf 10                              // A constant value added to the PID-tuner
-      #define PID_FAN_SCALING_MIN_SPEED 10               // Minimum fan speed at which to enable PID_FAN_SCALING
+      #define PID_FAN_SCALING_LIN_FACTOR (0)             // Power-loss due to cooling = Kf * (fan_speed)  // 风扇散热造成的功率损失 = Kf * 风扇转速
+      #define DEFAULT_Kf 10                              // A constant value added to the PID-tuner  // 一个添加到 PID 调参器中的固定常量值
+      #define PID_FAN_SCALING_MIN_SPEED 10               // Minimum fan speed at which to enable PID_FAN_SCALING  // 启用 PID 风扇散热补偿功能的【最低风扇转速阈值】
     #endif
   #endif
 #endif
@@ -482,24 +632,42 @@
  *
  * Enable Autotemp Mode with M104/M109 F<factor> S<mintemp> B<maxtemp>.
  * Disable by sending M104/M109 with no F parameter (or F0 with AUTOTEMP_PROPORTIONAL).
+ * 
+ * 自动温度模式
+ *
+ * 根据计划中的挤出运动（E轴移动），动态调整喷头目标温度。
+ *
+ * （与 PID_EXTRUSION_SCALING 不同，后者通过额外的 Kc 值跟踪挤出并调整 PID 输出。）
+ *
+ * 自动温度计算公式：
+ *   目标温度 = 最低温度 + 系数 × 挤出速度(mm/秒)
+ *   最终温度不会超过设定的最高温度。
+ *
+ * 使用 M104/M109 F<系数> S<最低温> B<最高温> 开启自动温度。
+ * 发送不带 F 参数的 M104/M109 即可关闭（或使用 AUTOTEMP_PROPORTIONAL 时发送 F0）。
+ * 
+ * （译者注）：功能简介：
+    固件动态变温。
+     打印越快 → 温度自动越高
+     打印越慢 → 温度自动越低
  */
 #define AUTOTEMP
 #if ENABLED(AUTOTEMP)
-  #define AUTOTEMP_OLDWEIGHT    0.98  // Factor used to weight previous readings (0.0 < value < 1.0)
+  #define AUTOTEMP_OLDWEIGHT    0.98  // Factor used to weight previous readings (0.0 < value < 1.0)  // 用于加权平均历史读数的系数（取值范围：0.0 ～ 1.0）
   #define AUTOTEMP_MIN          210
   #define AUTOTEMP_MAX          250
   #define AUTOTEMP_FACTOR       0.1f
-  // Turn on AUTOTEMP on M104/M109 by default using proportions set here
+  // Turn on AUTOTEMP on M104/M109 by default using proportions set here  // 默认使用此处设置的参数，在执行 M104/M109 时自动开启 自动温度模式（AUTOTEMP）
   //#define AUTOTEMP_PROPORTIONAL
   #if ENABLED(AUTOTEMP_PROPORTIONAL)
-    #define AUTOTEMP_MIN_P      0 // (°C) Added to the target temperature
-    #define AUTOTEMP_MAX_P      5 // (°C) Added to the target temperature
-    #define AUTOTEMP_FACTOR_P   1 // Apply this F parameter by default (overridden by M104/M109 F)
+    #define AUTOTEMP_MIN_P      0 // (°C) Added to the target temperature  // (摄氏度) 在目标温度基础上额外增加的温度值
+    #define AUTOTEMP_MAX_P      5 // (°C) Added to the target temperature  // (摄氏度) 在目标温度基础上额外增加的温度值
+    #define AUTOTEMP_FACTOR_P   1 // Apply this F parameter by default (overridden by M104/M109 F)  // 默认使用此 F 参数（可被 M104/M109 指令中的 F 参数覆盖）
   #endif
 #endif
 
-// Show Temperature ADC value
-// Enable for M105 to include ADC values read from temperature sensors.
+// Show Temperature ADC value                                            // 显示温度 ADC 原始值
+// Enable for M105 to include ADC values read from temperature sensors.  // 启用后，M105 指令会返回从温度传感器读取的 ADC 数值
 //#define SHOW_TEMP_ADC_VALUES
 
 /**
@@ -516,10 +684,23 @@
  *
  * If you want to enable this feature for your hotend thermistor(s)
  * uncomment and set values > 0 in the constants below
+ * 
+ * 高温热敏电阻支持
+ *
+ * 能够支持高温的热敏电阻，在室温及更低温度下往往很难获得准确读数。
+ * 这意味着在预热过程中加热元件刚启动时，可能会触发 TEMP_SENSOR_X_RAW_LO_TEMP 检测，
+ * 系统会出于安全触发 MINTEMP 错误并强制停机。
+ *
+ * 为了避开这个限制，我们设置了一个预热时间（在此期间不会触发 MINTEMP 错误），
+ * 并增加了一个低温缓冲区间来处理异常读数。
+ *
+ * 如果你想为你的喷头热敏电阻启用此功能
+ * 取消下面常量的注释，并设置 > 0 的数值
  */
 
-// The number of consecutive low temperature errors that can occur
+// The number of consecutive low temperature errors that can occur  
 // before a MINTEMP error is triggered. (Shouldn't be more than 10.)
+// 在触发 MINTEMP 错误之前，允许连续出现多少次低温错误。（不应超过 10）
 //#define MAX_CONSECUTIVE_LOW_TEMPERATURE_ERROR_ALLOWED 0
 
 /**
@@ -528,6 +709,12 @@
  * hot end to reach the target temperature, but the time it takes to reach
  * the minimum temperature your thermistor can read. The lower the better/safer.
  * This shouldn't need to be more than 30 seconds (30000)
+ * 
+ * 喷头在开始【温度检测】之前，预热的毫秒数。
+ * 这个值【不要】设置为喷头达到目标温度的时间，
+ * 而应设置为热敏电阻能读取到【最低有效温度】所需的时间。
+ * 数值越小越好、越安全。
+ * 通常不需要超过 30 秒（30000）。
  */
 //#define PREHEAT_TIME_HOTEND_MS 0
 //#define PREHEAT_TIME_BED_MS 0
