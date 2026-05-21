@@ -1255,32 +1255,48 @@
   //#define INVERT_E1_VS_E0_DIR       // E direction signals are opposites           // 两路挤出电机转动方向相反
 #endif
 
+
+//============================================= 挤出机配置区 ======================================================
 // @section extruder
 
 // Activate a solenoid on the active extruder with M380. Disable all with M381.
 // Define SOL0_PIN, SOL1_PIN, etc., for each extruder that has a solenoid.
+// 使用指令 M380 激活当前挤出机上的电磁阀；使用 M381 禁用所有电磁阀。
+// 为每个配备了电磁阀的挤出机定义引脚：SOL0_PIN、SOL1_PIN 等。
 //#define EXT_SOLENOID
 
+//============================================= 回零 / 归位配置区 ==================================================
 // @section homing
 
 /**
  * Homing Procedure
  * Homing (G28) does an indefinite move towards the endstops to establish
  * the position of the toolhead relative to the workspace.
+ * 回零工作流程
+ * 回零（G28）会让喷头朝限位开关方向持续移动，
+ * 以此确定喷头相对于打印平台的初始位置。
  */
 
 //#define SENSORLESS_BACKOFF_MM  { 2, 2, 0 }  // (linear=mm, rotational=°) Backoff from endstops before sensorless homing
+                                              // （直线轴单位：毫米 / 旋转轴单位：度）
+                                              // 无传感器回零（sensorless homing）时，离开限位开关的回退距离
 
-#define HOMING_BUMP_MM      { 5, 5, 2 }       // (linear=mm, rotational=°) Backoff from endstops after first bump
-#define HOMING_BUMP_DIVISOR { 2, 2, 4 }       // Re-Bump Speed Divisor (Divides the Homing Feedrate)
+#define HOMING_BUMP_MM      { 5, 5, 2 }       // (linear=mm, rotational=°) Backoff from endstops after first bump  // 直线轴单位毫米，旋转轴单位度，首次撞限位后回退距离
+                                              // （译者注）：上面是配置轴第一次碰撞限位停下后，自动反向退回设定距离，用于二次精准找零，避免硬顶限位卡死，提升回零定位精度。
+#define HOMING_BUMP_DIVISOR { 2, 2, 4 }       // Re-Bump Speed Divisor (Divides the Homing Feedrate)               // 二次碰撞回零速度系数（将回零进给速度除以该值）
+                                              // （译者注）：这是二次精准回零时用的速度设置：第一次撞限位是快速的，退开后第二次再撞时，速度会变得很慢,这个数值就是减速倍数：二次回零速度 = 原回零速度 ÷ 这个数
 
-//#define HOMING_BACKOFF_POST_MM { 2, 2, 2 }  // (linear=mm, rotational=°) Backoff from endstops after homing
-//#define XY_COUNTERPART_BACKOFF_MM 0         // (mm) Backoff X after homing Y, and vice-versa
+//#define HOMING_BACKOFF_POST_MM { 2, 2, 2 }  // (linear=mm, rotational=°) Backoff from endstops after homing      // （直线轴：毫米 / 旋转轴：度）回零完成后，从限位开关处回退的距离
+//#define XY_COUNTERPART_BACKOFF_MM 0         // (mm) Backoff X after homing Y, and vice-versa                     // （毫米）Y轴回零后X轴的回退距离，反之亦然
 
-//#define QUICK_HOME                          // If G28 contains XY do a diagonal move first
-//#define HOME_Y_BEFORE_X                     // If G28 contains XY home Y before X
-//#define HOME_Z_FIRST                        // Home Z first. Requires a real endstop (not a probe).
-//#define CODEPENDENT_XY_HOMING               // If X/Y can't home without homing Y/X first
+//#define QUICK_HOME                          // If G28 contains XY do a diagonal move first                       // 执行G28同时回零XY轴时，先进行斜向联动移动
+                                              // （译者注）：上方选项勾选启用后，一键回零 XY 时，喷头不再单独先后走 X、走 Y，而是斜着同步移动靠近原点，适配 CoreXY 等联动结构，减少皮带拉扯，回零更顺滑。
+//#define HOME_Y_BEFORE_X                     // If G28 contains XY home Y before X                                // 执行G28同时回零XY时，优先先回零Y轴，再回零X轴
+                                              // （译者注）：开启后一键 XY 回零顺序变为：先归位 Y 轴到位，再执行 X 轴回零，适配部分机械结构避免走位干涉，按需调换 XY 回零先后次序。
+//#define HOME_Z_FIRST                        // Home Z first. Requires a real endstop (not a probe).              // 优先先回零Z轴，此功能需使用实体限位开关，不可用调平探头替代
+                                              // （译者注）：开启后整机回零最先抬升 Z 轴，避免喷头刮蹭热床造成磕碰损伤；注意必须接独立 Z 物理限位，仅靠自动调平探头无法启用该模式。
+//#define CODEPENDENT_XY_HOMING               // If X/Y can't home without homing Y/X first                        // 若X轴/ Y轴无法单独回零，必须先完成另一轴回零才可执行
+                                              // （译者注）：部分机型机械结构存在走位干涉，单独回 X 或单独回 Y 会撞机，开启后强制互锁：必须先归位其中一轴，另一轴才能正常完成回零，规避硬件碰撞。
 
 // @section bltouch
 
