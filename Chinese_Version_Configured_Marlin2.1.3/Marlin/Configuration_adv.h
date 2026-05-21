@@ -721,41 +721,53 @@
 
 // @section extruder
 
+// ======================================== 挤出机相关的配置 =============================================
+
 /**
- * Extruder runout prevention.
- * If the machine is idle and the temperature over MINTEMP
- * then extrude some filament every couple of SECONDS.
+ * Extruder runout prevention.                              // 挤出机防堵回抽/防空转溢料功能
+ * If the machine is idle and the temperature over MINTEMP  // 设备处于待机状态且温度高于最低安全温度时
+ * then extrude some filament every couple of SECONDS.      // 每隔设定秒数自动挤出一小段耗材
  */
 //#define EXTRUDER_RUNOUT_PREVENT
 #if ENABLED(EXTRUDER_RUNOUT_PREVENT)
-  #define EXTRUDER_RUNOUT_MINTEMP 190
-  #define EXTRUDER_RUNOUT_SECONDS 30
-  #define EXTRUDER_RUNOUT_SPEED 1500  // (mm/min)
-  #define EXTRUDER_RUNOUT_EXTRUDE 5   // (mm)
+  #define EXTRUDER_RUNOUT_MINTEMP 190    // 最低启动温度
+  #define EXTRUDER_RUNOUT_SECONDS 30     // 间隔时间（秒）
+  #define EXTRUDER_RUNOUT_SPEED 1500     // 出料速度（mm/分钟）
+  #define EXTRUDER_RUNOUT_EXTRUDE 5      // 每次出料长度（mm）
 #endif
 
 /**
  * Hotend Idle Timeout
  * Prevent filament in the nozzle from charring and causing a critical jam.
+ * 喷头待机超时功能
+ * 防止喷嘴内耗材碳化发黑，进而引发严重堵头
  */
 //#define HOTEND_IDLE_TIMEOUT
 #if ENABLED(HOTEND_IDLE_TIMEOUT)
-  #define HOTEND_IDLE_TIMEOUT_SEC (5*60)    // (seconds) Time without extruder movement to trigger protection
-  #define HOTEND_IDLE_MIN_TRIGGER   180     // (°C) Minimum temperature to enable hotend protection
-  #define HOTEND_IDLE_NOZZLE_TARGET   0     // (°C) Safe temperature for the nozzle after timeout
-  #define HOTEND_IDLE_BED_TARGET      0     // (°C) Safe temperature for the bed after timeout
+  #define HOTEND_IDLE_TIMEOUT_SEC (5*60)    // (seconds) Time without extruder movement to trigger protection  // (秒) 挤出机无动作的时间，达到后触发保护机制
+  #define HOTEND_IDLE_MIN_TRIGGER   180     // (°C) Minimum temperature to enable hotend protection            // (°C) 启用喷头保护功能的最低温度
+  #define HOTEND_IDLE_NOZZLE_TARGET   0     // (°C) Safe temperature for the nozzle after timeout              // (°C) 超时保护触发后，喷嘴会降到的安全温度
+  #define HOTEND_IDLE_BED_TARGET      0     // (°C) Safe temperature for the bed after timeout                 // (℃) 超时触发后热床降至的安全待机温度
 #endif
 
 // @section temperature
 
-// Calibration for AD595 / AD8495 sensor to adjust temperature measurements.
-// The final temperature is calculated as (measuredTemp * GAIN) + OFFSET.
+//======================================= 温度控制模块 =======================================
+
+// Calibration for AD595 / AD8495 sensor to adjust temperature measurements.     // AD595 / AD8495 温度传感器校准参数，用于修正温度测量值
+// The final temperature is calculated as (measuredTemp * GAIN) + OFFSET.        // 最终温度计算公式：实际显示温度 = (测量温度 * 增益系数) + 偏移补偿
 #define TEMP_SENSOR_AD595_OFFSET  0.0
 #define TEMP_SENSOR_AD595_GAIN    1.0
 #define TEMP_SENSOR_AD8495_OFFSET 0.0
 #define TEMP_SENSOR_AD8495_GAIN   1.0
 
+
+
+
+
+
 // @section fans
+//========================================= 风扇模块 =========================================
 
 /**
  * Controller Fan
@@ -763,29 +775,35 @@
  *
  * The fan turns on automatically whenever any driver is enabled and turns
  * off (or reduces to idle speed) shortly after drivers are turned off.
+ * 
+ * 主板主控散热风扇
+ * 用于给步进驱动芯片与功率管MOS管散热降温
+ *
+ * 任意驱动模块启动工作时，风扇自动开启
+ * 所有驱动停止工作后，风扇延时关闭或降至低速待机
  */
 //#define USE_CONTROLLER_FAN
 #if ENABLED(USE_CONTROLLER_FAN)
-  //#define CONTROLLER_FAN_PIN -1           // Set a custom pin for the controller fan
-  //#define CONTROLLER_FAN2_PIN -1          // Set a custom pin for second controller fan
-  //#define CONTROLLER_FAN_USE_Z_ONLY       // With this option only the Z axis is considered
-  //#define CONTROLLER_FAN_IGNORE_Z         // Ignore Z stepper. Useful when stepper timeout is disabled.
-  #define CONTROLLERFAN_SPEED_MIN         0 // (0-255) Minimum speed. (If set below this value the fan is turned off.)
-  #define CONTROLLERFAN_SPEED_ACTIVE    255 // (0-255) Active speed, used when any motor is enabled
-  #define CONTROLLERFAN_SPEED_IDLE        0 // (0-255) Idle speed, used when motors are disabled
-  #define CONTROLLERFAN_IDLE_TIME        60 // (seconds) Extra time to keep the fan running after disabling motors
+  //#define CONTROLLER_FAN_PIN -1           // Set a custom pin for the controller fan                                 // 为主板散热风扇（Controller Fan）设置自定义引脚
+  //#define CONTROLLER_FAN2_PIN -1          // Set a custom pin for second controller fan                              // 为第二个主板散热风扇设置自定义引脚
+  //#define CONTROLLER_FAN_USE_Z_ONLY       // With this option only the Z axis is considered                          // 启用该选项后，仅判定Z轴状态
+  //#define CONTROLLER_FAN_IGNORE_Z         // Ignore Z stepper. Useful when stepper timeout is disabled.              // 忽略 Z 轴步进电机状态,// 在禁用了步进电机超时功能时使用非常有用
+  #define CONTROLLERFAN_SPEED_MIN         0 // (0-255) Minimum speed. (If set below this value the fan is turned off.) // (0-255) 最低运行转速。（如果设置低于此值，风扇将直接关闭。）
+  #define CONTROLLERFAN_SPEED_ACTIVE    255 // (0-255) Active speed, used when any motor is enabled                    // (0-255) 风扇运行转速（任意电机启用时使用）
+  #define CONTROLLERFAN_SPEED_IDLE        0 // (0-255) Idle speed, used when motors are disabled                       // (0-255) 待机转速（电机全部禁用时使用）
+  #define CONTROLLERFAN_IDLE_TIME        60 // (seconds) Extra time to keep the fan running after disabling motors     // (秒) 电机全部禁用后，风扇**额外持续运行的时间**
 
-  // Use TEMP_SENSOR_BOARD as a trigger for enabling the controller fan
+  // Use TEMP_SENSOR_BOARD as a trigger for enabling the controller fan  // 使用主板温度传感器（TEMP_SENSOR_BOARD）作为启用控制器风扇的触发条件
   //#define CONTROLLER_FAN_MIN_BOARD_TEMP 40  // (°C) Turn on the fan if the board reaches this temperature
 
-  // Use TEMP_SENSOR_SOC as a trigger for enabling the controller fan
+  // Use TEMP_SENSOR_SOC as a trigger for enabling the controller fan   // 使用芯片（SOC）温度传感器作为启用控制器风扇的触发条件
   //#define CONTROLLER_FAN_MIN_SOC_TEMP 40  // (°C) Turn on the fan if the SoC reaches this temperature
 
-  #define CONTROLLER_FAN_BED_HEATING        // Turn on the fan when heating the bed
+  #define CONTROLLER_FAN_BED_HEATING        // Turn on the fan when heating the bed    // 热床启动加热时，自动开启该风扇
 
-  //#define CONTROLLER_FAN_EDITABLE         // Enable M710 configurable settings
+  //#define CONTROLLER_FAN_EDITABLE         // Enable M710 configurable settings       // 启用M710风扇自定义配置指令
   #if ENABLED(CONTROLLER_FAN_EDITABLE)
-    #define CONTROLLER_FAN_MENU             // Enable the Controller Fan submenu
+    #define CONTROLLER_FAN_MENU             // Enable the Controller Fan submenu       // 开启主板散热风扇专属设置子菜单
   #endif
 #endif
 
@@ -794,13 +812,24 @@
  * When part cooling or controller fans first start, run at a speed that
  * gets it spinning reliably for a short time before setting the requested speed.
  * (Does not work on Sanguinololu with FAN_SOFT_PWM.)
+ * 
+ * 风扇启动加速功能
+ * 当模型冷却风扇或主板散热风扇刚启动时，
+ * 先以较高转速短时间运转，确保风扇可靠转动，
+ * 之后再降至设定的转速。
+ * （在使用软件PWM的Sanguinololu主板上无效。）
  */
 //#define FAN_KICKSTART_TIME  100  // (ms)
 //#define FAN_KICKSTART_POWER 180  // 64-255
 //#define FAN_KICKSTART_LINEAR     // Set kickstart time linearly based on the speed, e.g., for 20% (51) it will be FAN_KICKSTART_TIME * 0.2.
                                    // Useful for quick speed up to low speed. Kickstart power must be set to 255.
+                                   // 根据风扇转速线性设置启动加速时间，
+                                   // 例如：转速 20% (51) 时，启动时间 = FAN_KICKSTART_TIME × 0.2。
+                                   // 适用于快速低速启动。
+                                   // 启动功率必须设为 255（全速）。
 
-// Some coolers may require a non-zero "off" state.
+// Some coolers may require a non-zero "off" state.   // 部分散热器/风扇可能需要一个【非零的“关闭”状态】。
+//（译者注）：上面这句话的意思是有些风扇不能用 0 转速来关闭，必须给一点点微小电压 / 转速才能真正 “关” 或进入待机状态。
 //#define FAN_OFF_PWM  1
 
 /**
@@ -814,26 +843,48 @@
  * Value 0 always turns off the fan.
  *
  * Define one or both of these to override the default 0-255 range.
+ * 
+ * PWM风扇转速映射
+ *
+ * 定义PWM风扇的最低/最高转速（通过M106指令设置）。
+ *
+ * 使用这些选项后，M106指令的 0-255 数值范围会被映射到一个更小的区间内，
+ * 以确保风扇有足够的启动动力，或者让低电流风扇在高电流下安全运行。
+ *（例如：用12V/24V电压驱动5V/12V风扇）
+ * 数值 0 始终会关闭风扇。 
+ *
+ * 定义其中一个或两个参数，即可覆盖默认的 0-255 范围。
  */
 //#define FAN_MIN_PWM 50
 //#define FAN_MAX_PWM 128
 
 /**
- * Fan Fast PWM
+ * Fan Fast PWM   // 风扇高速 PWM 调速
  *
  * Combinations of PWM Modes, prescale values and TOP resolutions are used internally
  * to produce a frequency as close as possible to the desired frequency.
+ * 内部自动组合 PWM 模式、预分频值、分辨率
+ * 生成尽可能接近你设定目标的 PWM 频率
  *
- * FAST_PWM_FAN_FREQUENCY
+ * FAST_PWM_FAN_FREQUENCY  // 设定风扇高速 PWM 的工作频率
  *   Set this to your desired frequency.
  *   For AVR, if left undefined this defaults to F = F_CPU/(2*255*1)
  *            i.e., F = 31.4kHz on 16MHz micro-controllers or F = 39.2kHz on 20MHz micro-controllers.
  *   For non AVR, if left undefined this defaults to F = 1Khz.
  *   This F value is only to protect the hardware from an absence of configuration
  *   and not to complete it when users are not aware that the frequency must be specifically set to support the target board.
+ * 
+ * *   在此设置你想要的PWM频率。
+ *   对于AVR主板（如Arduino Mega2560）：如果不定义，默认使用公式 F = F_CPU/(2*255*1)
+ *            即：16MHz芯片 → 31.4kHz | 20MHz芯片 → 39.2kHz
+ *   对于非AVR主板（STM32/ESP32等）：不定义则默认为 1kHz
+ *   这个默认频率**仅用于防止硬件无配置损坏**，
+ *   并不是最优值，用户必须根据自己的主板与风扇手动设置正确频率。
  *
  *   NOTE: Setting very low frequencies (< 10 Hz) may result in unexpected timer behavior.
  *         Setting very high frequencies can damage your hardware.
+ *   注意: 设置极低频率（<10赫兹）可能导致定时器运行异常。
+ *         设置过高频率可能损坏你的硬件。
  *
  * USE_OCR2A_AS_TOP [undefined by default]
  *   Boards that use TIMER2 for PWM have limitations resulting in only a few possible frequencies on TIMER2:
@@ -842,10 +893,22 @@
  *   A greater range can be achieved by enabling USE_OCR2A_AS_TOP. But note that this option blocks the use of
  *   PWM on pin OC2A. Only use this option if you don't need PWM on 0C2A. (Check your schematic.)
  *   USE_OCR2A_AS_TOP sacrifices duty cycle control resolution to achieve this broader range of frequencies.
+ * 
+ * USE_OCR2A_AS_TOP [默认未开启]
+ *   使用 TIMER2 做 PWM 的主板，频率只能从固定几个值里选：
+ *   16MHz 芯片: [62.5kHz, 31.4kHz(默认), 7.8kHz, 3.92kHz...]
+ *   20MHz 芯片: [78.1kHz, 39.2kHz(默认), 9.77kHz...]
+ *
+ *   开启 USE_OCR2A_AS_TOP 可以解锁**更多频率**，
+ *   但代价是：**占用 OC2A 引脚，该引脚无法再用于 PWM**。
+ *   只有你确定不用 OC2A 引脚时才能开（查主板图纸）。
+ *
+ *   同时，开启后会**损失一点 PWM 转速调节精度**。
  */
 //#define FAST_PWM_FAN    // Increase the fan PWM frequency. Removes the PWM noise but increases heating in the FET/Arduino
+// 提高风扇 PWM 调速频率。可消除 PWM 噪音，但会增加 FET 场效应管 / 主板的发热。
 #if ENABLED(FAST_PWM_FAN)
-  //#define FAST_PWM_FAN_FREQUENCY 31400  // Define here to override the defaults below
+  //#define FAST_PWM_FAN_FREQUENCY 31400  // Define here to override the defaults below // 在此处定义参数，以覆盖下方的默认设置
   //#define USE_OCR2A_AS_TOP
   #ifndef FAST_PWM_FAN_FREQUENCY
     #ifdef __AVR__
@@ -858,10 +921,11 @@
 
 /**
  * Assign more PWM fans for part cooling, synchronized with Fan 0
+ * 分配更多PWM风扇用于模型冷却，并与0号风扇保持同步运转
  */
-//#define REDUNDANT_PART_COOLING_FAN 1  // Index of the first fan to synchronize with Fan 0
+//#define REDUNDANT_PART_COOLING_FAN 1  // Index of the first fan to synchronize with Fan 0  // 与0号风扇同步的第一个风扇的编号
 #ifdef REDUNDANT_PART_COOLING_FAN
-  //#define NUM_REDUNDANT_FANS 1        // Number of sequential fans to synchronize with Fan 0
+  //#define NUM_REDUNDANT_FANS 1        // Number of sequential fans to synchronize with Fan 0  // 要与0号风扇同步运行的连续风扇数量
 #endif
 
 /**
@@ -875,6 +939,17 @@
  *
  * Multiple extruders can be assigned to the same pin in which case
  * the fan will turn on when any selected extruder is above the threshold.
+ * 
+ * 挤出机散热风扇
+ *
+ * 当挤出机温度超过 EXTRUDER_AUTO_FAN_TEMPERATURE 设定值时，
+ * 对应的散热风扇会**自动开启**。
+ *
+ * 主板引脚文件已定义推荐引脚，可在此处覆盖，
+ * 或设置为 -1 完全禁用该风扇。
+ *
+ * 多个挤出机可共用同一个风扇引脚，
+ * 此时**任意一个挤出机超温**，风扇就会启动。
  */
 #define E0_AUTO_FAN_PIN -1
 #define E1_AUTO_FAN_PIN -1
@@ -888,7 +963,7 @@
 #define COOLER_AUTO_FAN_PIN -1
 
 #define EXTRUDER_AUTO_FAN_TEMPERATURE 50
-#define EXTRUDER_AUTO_FAN_SPEED 255   // 255 == full speed
+#define EXTRUDER_AUTO_FAN_SPEED 255   // 255 == full speed（全速运行）
 #define CHAMBER_AUTO_FAN_TEMPERATURE 30
 #define CHAMBER_AUTO_FAN_SPEED 255
 #define COOLER_AUTO_FAN_TEMPERATURE 18
@@ -899,10 +974,14 @@
  *
  * Define one or more tachometer pins to enable fan speed
  * monitoring, and reporting of fan speeds with M123.
+ *  喷头散热风扇转速计
  *
- * NOTE: Only works with fans up to 7000 RPM.
+ * 定义一个或多个转速计引脚，以启用风扇转速监控功能，
+ * 并可通过 M123 指令报告实时风扇转速。
+ *
+ * NOTE: Only works with fans up to 7000 RPM.  // 注意：该测速功能仅支持转速不超过7000转/分钟的风扇
  */
-//#define FOURWIRES_FANS      // Needed with AUTO_FAN when 4-wire PWM fans are installed
+//#define FOURWIRES_FANS      // Needed with AUTO_FAN when 4-wire PWM fans are installed  // 当安装 4线 PWM 风扇并使用 AUTO_FAN（自动风扇）功能时，需要启用此项
 //#define E0_FAN_TACHO_PIN -1
 //#define E0_FAN_TACHO_PULLUP
 //#define E0_FAN_TACHO_PULLDOWN
@@ -934,6 +1013,11 @@
  * This feature allows you to digitally multiplex the fan output.
  * The multiplexer is automatically switched at tool-change.
  * Set FANMUX[012]_PINs below for up to 2, 4, or 8 multiplexed fans.
+ * * 模型冷却风扇多路选择器
+ *
+ * 该功能允许你对风扇输出进行数字多路复用控制。
+ * 多路选择器会在**切换工具头（换挤出机）**时自动切换风扇。
+ * 在下方设置 FANMUX[012]_PIN 引脚，最多可支持 2、4 或 8 个复用风扇。
  */
 #define FANMUX0_PIN -1
 #define FANMUX1_PIN -1
