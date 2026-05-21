@@ -1429,11 +1429,21 @@
 
 #endif // BLTOUCH
 
+
+//========================================== 校准配置区 =============================================
 // @section calibrate
 
 /**
  * Z Steppers Auto-Alignment
  * Add the G34 command to align multiple Z steppers using a bed probe.
+ * Z 电机自动对齐
+ * 添加 G34 指令，通过调平探头自动校准多 Z 轴电机（双Z / 三Z 机器）
+ * 
+ * （译者注）：
+ * 这是双 Z 轴 / 三 Z 轴打印机专用功能：
+ * 很多打印机有 2 个或 3 个 Z 电机
+ * 如果两边高度不一样 → 热床倾斜、打印一边高一边低
+ * 开启后，可用指令 G34 让机器自动调平两侧 Z 轴，让热床完全水平
  */
 //#define Z_STEPPER_AUTO_ALIGN
 #if ENABLED(Z_STEPPER_AUTO_ALIGN)
@@ -1442,12 +1452,32 @@
    * These positions are machine-relative and do not shift with the M206 home offset!
    * If not defined, probe limits will be used.
    * Override with 'M422 S<index> X<pos> Y<pos>'.
+   * 
+   * 为 Z1、Z2 [, Z3 [, Z4]] 定义调平探头的 X、Y 探测点坐标
+   * 这些坐标是**机器绝对坐标**，不受 M206 回零偏移影响！
+   * 如果不定义，将使用探头的安全边界坐标
+   * 可通过指令 M422 S<序号> X<坐标> Y<坐标> 覆盖设置
+   * 
+   * （译者注）：
+   * 这是双 Z / 三 Z 自动调平（G34） 用的参数：
+   * 你要告诉固件：
+   * 探测左 Z 电机时，探头要去哪个 XY 坐标
+   * 探测右 Z 电机时，探头要去哪个 XY 坐标
+   * 坐标是固定机器坐标，不会被其他设置改动
    */
   //#define Z_STEPPER_ALIGN_XY { {  10, 190 }, { 100,  10 }, { 190, 190 } }
 
   /**
    * Orientation for the automatically-calculated probe positions.
    * Override Z stepper align points with 'M422 S<index> X<pos> Y<pos>'
+   * 设置自动计算的探头探测点方向/布局
+   * 可使用指令 M422 S<序号> X<坐标> Y<坐标> 手动覆盖 Z 电机对齐点
+   * 
+   * （译者注）：
+   * 这个选项是给 双 Z / 四 Z 自动调平（G34） 用的：
+   * 让固件自动帮你算探测点放在哪里
+   * 你只需要选方向 / 布局（比如左右、四角）
+   * 不想用自动的，就用 M422 指令手动改位置
    *
    * 2 Steppers:  (0)     (1)
    *               |       |   2   |
@@ -1475,70 +1505,84 @@
    * Define Stepper XY positions for Z1, Z2, Z3... corresponding to the screw
    * positions in the bed carriage, with one position per Z stepper in stepper
    * driver order.
+   * 
+   * Z 电机物理坐标，用于让热床对齐更快、更精准地收敛
+   * 需要 3 个或 4 个 Z 电机
+  
+   * 定义 Z1、Z2、Z3... 电机对应的 XY 坐标
+   * 坐标必须与热床/框架上的**调节螺丝实际位置**一致
+   * 按电机驱动顺序，每个 Z 电机对应一个坐标点
    */
   //#define Z_STEPPER_ALIGN_STEPPER_XY { { 210.7, 102.5 }, { 152.6, 220.0 }, { 94.5, 102.5 } }
 
   #ifndef Z_STEPPER_ALIGN_STEPPER_XY
-    // Amplification factor. Used to scale the correction step up or down in case
-    // the stepper (spindle) position is farther out than the test point.
-    #define Z_STEPPER_ALIGN_AMP 1.0       // Use a value > 1.0 NOTE: This may cause instability!
+    // Amplification factor. Used to scale the correction step up or down in case                   // 放大系数。当步进电机（丝杆）的实际位置比测试点更远时，
+    // the stepper (spindle) position is farther out than the test point.                           // 用这个系数来放大或缩小每一步的修正量。
+    #define Z_STEPPER_ALIGN_AMP 1.0       // Use a value > 1.0 NOTE: This may cause instability!    // 使用大于 1.0 的数值。注意：这可能会导致系统不稳定！
   #endif
 
-  // On a 300mm bed a 5% grade would give a misalignment of ~1.5cm
-  #define G34_MAX_GRADE              5    // (%) Maximum incline that G34 will handle
-  #define Z_STEPPER_ALIGN_ITERATIONS 5    // Number of iterations to apply during alignment
-  #define Z_STEPPER_ALIGN_ACC        0.02 // Stop iterating early if the accuracy is better than this
+  // On a 300mm bed a 5% grade would give a misalignment of ~1.5cm                                    // 以300毫米尺寸热床为例，5%的倾斜坡度会造成约1.5厘米的高度偏差
+  #define G34_MAX_GRADE              5    // (%) Maximum incline that G34 will handle                 // G34 指令能处理的**最大热床倾斜百分比**
+  #define Z_STEPPER_ALIGN_ITERATIONS 5    // Number of iterations to apply during alignment           // 自动对齐过程中的迭代次数（修正循环次数）
+  #define Z_STEPPER_ALIGN_ACC        0.02 // Stop iterating early if the accuracy is better than this // 当精度高于（小于等于）此值时，停止修正
 
-  #define RESTORE_LEVELING_AFTER_G34      // Restore leveling after G34 is done?
+  #define RESTORE_LEVELING_AFTER_G34      // Restore leveling after G34 is done?                      // G34多Z轴对齐完成后，是否恢复原有调平数据
 
   // After G34, re-home Z (G28 Z) or just calculate it from the last probe heights?
   // Re-homing might be more precise in reproducing the actual 'G28 Z' homing height, especially on an uneven bed.
+  // G34 完成后，重新执行 Z 轴回零 (G28 Z)？还是仅根据最后一次探测高度直接计算？
+  // 重新回零（G28 Z）能更精准地复现真实的回零高度，尤其在热床不平整的机器上效果更好。
   #define HOME_AFTER_G34
 
   /**
    * Commands to execute at the start of G34 probing,
    * after switching to the PROBING_TOOL.
+   * G34探测流程开始时执行的自定义指令
+   * 切换至探测专用工具模式后运行
    */
   //#define EVENT_GCODE_BEFORE_G34 "M300 P440 S200"
 
   /**
    * Commands to execute at the end of G34 probing.
    * Useful to retract or move the Z probe out of the way.
+   * G34探测结束后执行自定义G代码指令
+   * 适合收回探针、移动探头避让等收尾动作
    */
   //#define EVENT_GCODE_AFTER_G34 "G1 Z10 F12000\nG1 X15 Y330\nG1 Z0.5\nG1 Z10"
 
 #endif // Z_STEPPER_AUTO_ALIGN
 
 /**
- * Assisted Tramming
+ * Assisted Tramming   // 辅助调平（手动丝杆辅助找平）
  *
- * Add the G35 command to measure bed corners and help adjust screws. Requires a bed probe.
+ * Add the G35 command to measure bed corners and help adjust screws. Requires a bed probe.         // 启用G35指令，探测热床四角高度，辅助手动调节调平螺丝，需搭配床面探针使用
+ *                                                                                                  //（译者注）：运行G35后机器自动测四个角高度差，直观提示哪颗螺丝该调高 / 调低，手动拧螺丝找平热床，是辅助校平专用指令。
  */
 //#define ASSISTED_TRAMMING
 #if ENABLED(ASSISTED_TRAMMING)
 
-  // Define from 3 to 9 points to probe.
+  // Define from 3 to 9 points to probe.      // 定义3至9个探测采样点位
   #define TRAMMING_POINT_XY { {  20, 20 }, { 180,  20 }, { 180, 180 }, { 20, 180 } }
 
-  // Define position names for probe points.
+  // Define position names for probe points.  // 为各个探测点位自定义命名
   #define TRAMMING_POINT_NAME_1 "Front-Left"
   #define TRAMMING_POINT_NAME_2 "Front-Right"
   #define TRAMMING_POINT_NAME_3 "Back-Right"
   #define TRAMMING_POINT_NAME_4 "Back-Left"
 
-  #define RESTORE_LEVELING_AFTER_G35    // Enable to restore leveling setup after operation
-  //#define REPORT_TRAMMING_MM          // Report Z deviation (mm) for each point relative to the first
+  #define RESTORE_LEVELING_AFTER_G35    // Enable to restore leveling setup after operation             // 开启后，操作结束自动恢复原有调平配置
+  //#define REPORT_TRAMMING_MM          // Report Z deviation (mm) for each point relative to the first // 报告每个探测点相对于第一个点的 Z 轴高度偏差（单位：毫米）
 
-  //#define ASSISTED_TRAMMING_WIZARD    // Add a Tramming Wizard to the LCD menu
+  //#define ASSISTED_TRAMMING_WIZARD    // Add a Tramming Wizard to the LCD menu                        // 在液晶屏幕菜单中加入热床调平向导功能
 
-  //#define ASSISTED_TRAMMING_WAIT_POSITION { X_CENTER, Y_CENTER, 30 } // Move the nozzle out of the way for adjustment
+  //#define ASSISTED_TRAMMING_WAIT_POSITION { X_CENTER, Y_CENTER, 30 } // Move the nozzle out of the way for adjustment // 调平操作时移动喷头避让，方便手动调节螺丝
 
   /**
-   * Screw Thread. Use one of the following defines:
+   * Screw Thread. Use one of the following defines:        // 螺丝螺纹规格（螺距）。使用以下定义中的一种：
    *
-   *   M3_CW = M3 Clockwise, M3_CCW = M3 Counter-Clockwise
-   *   M4_CW = M4 Clockwise, M4_CCW = M4 Counter-Clockwise
-   *   M5_CW = M5 Clockwise, M5_CCW = M5 Counter-Clockwise
+   *   M3_CW = M3 Clockwise, M3_CCW = M3 Counter-Clockwise  // M3_CW  = M3螺丝 顺时针拧紧（升高）  M3_CCW = M3螺丝 逆时针拧紧（升高）
+   *   M4_CW = M4 Clockwise, M4_CCW = M4 Counter-Clockwise  // M4_CW  = M4螺丝 顺时针拧紧（升高）  M4_CCW = M4螺丝 逆时针拧紧（升高）
+   *   M5_CW = M5 Clockwise, M5_CCW = M5 Counter-Clockwise  // M5_CW  = M5螺丝 顺时针拧紧（升高）  M5_CCW = M5螺丝 逆时针拧紧（升高）
    *
    * :{'M3_CW':'M3 Clockwise','M3_CCW':'M3 Counter-Clockwise','M4_CW':'M4 Clockwise','M4_CCW':'M4 Counter-Clockwise','M5_CW':'M5 Clockwise','M5_CCW':'M5 Counter-Clockwise'}
    */
