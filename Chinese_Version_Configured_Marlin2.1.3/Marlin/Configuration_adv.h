@@ -1156,6 +1156,8 @@
   //#define EVENT_GCODE_IDEX_AFTER_MODECHANGE "G28X"
 #endif
 
+
+//============================================ 多步进电机配置区 ====================================================
 // @section multi stepper
 
 /**
@@ -1177,22 +1179,46 @@
  *     Also set with 'M666 X<offset>' and stored to EEPROM with 'M500'.
  *
  *   - Define the extra endstop pins here to override defaults. No auto-assignment.
+ * 
+ * 多步进电机 / 双限位开关
+ *
+ * 当定义了 X2_DRIVE_TYPE 时，表示 X 和 X2 电机会**同步一起运动**。
+ * 下面关于 X 轴的说明，同样适用于 Y 轴和 Z 轴的多电机配置。
+ *
+ * 限位偏移量可以通过指令 'M666 X<偏移值> Y<偏移值> Z<偏移值>' 修改，并保存到 EEPROM。
+ *
+ * - 如果 X2 电机需要与 X 电机**方向相反**，启用 INVERT_X2_VS_X_DIR。
+ *
+ * - 如果第二个电机带有**独立限位开关**，启用 X_DUAL_ENDSTOPS，支持偏移校准。
+ *
+ *   - 额外的限位开关会在 'M119' 指令中显示状态。
+ *
+ *   - 设置 X_DUAL_ENDSTOP_ADJUSTMENT 修正 X2 限位的误差。
+ *     执行 'G28' / 'G28 X' 回零时会自动应用。
+ *     偏移值通过回零后测量误差获得。
+ *     也可以用 'M666 X<偏移>' 设置，并用 'M500' 保存。
+ *
+ *   - 在此定义额外的限位引脚以覆盖默认值，**不会自动分配**。
  */
 #if HAS_X2_STEPPER && DISABLED(DUAL_X_CARRIAGE)
-  //#define INVERT_X2_VS_X_DIR        // X2 direction signal is the opposite of X
-  //#define X_DUAL_ENDSTOPS           // X2 has its own endstop
+  //#define INVERT_X2_VS_X_DIR        // X2 direction signal is the opposite of X    // X2 方向信号与 X 轴相反
+  //#define X_DUAL_ENDSTOPS           // X2 has its own endstop                      // X2 拥有独立的限位开关
   #if ENABLED(X_DUAL_ENDSTOPS)
-    //#define X2_STOP_PIN X_MAX_PIN   // X2 endstop pin override
-    #define X2_ENDSTOP_ADJUSTMENT  0  // X2 offset relative to X endstop
-  #endif
+    //#define X2_STOP_PIN X_MAX_PIN   // X2 endstop pin override                     // 自定义 / 重定义 X2 限位开关的引脚
+    #define X2_ENDSTOP_ADJUSTMENT  0  // X2 offset relative to X endstop             // X2 相对于 X 限位开关的偏移量
+  #endif                              //（译者注）：
+                                      // 这是双电机 + 双限位（双 X / 双 Z 最常用）的校准参数：
+                                      // X 和 X2 是带动同一根轴的两个电机
+                                      // 因为机械安装不可能完美对齐，所以两个限位开关触发位置会有微小差距
+                                      // 这个值就是用来补偿那个误差，让轴回零后完全水平、不歪、不斜
 #endif
 
 #if HAS_Y2_STEPPER
-  //#define INVERT_Y2_VS_Y_DIR        // Y2 direction signal is the opposite of Y
-  //#define Y_DUAL_ENDSTOPS           // Y2 has its own endstop
+  //#define INVERT_Y2_VS_Y_DIR        // Y2 direction signal is the opposite of Y    // Y2 方向信号与 Y 轴相反
+  //#define Y_DUAL_ENDSTOPS           // Y2 has its own endstop                      // Y2 拥有独立的限位开关
   #if ENABLED(Y_DUAL_ENDSTOPS)
-    //#define Y2_STOP_PIN Y_MAX_PIN   // Y2 endstop pin override
-    #define Y2_ENDSTOP_ADJUSTMENT  0  // Y2 offset relative to Y endstop
+    //#define Y2_STOP_PIN Y_MAX_PIN   // Y2 endstop pin override                     // 自定义 / 重定义 Y2 限位开关的引脚
+    #define Y2_ENDSTOP_ADJUSTMENT  0  // Y2 offset relative to Y endstop             // Y2 相对于 Y 限位开关的偏移量(用于补偿两个限位开关安装位置的微小差距)
   #endif
 #endif
 
@@ -1200,33 +1226,33 @@
 // Multi-Z steppers
 //
 #ifdef Z2_DRIVER_TYPE
-  //#define INVERT_Z2_VS_Z_DIR        // Z2 direction signal is the opposite of Z
+  //#define INVERT_Z2_VS_Z_DIR        // Z2 direction signal is the opposite of Z    // Z2 方向信号与 Z 轴相反
 
-  //#define Z_MULTI_ENDSTOPS          // Other Z axes have their own endstops
+  //#define Z_MULTI_ENDSTOPS          // Other Z axes have their own endstops        // 其余Z轴均配备独立限位开关
   #if ENABLED(Z_MULTI_ENDSTOPS)
-    //#define Z2_STOP_PIN X_MAX_PIN   // Z2 endstop pin override
-    #define Z2_ENDSTOP_ADJUSTMENT 0   // Z2 offset relative to Z endstop
+    //#define Z2_STOP_PIN X_MAX_PIN   // Z2 endstop pin override                     // 自定义 / 重定义 Z2 限位开关的引脚
+    #define Z2_ENDSTOP_ADJUSTMENT 0   // Z2 offset relative to Z endstop             // Z2限位相对主Z限位的偏移补偿值(用于补偿两个限位开关安装位置的微小差距)
   #endif
   #ifdef Z3_DRIVER_TYPE
-    //#define INVERT_Z3_VS_Z_DIR      // Z3 direction signal is the opposite of Z
+    //#define INVERT_Z3_VS_Z_DIR      // Z3 direction signal is the opposite of Z    // Z3 方向信号与 Z 轴相反
     #if ENABLED(Z_MULTI_ENDSTOPS)
-      //#define Z3_STOP_PIN Y_MAX_PIN // Z3 endstop pin override
-      #define Z3_ENDSTOP_ADJUSTMENT 0 // Z3 offset relative to Z endstop
+      //#define Z3_STOP_PIN Y_MAX_PIN // Z3 endstop pin override                     // 自定义 / 重定义 Z3 限位开关的引脚
+      #define Z3_ENDSTOP_ADJUSTMENT 0 // Z3 offset relative to Z endstop             // Z3限位相对主Z限位的偏移补偿值(用于补偿两个限位开关安装位置的微小差距)
     #endif
   #endif
   #ifdef Z4_DRIVER_TYPE
-    //#define INVERT_Z4_VS_Z_DIR      // Z4 direction signal is the opposite of Z
+    //#define INVERT_Z4_VS_Z_DIR      // Z4 direction signal is the opposite of      // Z4 方向信号与 Z 轴相反
     #if ENABLED(Z_MULTI_ENDSTOPS)
-      //#define Z4_STOP_PIN Z_MAX_PIN // Z4 endstop pin override
-      #define Z4_ENDSTOP_ADJUSTMENT 0 // Z4 offset relative to Z endstop
+      //#define Z4_STOP_PIN Z_MAX_PIN // Z4 endstop pin override                     // 自定义 / 重定义 Z4 限位开关的引脚
+      #define Z4_ENDSTOP_ADJUSTMENT 0 // Z4 offset relative to Z endstop             // Z4限位相对主Z限位的偏移补偿值(用于补偿两个限位开关安装位置的微小差距)
     #endif
   #endif
 #endif
 
-// Drive the E axis with two synchronized steppers
+// Drive the E axis with two synchronized steppers                                   // 使用两台同步步进电机驱动挤出E轴
 //#define E_DUAL_STEPPER_DRIVERS
 #if ENABLED(E_DUAL_STEPPER_DRIVERS)
-  //#define INVERT_E1_VS_E0_DIR       // E direction signals are opposites
+  //#define INVERT_E1_VS_E0_DIR       // E direction signals are opposites           // 两路挤出电机转动方向相反
 #endif
 
 // @section extruder
