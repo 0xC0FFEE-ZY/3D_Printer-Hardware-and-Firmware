@@ -2433,48 +2433,71 @@
    *  - SDSORT_USES_STACK does the same, but uses a local stack-based buffer.
    *  - SDSORT_CACHE_NAMES will retain the sorted file listing in RAM. (Expensive!)
    *  - SDSORT_DYNAMIC_RAM only uses RAM when the SD menu is visible. (Use with caution!)
+   * 
+   * 对 SD 卡文件列表按字母顺序排序。
+   * 启用此选项后，SD 卡上的文件 / 文件夹
+   * 会按名称排序，方便查找。
+   * 默认配置说明：
+   * 使用最慢但最安全的排序方式。
+   * 文件夹优先排在最上方。
+   * 排序缓存使用静态内存。
+   * 不额外支持 G-code 指令 (M34)。
+   * 最多只排序前 40 个项目。（超出部分不排序）
+   * SD 排序使用静态分配内存（由 SDSORT_LIMIT 定义），
+   * 编译器会计算最大内存占用，如果超出主板 RAM 限制会直接报错。
+   * 高级选项说明：
+   * SDSORT_USES_RAM：用静态目录缓存，排序更快。
+   * SDSORT_USES_STACK：同上，但基于栈区缓存。
+   * SDSORT_CACHE_NAMES：把排序结果常驻内存（非常耗内存！）。
+   * SDSORT_DYNAMIC_RAM：仅打开 SD 菜单时才占用内存（谨慎使用！）。
    */
   //#define SDCARD_SORT_ALPHA
 
-  // SD Card Sorting options
+  // SD Card Sorting options    // SD 卡文件排序选项
   #if ENABLED(SDCARD_SORT_ALPHA)
-    #define SDSORT_REVERSE     false  // Default to sorting file names in reverse order.
-    #define SDSORT_LIMIT       40     // Maximum number of sorted items (10-256). Costs 27 bytes each.
-    #define SDSORT_FOLDERS     -1     // -1=above  0=none  1=below
-    #define SDSORT_GCODE       false  // Enable G-code M34 to set sorting behaviors: M34 S<-1|0|1> F<-1|0|1>
-    #define SDSORT_USES_RAM    false  // Pre-allocate a static array for faster pre-sorting.
-    #define SDSORT_USES_STACK  false  // Prefer the stack for pre-sorting to give back some SRAM. (Negated by next 2 options.)
-    #define SDSORT_CACHE_NAMES false  // Keep sorted items in RAM longer for speedy performance. Most expensive option.
-    #define SDSORT_DYNAMIC_RAM false  // Use dynamic allocation (within SD menus). Least expensive option. Set SDSORT_LIMIT before use!
-    #define SDSORT_CACHE_VFATS 2      // Maximum number of 13-byte VFAT entries to use for sorting.
-                                      // Note: Only affects SCROLL_LONG_FILENAMES with SDSORT_CACHE_NAMES but not SDSORT_DYNAMIC_RAM.
+    #define SDSORT_REVERSE     false  // Default to sorting file names in reverse order.                                                // 默认以 倒序 方式排序文件名
+    #define SDSORT_LIMIT       40     // Maximum number of sorted items (10-256). Costs 27 bytes each.                                  // 最大可排序的项目数量（10-256）。每增加一项占用 27 字节内存。
+    #define SDSORT_FOLDERS     -1     // -1=above  0=none  1=below                                                                      // -1=显示在上方  0=不显示  1=显示在下方
+    #define SDSORT_GCODE       false  // Enable G-code M34 to set sorting behaviors: M34 S<-1|0|1> F<-1|0|1>                            // 启用 G-code 指令 M34 用于设置排序规则：M34 S<-1|0|1> F<-1|0|1>
+    #define SDSORT_USES_RAM    false  // Pre-allocate a static array for faster pre-sorting.                                            // 预分配静态数组，用于提升排序速度。
+    #define SDSORT_USES_STACK  false  // Prefer the stack for pre-sorting to give back some SRAM. (Negated by next 2 options.)          // 优先使用栈区进行预排序，以释放部分静态内存。(会被接下来的两个选项抵消效果)
+    #define SDSORT_CACHE_NAMES false  // Keep sorted items in RAM longer for speedy performance. Most expensive option.                 // 将已排序的文件列表长期保存在内存中，以提升响应速度。这是**最耗内存**的选项！
+    #define SDSORT_DYNAMIC_RAM false  // Use dynamic allocation (within SD menus). Least expensive option. Set SDSORT_LIMIT before use! // 使用动态内存分配（仅在SD菜单内生效）。占用内存最小的选项。使用前请先设置 SDSORT_LIMIT！
+    #define SDSORT_CACHE_VFATS 2      // Maximum number of 13-byte VFAT entries to use for sorting.                                     // 用于排序的最大13字节VFAT文件条目数量。
+                                      // Note: Only affects SCROLL_LONG_FILENAMES with SDSORT_CACHE_NAMES but not SDSORT_DYNAMIC_RAM.   
+                                      // 注意：仅在 启用SDSORT_CACHE_NAMES 且 未启用SDSORT_DYNAMIC_RAM 时，才会影响 SCROLL_LONG_FILENAMES（长文件名滚动显示）功能。
   #endif
 
   // Allow international symbols in long filenames. To display correctly, the
   // LCD's font must contain the characters. Check your selected LCD language.
+  // 允许在长文件名中使用国际字符（如中文、日文、西欧重音符号等）。
+  // 要正常显示，LCD 屏幕的字库必须包含这些字符。请检查你选择的 LCD 语言设置。
   //#define UTF_FILENAME_SUPPORT
 
-  //#define LONG_FILENAME_HOST_SUPPORT    // Get the long filename of a file/folder with 'M33 <dosname>' and list long filenames with 'M20 L'
-  //#define LONG_FILENAME_WRITE_SUPPORT   // Create / delete files with long filenames via M28, M30, and Binary Transfer Protocol
-  //#define M20_TIMESTAMP_SUPPORT         // Include timestamps by adding the 'T' flag to M20 commands
+  //#define LONG_FILENAME_HOST_SUPPORT    // Get the long filename of a file/folder with 'M33 <dosname>' and list long filenames with 'M20 L' // 使用指令 'M33 <dosname>' 获取文件/文件夹的长文件名；使用指令 'M20 L' 列出所有长文件名。
+  //#define LONG_FILENAME_WRITE_SUPPORT   // Create / delete files with long filenames via M28, M30, and Binary Transfer Protocol             // 通过 M28、M30 指令及二进制传输协议，支持创建/删除长文件名文件
+  //#define M20_TIMESTAMP_SUPPORT         // Include timestamps by adding the 'T' flag to M20 commands                   // 在 M20 指令中添加 'T' 参数（M20 T），使文件列表包含时间戳信息
 
-  //#define SCROLL_LONG_FILENAMES         // Scroll long filenames in the SD card menu
+  //#define SCROLL_LONG_FILENAMES         // Scroll long filenames in the SD card menu                 // SD卡菜单内超长文件名滚动显示
 
-  //#define SD_ABORT_NO_COOLDOWN          // Leave the heaters on after Stop Print (not recommended!)
+  //#define SD_ABORT_NO_COOLDOWN          // Leave the heaters on after Stop Print (not recommended!)  // 停止打印后保持加热部件持续通电（不推荐开启）
 
   /**
    * Abort SD printing when any endstop is triggered.
    * This feature is enabled with 'M540 S1' or from the LCD menu.
    * Endstops must be activated for this option to work.
+   * 任一限位开关（行程开关）被触发时，立即中止SD卡打印。
+   * 可通过指令 'M540 S1' 或 LCD 菜单启用此功能。
+   * 此功能生效的前提是：限位开关必须已启用。
    */
   //#define SD_ABORT_ON_ENDSTOP_HIT
   #if ENABLED(SD_ABORT_ON_ENDSTOP_HIT)
-    //#define SD_ABORT_ON_ENDSTOP_HIT_GCODE "G28XY" // G-code to run on endstop hit (e.g., "G28XY" or "G27")
+    //#define SD_ABORT_ON_ENDSTOP_HIT_GCODE "G28XY" // G-code to run on endstop hit (e.g., "G28XY" or "G27")  // 触发限位开关时执行的G-code指令（例如："G28XY" 或 "G27"）
   #endif
 
-  //#define SD_REPRINT_LAST_SELECTED_FILE // On print completion open the LCD Menu and select the same file
+  //#define SD_REPRINT_LAST_SELECTED_FILE // On print completion open the LCD Menu and select the same file   // 打印结束后自动打开屏幕菜单，并选中当前打印文件
 
-  //#define AUTO_REPORT_SD_STATUS         // Auto-report media status with 'M27 S<seconds>'
+  //#define AUTO_REPORT_SD_STATUS         // Auto-report media status with 'M27 S<seconds>'                   // 通过指令M27 S<秒数>，自动上报存储介质运行状态
 
   /**
    * Support for USB thumb drives using an Arduino USB Host Shield or
@@ -2489,7 +2512,19 @@
    *    SS               --> SD_SS_PIN
    *
    * [1] On AVR an interrupt-capable pin is best for UHS3 compatibility.
+   * 
+   * 支持通过 Arduino USB Host Shield 或
+   * 等效的 MAX3421E 扩展板 使用 USB 闪存盘（U盘）。
+   * USB 闪存盘会被 Marlin 固件识别为 SD 卡。
+   * MAX3421E 可与 SD 卡读卡器共用相同引脚，引脚对应关系：
+   *
+   *    SCLK, MOSI, MISO --> SCLK, MOSI, MISO
+   *    INT              --> SD_DETECT_PIN [1]
+   *    SS               --> SD_SS_PIN
+   *
+   * [1] 在 AVR 主板上，为兼容 UHS3，最好使用支持中断的引脚。
    */
+
   //#define USB_FLASH_DRIVE_SUPPORT
   #if ENABLED(USB_FLASH_DRIVE_SUPPORT)
     /**
@@ -2501,14 +2536,25 @@
      * - UHS3 is newer code with better USB compatibility. But it
      *   is less tested and is known to interfere with Servos.
      *   [1] This requires USB_INTR_PIN to be interrupt-capable.
+     * 
+     * 
+     * 
+     * USB 主机盾库（USB Host Shield Library）
+     *
+     * - UHS2：不使用中断，已在 LulzBot TAZ Pro（32位 Archim 主板）上
+     *   通过量产级测试，稳定可靠。
+     *
+     * - UHS3：较新版本，USB 兼容性更好。
+     *   但测试较少，且已知会与**舵机（Servos）**功能冲突。
+     *   [1] 此模式需要 USB_INTR_PIN 必须是**支持中断功能**的引脚。
      */
     //#define USE_UHS2_USB
     //#define USE_UHS3_USB
 
-    #define DISABLE_DUE_SD_MMC // Disable USB Host access to USB Drive to prevent hangs on block access for DUE platform
+    #define DISABLE_DUE_SD_MMC // Disable USB Host access to USB Drive to prevent hangs on block access for DUE platform // 禁用 USB 主机对U盘的访问，防止 DUE 平台在块访问时出现死机/卡死问题
 
     /**
-     * Native USB Host supported by some boards (USB OTG)
+     * Native USB Host supported by some boards (USB OTG)  // 部分主板支持的原生 USB 主机功能（USB OTG）
      */
     //#define USE_OTG_USB_HOST
 
@@ -2526,6 +2572,15 @@
    *
    * Tested with this bootloader:
    *   https://github.com/FleetProbe/MicroBridge-Arduino-ATMega2560
+   * 
+   * 
+   * 当使用支持 SD卡刷写固件的 bootloader（引导程序）时，
+   * 添加一个菜单项，用于在**下次重启时执行 SD 卡固件升级**。
+   *
+   * 仅支持 ATMEGA2560 (Arduino Mega) 主板
+   *
+   * 已在该引导程序上测试：
+   *   https://github.com/FleetProbe/MicroBridge-Arduino-ATMega2560
    */
   //#define SD_FIRMWARE_UPDATE
   #if ENABLED(SD_FIRMWARE_UPDATE)
@@ -2539,37 +2594,52 @@
    * Marlin will embed all settings in the firmware binary as compressed data.
    * Use 'M503 C' to write the settings out to the SD Card as 'mc.zip'.
    * See docs/ConfigEmbedding.md for details on how to use 'mc-apply.py'.
+   * 
+   * 若你的固件有超过约 3K 的空闲闪存空间，可启用此选项。
+   * Marlin 会将所有配置参数以压缩数据形式嵌入固件二进制文件中。
+   * 使用指令 'M503 C' 可将这些配置写入 SD 卡，生成 'mc.zip' 文件。
+   * 用法详情请查看文档 docs/ConfigEmbedding.md 以及 mc-apply.py 工具。
    */
   //#define CONFIGURATION_EMBEDDING
 
-  // Add an optimized binary file transfer mode, initiated with 'M28 B1'
+  // Add an optimized binary file transfer mode, initiated with 'M28 B1'  // 添加一种优化的二进制文件传输模式，通过指令 'M28 B1' 启动
   //#define BINARY_FILE_TRANSFER
 
   #if ENABLED(BINARY_FILE_TRANSFER)
     // Include extra facilities (e.g., 'M20 F') supporting firmware upload via BINARY_FILE_TRANSFER
+    // 包含额外辅助功能（例如 M20 F），用于支持通过二进制文件传输协议上传固件
     //#define CUSTOM_FIRMWARE_UPLOAD
   #endif
 
   // "Over-the-air" Firmware Update with M936 - Required to set EEPROM flag
+  // 通过 M936 指令实现“无线/远程”固件更新 —— 必须设置 EEPROM 标志位
   //#define OTA_FIRMWARE_UPDATE
 
   /**
-   * Set this option to one of the following (or the board's defaults apply):
+   * Set this option to one of the following (or the board's defaults apply):  * 将此选项设置为以下值之一（否则将使用主板的默认配置）：
    *
    *           LCD - Use the SD drive in the external LCD controller.
    *       ONBOARD - Use the SD drive on the control board.
    *  CUSTOM_CABLE - Use a custom cable to access the SD (as defined in a pins file).
    *
    * :[ 'LCD', 'ONBOARD', 'CUSTOM_CABLE' ]
+   * 
+   *           LCD - 使用外置液晶屏上的 SD 卡插槽。
+   *       ONBOARD - 使用主板上的 SD 卡插槽。
+   *  CUSTOM_CABLE - 使用自定义排线连接 SD 卡（定义在引脚文件中）。
+   *
+   * :[ 'LCD', 'ONBOARD', 'CUSTOM_CABLE' ]
    */
   //#define SDCARD_CONNECTION LCD
 
-  // Enable if SD detect is rendered useless (e.g., by using an SD extender)
+  // Enable if SD detect is rendered useless (e.g., by using an SD extender)   // 若SD卡检测功能失效（例如使用了SD卡延长线），请启用此项
   //#define NO_SD_DETECT
 
   /**
    * Multiple volume support - EXPERIMENTAL.
    * Adds 'M21 Pm' / 'M21 S' / 'M21 U' to mount SD Card / USB Drive.
+   * 多存储设备支持 - 实验性功能。
+   * 添加指令 M21 Pm / M21 S / M21 U 用于挂载 SD 卡 / U盘。
    */
   //#define MULTI_VOLUME
   #if ENABLED(MULTI_VOLUME)
@@ -2584,8 +2654,10 @@
 /**
  * By default an onboard SD card reader may be shared as a USB mass-
  * storage device. This option hides the SD card from the host PC.
+ * 默认情况下，板载 SD 读卡器可能会被共享为 USB 大容量存储设备。
+ * 这个选项会让 SD 卡对主机电脑隐藏。
  */
-//#define NO_SD_HOST_DRIVE   // Disable SD Card access over USB (for security).
+//#define NO_SD_HOST_DRIVE   // Disable SD Card access over USB (for security).  // 禁用 USB 访问 SD 卡（出于安全考虑）。
 
 /**
  * Additional options for Graphical Displays
