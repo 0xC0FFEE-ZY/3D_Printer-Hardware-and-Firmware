@@ -4711,12 +4711,15 @@
 #endif // HAS_TRINAMIC_CONFIG
 
 // @section i2cbus
+// I2C 总线相关设置
 
 //
 // I2C Master ID for LPC176x LCD and Digital Current control
 // Does not apply to other peripherals based on the Wire library.
+// LPC176x 主控芯片的显示屏与数字电流控制所用的 I2C 主机 ID
+// 不适用于其他基于 Wire 库的外设
 //
-//#define I2C_MASTER_ID  1  // Set a value from 0 to 2
+//#define I2C_MASTER_ID  1  // Set a value from 0 to 2  // 设置一个 0 到 2 之间的数值
 
 /**
  * TWI/I2C BUS
@@ -4743,11 +4746,33 @@
  * ; Example #3
  * ; Example serial output of a M261 request
  * echo:i2c-reply: from:99 bytes:5 data:hello
+ * 
+ * 
+ * TWI/I2C 总线
+ * 该功能尚处于测试阶段，可适配自定义 I2C 外接设备。
+ * 开启后能够与总线中的从设备收发 I2C 数据。
+ * 示例 1
+ * 该指令向地址为 0x63（十进制 99）的从设备发送字符串 Marlin
+ * 通过多条带十进制参数的 M260 指令组合实现
+ * M260 A99 ; 指定目标设备地址
+ * M260 B77 ; 字符 M
+ * M260 B97 ; 字符 a
+ * M260 B114 ; 字符 r
+ * M260 B108 ; 字符 l
+ * M260 B105 ; 字符 i
+ * M260 B110 ; 字符 n
+ * M260 S1 ; 发送缓存内数据
+ * 示例 2
+ * 向地址 99 的从设备请求读取 6 字节数据
+ * M261 A99 B5
+ * 示例 3
+ * 读取指令的串口返回示例
+ * 回显：I2C 应答，来源地址 99，数据长度 5，内容 hello
  */
 
 //#define EXPERIMENTAL_I2CBUS
 #if ENABLED(EXPERIMENTAL_I2CBUS)
-  #define I2C_SLAVE_ADDRESS  0  // Set a value from 8 to 127 to act as a slave
+  #define I2C_SLAVE_ADDRESS  0  // Set a value from 8 to 127 to act as a slave  // 设置一个 8 到 127 之间的数值，用作从机地址
 #endif
 
 // @section photo
