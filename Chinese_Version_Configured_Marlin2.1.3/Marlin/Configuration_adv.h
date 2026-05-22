@@ -2318,41 +2318,55 @@
    *  otherwise full speed will be applied.
    *
    * :['SPI_HALF_SPEED', 'SPI_QUARTER_SPEED', 'SPI_EIGHTH_SPEED']
+   * SD 卡 SPI 通信速率
+   * 可用于解决卷分区初始化失败报错
+   * 启用后可设为半速、四分之一速或八分之一速
+   * 未设置则默认采用全速模式
+   * 可选值：半速、四分之一速、八分之一速
    */
   //#define SD_SPI_SPEED SPI_HALF_SPEED
 
   // The standard SD detect circuit reads LOW when media is inserted and HIGH when empty.
   // Enable this option and set to HIGH if your SD cards are incorrectly detected.
+  // 标准SD卡检测电路：插入SD卡时读取为低电平，无卡时为高电平。
+  // 如果你的SD卡检测异常（误判有无卡），启用此选项并设置为 HIGH。
   //#define SD_DETECT_STATE HIGH
 
-  //#define SD_IGNORE_AT_STARTUP            // Don't mount the SD card when starting up
-  //#define SDCARD_READONLY                 // Read-only SD card (to save over 2K of flash)
+  //#define SD_IGNORE_AT_STARTUP            // Don't mount the SD card when starting up                   // 开机时不自动挂载 SD 卡
+  //#define SDCARD_READONLY                 // Read-only SD card (to save over 2K of flash)               // SD 卡设为只读模式（可节省超过 2K 的固件存储空间）
 
-  //#define GCODE_REPEAT_MARKERS            // Enable G-code M808 to set repeat markers and do looping
+  //#define GCODE_REPEAT_MARKERS            // Enable G-code M808 to set repeat markers and do looping    // 启用 G-code 指令 M808，用于设置重复标记并执行循环打印（译者注：此功能适用于批量重复打印）
 
-  #define SD_PROCEDURE_DEPTH 1              // Increase if you need more nested M32 calls
+  #define SD_PROCEDURE_DEPTH 1              // Increase if you need more nested M32 calls                 // 如果需要更多层嵌套的 M32 调用，请增大此数值
 
-  #define SD_FINISHED_STEPPERRELEASE true   // Disable steppers when SD Print is finished
-  #define SD_FINISHED_RELEASECOMMAND "M84"  // Use "M84XYE" to keep Z enabled so your bed stays in place
+  #define SD_FINISHED_STEPPERRELEASE true   // Disable steppers when SD Print is finished                 // SD卡打印完成后关闭步进电机
+  #define SD_FINISHED_RELEASECOMMAND "M84"  // Use "M84XYE" to keep Z enabled so your bed stays in place  // 使用指令 "M84XYE" 仅关闭 X、Y、E 轴电机，保持 Z 轴电机通电，这样平台/打印头会保持在原位不会下落
 
   // Reverse SD sort to show "more recent" files first, according to the card's FAT.
   // Since the FAT gets out of order with usage, SDCARD_SORT_ALPHA is recommended.
+  // 根据SD卡的FAT文件分配表，反转SD卡文件排序，让“最新的”文件优先显示。
+  // 由于长期使用后FAT表会变得无序，推荐配合开启 SDCARD_SORT_ALPHA（字母排序）功能。
   #define SDCARD_RATHERRECENTFIRST
 
-  #define SD_MENU_CONFIRM_START             // Confirm the selected SD file before printing
+  #define SD_MENU_CONFIRM_START             // Confirm the selected SD file before printing                    // 选中SD卡文件后，打印前弹窗确认
 
-  //#define NO_SD_AUTOSTART                 // Remove auto#.g file support completely to save some Flash, SRAM
-  //#define MENU_ADDAUTOSTART               // Add a menu option to run auto#.g files
+  //#define NO_SD_AUTOSTART                 // Remove auto#.g file support completely to save some Flash, SRAM // 完全移除 auto#.g 文件的支持，以节省部分闪存和内存
+  //#define MENU_ADDAUTOSTART               // Add a menu option to run auto#.g files                          // 添加一个菜单选项，用于手动运行 auto#.g 自动脚本文件
 
-  //#define ONE_CLICK_PRINT                 // Prompt to print the newest file on inserted media
-  //#define BROWSE_MEDIA_ON_INSERT          // Open the file browser when media is inserted
+  //#define ONE_CLICK_PRINT                 // Prompt to print the newest file on inserted media               // 插入存储卡后，弹窗提示是否打印最新文件
+  //#define BROWSE_MEDIA_ON_INSERT          // Open the file browser when media is inserted                    // 插入SD卡/存储介质时，自动打开文件浏览器
 
-  //#define MEDIA_MENU_AT_TOP               // Force the media menu to be listed on the top of the main menu
+  //#define MEDIA_MENU_AT_TOP               // Force the media menu to be listed on the top of the main menu   // 将存储介质菜单固定置顶在主菜单首位
 
-  #define EVENT_GCODE_SD_ABORT "G28XY"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
+  #define EVENT_GCODE_SD_ABORT "G28XY"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")        // SD卡打印中止时执行的G-code指令（例如："G28XY" 或 "G27"）
+                                            // 上面是打印中途取消 / 中止时，打印机自动执行的指令
+                                            // 你可以在这里填一行 G-code，比如：
+                                            // G27：归位喷头，清洁喷嘴
+                                            // G28XY：XY 轴回原点
+                                            // 作用：打印取消后，让机器自动归位、清理，不用手动操作
 
   #if ENABLED(PRINTER_EVENT_LEDS)
-    #define PE_LEDS_COMPLETED_TIME  (30*60) // (seconds) Time to keep the LED "done" color before restoring normal illumination
+    #define PE_LEDS_COMPLETED_TIME  (30*60) // (seconds) Time to keep the LED "done" color before restoring normal illumination  //（秒）打印完成指示灯色维持时长，之后恢复常规灯光
   #endif
 
   /**
