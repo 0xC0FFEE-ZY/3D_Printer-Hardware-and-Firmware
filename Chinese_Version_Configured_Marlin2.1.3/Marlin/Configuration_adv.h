@@ -3379,32 +3379,34 @@
   #endif
 #endif // PTC_PROBE || PTC_BED || PTC_HOTEND
 
+
+//=============================================== 附加功能 / 扩展配置 ============================================
 // @section extras
 
 //
-// G60/G61 Position Save and Return
+// G60/G61 Position Save and Return   // G60/G61 坐标位置保存与复位
 //
-//#define SAVED_POSITIONS 1         // Each saved position slot costs 12 bytes
+//#define SAVED_POSITIONS 1         // Each saved position slot costs 12 bytes  // 每个保存的位置槽位占用 12 字节内存
 
 //
 // G2/G3 Arc Support
 //
-#define ARC_SUPPORT                   // Requires ~3226 bytes
+#define ARC_SUPPORT                   // Requires ~3226 bytes      // 启用该功能大约需要占用 3226 字节的固件存储空间
 #if ENABLED(ARC_SUPPORT)
-  #define MIN_ARC_SEGMENT_MM      0.1 // (mm) Minimum length of each arc segment
-  #define MAX_ARC_SEGMENT_MM      1.0 // (mm) Maximum length of each arc segment
-  #define MIN_CIRCLE_SEGMENTS    72   // Minimum number of segments in a complete circle
-  //#define ARC_SEGMENTS_PER_SEC 50   // Use the feedrate to choose the segment length
-  #define N_ARC_CORRECTION       25   // Number of interpolated segments between corrections
-  //#define ARC_P_CIRCLES             // Enable the 'P' parameter to specify complete circles
-  //#define SF_ARC_FIX                // Enable only if using SkeinForge with "Arc Point" fillet procedure
+  #define MIN_ARC_SEGMENT_MM      0.1 // (mm) Minimum length of each arc segment                           // (毫米) 圆弧每一小段的最小长度
+  #define MAX_ARC_SEGMENT_MM      1.0 // (mm) Maximum length of each arc segment                           // (毫米) 圆弧每一小段的最大长度
+  #define MIN_CIRCLE_SEGMENTS    72   // Minimum number of segments in a complete circle                   // 一个完整圆形的最小分段数量
+  //#define ARC_SEGMENTS_PER_SEC 50   // Use the feedrate to choose the segment length                     // 根据打印速度（进给率）自动计算圆弧分段长度
+  #define N_ARC_CORRECTION       25   // Number of interpolated segments between corrections               // 校正间隔之间的插补段数
+  //#define ARC_P_CIRCLES             // Enable the 'P' parameter to specify complete circles              // 启用 'P' 参数，用于指定绘制完整的圆圈数量
+  //#define SF_ARC_FIX                // Enable only if using SkeinForge with "Arc Point" fillet procedure // 仅当使用带有 "Arc Point" 圆角功能的 SkeinForge 切片软件时才启用
 #endif
 
-// G5 Bézier Curve Support with XYZE destination and IJPQ offsets
-//#define BEZIER_CURVE_SUPPORT        // Requires ~2666 bytes
+// G5 Bézier Curve Support with XYZE destination and IJPQ offsets   // G5 贝塞尔曲线支持（包含 XYZE 目标点与 IJPQ 偏移参数）
+//#define BEZIER_CURVE_SUPPORT        // Requires ~2666 bytes       // 启用该功能大约需要占用 2666 字节的固件存储空间
 
 #if ANY(ARC_SUPPORT, BEZIER_CURVE_SUPPORT)
-  //#define CNC_WORKSPACE_PLANES      // Allow G2/G3/G5 to operate in XY, ZX, or YZ planes
+  //#define CNC_WORKSPACE_PLANES      // Allow G2/G3/G5 to operate in XY, ZX, or YZ planes    // 允许 G2/G3/G5 在 XY、ZX 或 YZ 平面上执行曲线运动
 #endif
 
 /**
@@ -3414,6 +3416,13 @@
  * reduces motion calculations, increases top printing speeds, and results in
  * less step aliasing by calculating all motions in advance.
  * Preparing your G-code: https://github.com/colinrgodsey/step-daemon
+ * 
+ * 直接步进控制
+ *
+ * 与 Klipper 固件使用的技术类似，G6 直接步进能显著
+ * 减少运动计算量、提升最高打印速度，
+ * 并通过预先计算所有运动来减少步进丢步问题。
+ * 准备你的 G-code：https://github.com/colinrgodsey/step-daemon
  */
 //#define DIRECT_STEPPING
 
@@ -3423,16 +3432,20 @@
  * This option adds G38.2 and G38.3 (probe towards target)
  * and optionally G38.4 and G38.5 (probe away from target).
  * Set MULTIPLE_PROBING for G38 to probe more than once.
+ * 
+ * 此选项启用 G38.2 和 G38.3（向目标方向探测）
+ * 并可选择启用 G38.4 和 G38.5（远离目标方向探测）。
+ * 设置 MULTIPLE_PROBING 可让 G38 进行多次探测以提高精度。
  */
 //#define G38_PROBE_TARGET
 #if ENABLED(G38_PROBE_TARGET)
-  //#define G38_PROBE_AWAY        // Include G38.4 and G38.5 to probe away from target
-  #define G38_MINIMUM_MOVE 0.0275 // (mm) Minimum distance that will produce a move.
+  //#define G38_PROBE_AWAY        // Include G38.4 and G38.5 to probe away from target  // 包含 G38.4 和 G38.5 指令，用于**反向/远离目标**进行探测
+  #define G38_MINIMUM_MOVE 0.0275 // (mm) Minimum distance that will produce a move.    // (毫米) 能触发电机移动的最小距离
 #endif
 
-// @section motion
+// @section motion   // 运动控制
 
-// Moves (or segments) with fewer steps than this will be joined with the next move
+// Moves (or segments) with fewer steps than this will be joined with the next move     // 如果移动（或分段）的步数少于此数值，将会与下一个移动合并执行
 #define MIN_STEPS_PER_SEGMENT 6
 
 /**
@@ -3447,6 +3460,18 @@
  * 15000 : Minimum for TB6560 drivers (guess, no info in datasheet)
  *
  * Override the default value based on the driver type set in Configuration.h.
+ * 
+ * 设置步进电机方向（DIR）前后的最小延时（单位：纳秒 ns）
+ *     0 : 无延时（至少需要 10µS，因为必须执行一次步进中断）
+ *    20 : TMC2xxx 系列驱动最低要求
+ *   200 : A4988 驱动最低要求
+ *   400 : A5984 驱动最低要求
+ *   500 : LV8729 驱动最低要求（估算，手册无数据）
+ *   650 : DRV8825 驱动最低要求
+ *  1500 : TB6600 驱动最低要求（估算，手册无数据）
+ * 15000 : TB6560 驱动最低要求（估算，手册无数据）
+ *
+ * 根据 Configuration.h 中设置的驱动类型自动覆盖默认值。
  */
 //#define MINIMUM_STEPPER_POST_DIR_DELAY 650
 //#define MINIMUM_STEPPER_PRE_DIR_DELAY 650
@@ -3462,6 +3487,17 @@
  *   30000 : Minimum for TB6560 stepper drivers
  *
  * Override the default value based on the driver type set in Configuration.h.
+ * 
+ * 步进驱动最小脉冲宽度（单位：纳秒 ns）
+ * 如果未自定义，将使用默认值（来自 Conditionals-4-adv.h）：
+ *     100 : TMC2xxx 系列驱动最小要求
+ *     500 : LV8729 驱动最小要求
+ *    1000 : A4988 / A5984 驱动最小要求
+ *    2000 : DRV8825 驱动最小要求
+ *    3000 : TB6600 驱动最小要求
+ *   30000 : TB6560 驱动最小要求
+ *
+ * 根据 Configuration.h 中设置的驱动类型自动覆盖默认值。
  */
 //#define MINIMUM_STEPPER_PULSE_NS 2000
 
@@ -3476,12 +3512,23 @@
  *    15000 : Maximum for TB6560 stepper driver
  *
  * Override the default value based on the driver type set in Configuration.h.
+ * 
+ * 步进驱动允许的最大步进频率（单位：赫兹 Hz）
+ * 如果未自定义，将使用默认值（来自 Conditionals-4-adv.h）：
+ *  5000000：TMC2xxx 系列驱动最大值
+ *  1000000：LV8729 驱动最大值
+ *   500000：A4988 驱动最大值
+ *   250000：DRV8825 驱动最大值
+ *   150000：TB6600 驱动最大值
+ *    15000：TB6560 驱动最大值
+ *
+ * 根据 Configuration.h 中设置的驱动类型自动覆盖默认值。
  */
 //#define MAXIMUM_STEPPER_RATE 250000
 
-// @section temperature
+// @section temperature  温度设置
 
-// Control heater 0 and heater 1 in parallel.
+// Control heater 0 and heater 1 in parallel.   // 并联同步控制0号与1号加热设备
 //#define HEATERS_PARALLEL
 
 //===========================================================================
