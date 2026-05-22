@@ -1590,70 +1590,76 @@
 
 #endif
 
+
+//=============================================== 运动控制 ===================================================
 // @section motion control
 
 /**
  * Fixed-time-based Motion Control -- BETA FEATURE
  * Enable/disable and set parameters with G-code M493.
  * See ft_types.h for named values used by FTM options.
+ * 基于固定时间的运动控制 -- 测试功能（BETA）
+ * 使用 G 代码 M493 启用/禁用并设置参数。
+ * 查看 ft_types.h 文件获取 FTM 选项使用的命名参数值。
  */
 //#define FT_MOTION
 #if ENABLED(FT_MOTION)
-  //#define FTM_IS_DEFAULT_MOTION                 // Use FT Motion as the factory default?
-  #define FTM_DEFAULT_DYNFREQ_MODE dynFreqMode_DISABLED // Default mode of dynamic frequency calculation. (DISABLED, Z_BASED, MASS_BASED)
-  #define FTM_DEFAULT_SHAPER_X      ftMotionShaper_NONE // Default shaper mode on X axis (NONE, ZV, ZVD, ZVDD, ZVDDD, EI, 2HEI, 3HEI, MZV)
-  #define FTM_DEFAULT_SHAPER_Y      ftMotionShaper_NONE // Default shaper mode on Y axis
-  #define FTM_SHAPING_DEFAULT_FREQ_X   37.0f      // (Hz) Default peak frequency used by input shapers
-  #define FTM_SHAPING_DEFAULT_FREQ_Y   37.0f      // (Hz) Default peak frequency used by input shapers
-  #define FTM_LINEAR_ADV_DEFAULT_ENA   false      // Default linear advance enable (true) or disable (false)
-  #define FTM_LINEAR_ADV_DEFAULT_K      0.0f      // Default linear advance gain. (Acceleration-based scaling factor.)
-  #define FTM_SHAPING_ZETA_X            0.1f      // Zeta used by input shapers for X axis
-  #define FTM_SHAPING_ZETA_Y            0.1f      // Zeta used by input shapers for Y axis
+  //#define FTM_IS_DEFAULT_MOTION                 // Use FT Motion as the factory default?                                                 // 是否将 FT 运动控制设置为出厂默认模式？
+  #define FTM_DEFAULT_DYNFREQ_MODE dynFreqMode_DISABLED // Default mode of dynamic frequency calculation. (DISABLED, Z_BASED, MASS_BASED)  // 动态频率计算的默认模式（可选：关闭、基于Z轴、基于质量）
+  #define FTM_DEFAULT_SHAPER_X      ftMotionShaper_NONE // Default shaper mode on X axis (NONE, ZV, ZVD, ZVDD, ZVDDD, EI, 2HEI, 3HEI, MZV) // X 轴默认振动抑制模式（可选：关闭、ZV、ZVD、ZVDD、ZVDDD、EI、2HEI、3HEI、MZV）
+  #define FTM_DEFAULT_SHAPER_Y      ftMotionShaper_NONE // Default shaper mode on Y axis                                // Y 轴默认振动抑制模式
+  #define FTM_SHAPING_DEFAULT_FREQ_X   37.0f      // (Hz) Default peak frequency used by input shapers                  // (赫兹) 输入整形器使用的默认峰值频率
+  #define FTM_SHAPING_DEFAULT_FREQ_Y   37.0f      // (Hz) Default peak frequency used by input shapers                  // (赫兹) 输入整形器使用的默认峰值频率
+                                                                                                                        //（译者注）：数值 = 你的机架一秒钟震动多少次，固件根据这个频率抵消抖动，让打印没有波纹
+  #define FTM_LINEAR_ADV_DEFAULT_ENA   false      // Default linear advance enable (true) or disable (false)            // 默认是否启用 线性推进 (Linear Advance)（作用：让出料更精准，消除打印边角鼓包、拉丝。）
+  #define FTM_LINEAR_ADV_DEFAULT_K      0.0f      // Default linear advance gain. (Acceleration-based scaling factor.)  // 默认线性推进增益系数（基于加速度的比例系数）
+  #define FTM_SHAPING_ZETA_X            0.1f      // Zeta used by input shapers for X axis                              // X 轴输入整形器使用的阻尼系数（Zeta）
+  #define FTM_SHAPING_ZETA_Y            0.1f      // Zeta used by input shapers for Y axis                              // Y 轴输入整形器使用的阻尼系数（Zeta）
 
-  #define FTM_SHAPING_V_TOL_X           0.05f     // Vibration tolerance used by EI input shapers for X axis
-  #define FTM_SHAPING_V_TOL_Y           0.05f     // Vibration tolerance used by EI input shapers for Y axis
+  #define FTM_SHAPING_V_TOL_X           0.05f     // Vibration tolerance used by EI input shapers for X axis            // X 轴 EI 型振动抑制器 使用的 振动容差值
+  #define FTM_SHAPING_V_TOL_Y           0.05f     // Vibration tolerance used by EI input shapers for Y axis            // Y 轴 EI 型振动抑制器 使用的 振动容差值
 
-  //#define FT_MOTION_MENU                        // Provide a MarlinUI menu to set M493 parameters
+  //#define FT_MOTION_MENU                        // Provide a MarlinUI menu to set M493 parameters                     // 在屏幕菜单中提供设置 M493 参数的选项
 
   /**
-   * Advanced configuration
+   * Advanced configuration     // 高级配置项
    */
-  #define FTM_UNIFIED_BWS                         // DON'T DISABLE unless you use Ulendo FBS (not implemented)
+  #define FTM_UNIFIED_BWS                         // DON'T DISABLE unless you use Ulendo FBS (not implemented)         // 不要禁用此选项，除非你使用 Ulendo FBS（本固件尚未支持）（Ulendo FBS：一种第三方的振动补偿软件 / 算法）
   #if ENABLED(FTM_UNIFIED_BWS)
-    #define FTM_BW_SIZE               100         // Unified Window and Batch size with a ratio of 2
+    #define FTM_BW_SIZE               100         // Unified Window and Batch size with a ratio of 2                   // 统一窗口大小与批处理大小，采用 2 倍比例关系
   #else
-    #define FTM_WINDOW_SIZE           200         // Custom Window size for trajectory generation needed by Ulendo FBS
-    #define FTM_BATCH_SIZE            100         // Custom Batch size for trajectory generation needed by Ulendo FBS
+    #define FTM_WINDOW_SIZE           200         // Custom Window size for trajectory generation needed by Ulendo FBS // 为 Ulendo FBS 系统所需的轨迹生成自定义窗口大小
+    #define FTM_BATCH_SIZE            100         // Custom Batch size for trajectory generation needed by Ulendo FBS  // 为 Ulendo FBS 系统所需的轨迹生成自定义批处理大小
   #endif
 
-  #define FTM_FS                     1000         // (Hz) Frequency for trajectory generation. (Reciprocal of FTM_TS)
-  #define FTM_TS                        0.001f    // (s) Time step for trajectory generation. (Reciprocal of FTM_FS)
+  #define FTM_FS                     1000         // (Hz) Frequency for trajectory generation. (Reciprocal of FTM_TS)  // (赫兹) 轨迹生成频率（是 FTM_TS 的倒数）
+  #define FTM_TS                        0.001f    // (s) Time step for trajectory generation. (Reciprocal of FTM_FS)   // (秒) 轨迹生成的时间步长（是 FTM_FS 的倒数）
 
   #if DISABLED(COREXY)
-    #define FTM_STEPPER_FS          20000         // (Hz) Frequency for stepper I/O update
+    #define FTM_STEPPER_FS          20000         // (Hz) Frequency for stepper I/O update                             // (赫兹) 步进电机 I/O 更新频率
 
-    // Use this to adjust the time required to consume the command buffer.
-    // Try increasing this value if stepper motion is choppy.
-    #define FTM_STEPPERCMD_BUFF_SIZE 3000         // Size of the stepper command buffers
+    // Use this to adjust the time required to consume the command buffer.               // 用于调整消耗命令缓冲区所需的时间。
+    // Try increasing this value if stepper motion is choppy.                            // 如果步进电机运动出现卡顿、不流畅，尝试增大这个值。
+    #define FTM_STEPPERCMD_BUFF_SIZE 3000         // Size of the stepper command buffers // 步进电机指令缓冲区大小
 
   #else
-    // CoreXY motion needs a larger buffer size. These values are based on our testing.
+    // CoreXY motion needs a larger buffer size. These values are based on our testing.  // CoreXY 结构需要更大的缓冲区大小。这些数值是基于我们的测试得出的。
     #define FTM_STEPPER_FS          30000
     #define FTM_STEPPERCMD_BUFF_SIZE 6000
   #endif
 
-  #define FTM_STEPS_PER_UNIT_TIME (FTM_STEPPER_FS / FTM_FS)       // Interpolated stepper commands per unit time
-  #define FTM_CTS_COMPARE_VAL (FTM_STEPS_PER_UNIT_TIME / 2)       // Comparison value used in interpolation algorithm
-  #define FTM_MIN_TICKS ((STEPPER_TIMER_RATE) / (FTM_STEPPER_FS)) // Minimum stepper ticks between steps
+  #define FTM_STEPS_PER_UNIT_TIME (FTM_STEPPER_FS / FTM_FS)       // Interpolated stepper commands per unit time      // 单位时间内的插补步进指令数量
+  #define FTM_CTS_COMPARE_VAL (FTM_STEPS_PER_UNIT_TIME / 2)       // Comparison value used in interpolation algorithm // 插补算法中使用的对比基准值
+  #define FTM_MIN_TICKS ((STEPPER_TIMER_RATE) / (FTM_STEPPER_FS)) // Minimum stepper ticks between steps              // 步进电机 两步之间的最小时间间隔（最小脉冲间隔）
 
-  #define FTM_MIN_SHAPE_FREQ           10         // Minimum shaping frequency
-  #define FTM_RATIO (FTM_FS / FTM_MIN_SHAPE_FREQ) // Factor for use in FTM_ZMAX. DON'T CHANGE.
-  #define FTM_ZMAX (FTM_RATIO * 2)                // Maximum delays for shaping functions (even numbers only!)
-                                                  // Calculate as:
-                                                  //   ZV       : FTM_RATIO / 2
-                                                  //   ZVD, MZV : FTM_RATIO
-                                                  //   2HEI     : FTM_RATIO * 3 / 2
-                                                  //   3HEI     : FTM_RATIO * 2
+  #define FTM_MIN_SHAPE_FREQ           10         // Minimum shaping frequency                                        // 最小整形频率
+  #define FTM_RATIO (FTM_FS / FTM_MIN_SHAPE_FREQ) // Factor for use in FTM_ZMAX. DON'T CHANGE.                        // 用于计算 FTM_ZMAX 的系数。禁止修改。
+  #define FTM_ZMAX (FTM_RATIO * 2)                // Maximum delays for shaping functions (even numbers only!)        // 整形功能（振动抑制）的最大延迟值（必须是偶数！）
+                                                  // Calculate as:                       // 计算方式如下：
+                                                  //   ZV       : FTM_RATIO / 2          //   ZV      振动抑制类型：使用 FTM_RATIO / 2
+                                                  //   ZVD, MZV : FTM_RATIO              //   ZVD、MZV 振动抑制类型：使用 FTM_RATIO
+                                                  //   2HEI     : FTM_RATIO * 3 / 2      //   2HEI    振动抑制类型：使用 FTM_RATIO * 3 / 2
+                                                  //   3HEI     : FTM_RATIO * 2          //   3HEI    振动抑制类型：使用 FTM_RATIO * 2
 #endif
 
 /**
@@ -1670,26 +1676,43 @@
  * effectiveness during high speed movements.
  *
  * Tune with M593 D<factor> F<frequency>
+ * 
+ *  输入整形（振动抑制）
+ *
+ * 零振动（ZV）输入整形：用于 X / Y 轴运动
+ *
+ * 该功能会占用大量的步进缓存内存。
+ * 缓存大小由以下参数自动计算：
+ *   SHAPING_FREQ_[XYZ]、
+ *   DEFAULT_AXIS_STEPS_PER_UNIT、
+ *   DEFAULT_MAX_FEEDRATE、
+ *   ADAPTIVE_STEP_SMOOTHING
+ *
+ * 你可以手动设置 SHAPING_MIN_FREQ 和/或 SHAPING_MAX_FEEDRATE 来覆盖默认值。
+ * 频率越高、速度越低，占用的缓存就越小。
+ * 如果运行时缓存太小，高速运动下振动抑制效果会下降。
+ *
+ * 使用指令 M593 D<系数> F<频率> 进行调试
  */
 //#define INPUT_SHAPING_X
 //#define INPUT_SHAPING_Y
 //#define INPUT_SHAPING_Z
 #if ANY(INPUT_SHAPING_X, INPUT_SHAPING_Y, INPUT_SHAPING_Z)
   #if ENABLED(INPUT_SHAPING_X)
-    #define SHAPING_FREQ_X  40.0        // (Hz) The default dominant resonant frequency on the X axis.
-    #define SHAPING_ZETA_X   0.15       // Damping ratio of the X axis (range: 0.0 = no damping to 1.0 = critical damping).
+    #define SHAPING_FREQ_X  40.0        // (Hz) The default dominant resonant frequency on the X axis.                               // (Hz) X 轴的默认主共振频率
+    #define SHAPING_ZETA_X   0.15       // Damping ratio of the X axis (range: 0.0 = no damping to 1.0 = critical damping).          // X 轴阻尼比（取值范围：0.0 = 无阻尼，1.0 = 临界阻尼）
   #endif
   #if ENABLED(INPUT_SHAPING_Y)
-    #define SHAPING_FREQ_Y  40.0        // (Hz) The default dominant resonant frequency on the Y axis.
-    #define SHAPING_ZETA_Y   0.15       // Damping ratio of the Y axis (range: 0.0 = no damping to 1.0 = critical damping).
+    #define SHAPING_FREQ_Y  40.0        // (Hz) The default dominant resonant frequency on the Y axis.                               // (Hz) Y 轴的默认主共振频率
+    #define SHAPING_ZETA_Y   0.15       // Damping ratio of the Y axis (range: 0.0 = no damping to 1.0 = critical damping).          // Y 轴阻尼比（取值范围：0.0 = 无阻尼，1.0 = 临界阻尼）。
   #endif
   #if ENABLED(INPUT_SHAPING_Z)
-    #define SHAPING_FREQ_Z  40.0        // (Hz) The default dominant resonant frequency on the Z axis.
-    #define SHAPING_ZETA_Z   0.15       // Damping ratio of the Z axis (range: 0.0 = no damping to 1.0 = critical damping).
+    #define SHAPING_FREQ_Z  40.0        // (Hz) The default dominant resonant frequency on the Z axis.                               // (Hz) Z 轴默认主共振频率
+    #define SHAPING_ZETA_Z   0.15       // Damping ratio of the Z axis (range: 0.0 = no damping to 1.0 = critical damping).          // Z 轴阻尼比（取值范围：0.0 = 无阻尼，1.0 = 临界阻尼）。
   #endif
-  //#define SHAPING_MIN_FREQ  20.0      // (Hz) By default the minimum of the shaping frequencies. Override to affect SRAM usage.
-  //#define SHAPING_MAX_STEPRATE 10000  // By default the maximum total step rate of the shaped axes. Override to affect SRAM usage.
-  //#define SHAPING_MENU                // Add a menu to the LCD to set shaping parameters.
+  //#define SHAPING_MIN_FREQ  20.0      // (Hz) By default the minimum of the shaping frequencies. Override to affect SRAM usage.    // (Hz) 默认使用整形频率中的最小值。可修改此值以影响内存（SRAM）占用。
+  //#define SHAPING_MAX_STEPRATE 10000  // By default the maximum total step rate of the shaped axes. Override to affect SRAM usage. // 默认使用整形轴的最大总步进速率。可修改此值以影响内存（SRAM）占用。
+  //#define SHAPING_MENU                // Add a menu to the LCD to set shaping parameters.                                          // 在液晶屏菜单中添加选项，用于设置振动抑制（Input Shaping）参数。
 #endif
 
 // @section motion
@@ -1697,9 +1720,18 @@
 #define AXIS_RELATIVE_MODES { false, false, false, false }
 
 // Add a Duplicate option for well-separated conjoined nozzles
+// 为间距合适的连体双喷/独立双喷头添加“重复打印”模式选项
+
+// （译者注）：
+// 这个功能是给双喷头打印机用的：
+// 开启后，打印机屏幕 / 软件里会多出一个 Duplicate（重复模式）
+// 两个喷头会打印完全一样的模型
+// 相当于一次打印 2 个相同模型，效率翻倍
+
 //#define MULTI_NOZZLE_DUPLICATION
 
 // By default stepper drivers require an active-HIGH signal but some high-power drivers require an active-LOW signal to step.
+// 步进驱动默认采用高电平有效脉冲信号，部分大功率驱动器需使用低电平有效脉冲信号
 #define STEP_STATE_X HIGH
 #define STEP_STATE_Y HIGH
 #define STEP_STATE_Z HIGH
@@ -1715,28 +1747,38 @@
  * Idle Stepper Shutdown
  * Enable DISABLE_IDLE_* to shut down axis steppers after an idle period.
  * The default timeout duration can be overridden with M18 and M84. Set to 0 for No Timeout.
+ * 步进电机空闲断电功能
+ * 开启 DISABLE_IDLE_* 相关选项，可让轴电机空闲一段时间后自动断电休眠
+ * 空闲超时默认时长可通过 M18、M84 指令自定义，设为0则关闭超时永不断电
  */
 #define DEFAULT_STEPPER_TIMEOUT_SEC 120
 #define DISABLE_IDLE_X
 #define DISABLE_IDLE_Y
-#define DISABLE_IDLE_Z    // Disable if the nozzle could fall onto your printed part!
+#define DISABLE_IDLE_Z    // Disable if the nozzle could fall onto your printed part!             // 若喷头容易下坠砸到打印件，请关闭此功能！
 //#define DISABLE_IDLE_I
 //#define DISABLE_IDLE_J
 //#define DISABLE_IDLE_K
 //#define DISABLE_IDLE_U
 //#define DISABLE_IDLE_V
 //#define DISABLE_IDLE_W
-#define DISABLE_IDLE_E    // Shut down all idle extruders
+#define DISABLE_IDLE_E    // Shut down all idle extruders                                         // 空闲时关闭所有挤出机电机
 
-// Default Minimum Feedrates for printing and travel moves
-#define DEFAULT_MINIMUMFEEDRATE       0.0     // (mm/s) Minimum feedrate. Set with M205 S.
-#define DEFAULT_MINTRAVELFEEDRATE     0.0     // (mm/s) Minimum travel feedrate. Set with M205 T.
+// Default Minimum Feedrates for printing and travel moves                                        // 打印运动和空程移动的默认最低速度
+#define DEFAULT_MINIMUMFEEDRATE       0.0     // (mm/s) Minimum feedrate. Set with M205 S.        // (mm/s) 最低运动速度。可通过 M205 S 指令设置。
+#define DEFAULT_MINTRAVELFEEDRATE     0.0     // (mm/s) Minimum travel feedrate. Set with M205 T. // (mm/s) 最低空程移动速度（不吐丝的快速移动）。可通过 M205 T 指令设置。
 
-// Minimum time that a segment needs to take as the buffer gets emptied
-#define DEFAULT_MINSEGMENTTIME        20000   // (µs) Set with M205 B.
+// Minimum time that a segment needs to take as the buffer gets emptied                           // 当运动缓冲即将耗尽时，单个运动段必须保持的最短时间
+               // （译者注）：下面是固件保护打印机不抖、不丢步的高级参数
+               // 作用：
+               // 当指令来不及处理、缓存快空了
+               // 固件会强制让每一小段运动多走一点点时间
+               // 防止突然卡顿、抖动、撞响、丢步
+#define DEFAULT_MINSEGMENTTIME        20000   // (µs) Set with M205 B.   // (µs) 可通过 M205 B 指令设置。（这是上面运动缓冲保护时间的具体数值）
 
 // Slow down the machine if the lookahead buffer is (by default) half full.
 // Increase the slowdown divisor for larger buffer sizes.
+// 当前瞻缓冲达到（默认）一半时开始降低机器速度。
+// 缓冲更大时，请增大这个减速除数。
 #define SLOWDOWN
 #if ENABLED(SLOWDOWN)
   #define SLOWDOWN_DIVISOR 2
@@ -1747,41 +1789,54 @@
  * Reduce resonance by limiting the frequency of small zigzag infill moves.
  * See https://hydraraptor.blogspot.com/2010/12/frequency-limit.html
  * Use M201 F<freq> S<min%> to change limits at runtime.
+ * XY 频率限制
+ * 通过限制小锯齿填充运动的频率来减少共振。
+ * 详情见：https://hydraraptor.blogspot.com/2010/12/frequency-limit.html
+ * 使用 M201 F<频率> S<最小百分比> 在运行时修改限制。
  */
-//#define XY_FREQUENCY_LIMIT      10 // (Hz) Maximum frequency of small zigzag infill moves. Set with M201 F<hertz>.
+//#define XY_FREQUENCY_LIMIT      10 // (Hz) Maximum frequency of small zigzag infill moves. Set with M201 F<hertz>.  // (Hz) 小锯齿填充运动的最大频率。使用 M201 F<赫兹> 设置。
 #ifdef XY_FREQUENCY_LIMIT
-  #define XY_FREQUENCY_MIN_PERCENT 5 // (%) Minimum FR percentage to apply. Set with M201 S<min%>.
+  #define XY_FREQUENCY_MIN_PERCENT 5 // (%) Minimum FR percentage to apply. Set with M201 S<min%>.                    // (%) 应用频率限制时的最小进给速度百分比。使用 M201 S<百分比> 设置。
 #endif
 
 //
 // Backlash Compensation
 // Adds extra movement to axes on direction-changes to account for backlash.
+// 间隙补偿（Backlash Compensation）
+// 在轴改变运动方向时，增加一段额外的补偿移动，用来抵消机械间隙。
 //
 //#define BACKLASH_COMPENSATION
 #if ENABLED(BACKLASH_COMPENSATION)
   // Define values for backlash distance and correction.
   // If BACKLASH_GCODE is enabled these values are the defaults.
-  #define BACKLASH_DISTANCE_MM { 0, 0, 0 } // (linear=mm, rotational=°) One value for each linear axis
-  #define BACKLASH_CORRECTION    0.0       // 0.0 = no correction; 1.0 = full correction
+  // 定义间隙补偿的距离和校正参数
+  // 如果启用了 BACKLASH_GCODE，这些值将作为默认参数
+  #define BACKLASH_DISTANCE_MM { 0, 0, 0 } // (linear=mm, rotational=°) One value for each linear axis // (linear=mm, rotational=°) 每个直线轴对应一个参数值
+  #define BACKLASH_CORRECTION    0.0       // 0.0 = no correction; 1.0 = full correction               // 0.0 = 不校正；1.0 = 完全校正
 
-  // Add steps for motor direction changes on CORE kinematics
+  // Add steps for motor direction changes on CORE kinematics              // 对于CORE结构机型（如CoreXY/CoreXZ），在电机换向时添加补偿步数
   //#define CORE_BACKLASH
 
   // Set BACKLASH_SMOOTHING_MM to spread backlash correction over multiple segments
   // to reduce print artifacts. (Enabling this is costly in memory and computation!)
+  // 将间隙补偿分摊到多个运动段中，减少打印瑕疵。
+  // 开启此项会大幅消耗内存和运算能力！
   //#define BACKLASH_SMOOTHING_MM 3 // (mm)
 
-  // Add runtime configuration and tuning of backlash values (M425)
+  // Add runtime configuration and tuning of backlash values (M425)        // 启用间隙补偿值的实时配置与调谐功能（指令：M425）
   //#define BACKLASH_GCODE
 
   #if ENABLED(BACKLASH_GCODE)
-    // Measure the Z backlash when probing (G29) and set with "M425 Z"
+    // Measure the Z backlash when probing (G29) and set with "M425 Z"     // 在自动调平（G29）时测量Z轴间隙，并通过 M425 Z 指令应用
     #define MEASURE_BACKLASH_WHEN_PROBING
 
     #if ENABLED(MEASURE_BACKLASH_WHEN_PROBING)
       // When measuring, the probe will move up to BACKLASH_MEASUREMENT_LIMIT
       // mm away from point of contact in BACKLASH_MEASUREMENT_RESOLUTION
       // increments while checking for the contact to be broken.
+      // 测量时，探针会以 BACKLASH_MEASUREMENT_RESOLUTION
+      // 为步距，向上移动最多 BACKLASH_MEASUREMENT_LIMIT 毫米
+      // 同时检测触点是否断开，以此测量间隙。
       #define BACKLASH_MEASUREMENT_LIMIT       0.5   // (mm)
       #define BACKLASH_MEASUREMENT_RESOLUTION  0.005 // (mm)
       #define BACKLASH_MEASUREMENT_FEEDRATE    Z_PROBE_FEEDRATE_SLOW // (mm/min)
@@ -1801,6 +1856,15 @@
  *
  * Note: HOTEND_OFFSET and CALIBRATION_OBJECT_CENTER must be set to within
  *       ±5mm of true values for G425 to succeed.
+ * 
+ * 自动间隙、位置和喷头偏移量校准
+ *
+ * 启用 G425 指令，使用安装在热床上的导电金属块、螺丝或垫片进行自动校准。
+ * G425 会让探头触碰热床上校准物的顶面和侧面，
+ * 测量并修正：位置偏移、轴间隙、喷头偏移量。
+ *
+ * 注意：HOTEND_OFFSET（喷头偏移）和 CALIBRATION_OBJECT_CENTER（校准物中心）
+ *       必须设置在真实值的 ±5mm 范围内，G425 才能正常工作。
  */
 //#define CALIBRATION_GCODE
 #if ENABLED(CALIBRATION_GCODE)
@@ -1812,19 +1876,21 @@
   #define CALIBRATION_FEEDRATE_FAST           1200    // (mm/min)
   #define CALIBRATION_FEEDRATE_TRAVEL         3000    // (mm/min)
 
-  // The following parameters refer to the conical section of the nozzle tip.
+  // The following parameters refer to the conical section of the nozzle tip.   // 以下参数均对应喷嘴头部的锥面结构
   #define CALIBRATION_NOZZLE_TIP_HEIGHT          1.0  // (mm)
   #define CALIBRATION_NOZZLE_OUTER_DIAMETER      2.0  // (mm)
 
-  // Uncomment to enable reporting (required for "G425 V", but consumes flash).
+  // Uncomment to enable reporting (required for "G425 V", but consumes flash). // 取消注释开启数据上报功能（G425 V指令必备），会占用闪存空间
   //#define CALIBRATION_REPORTING
 
-  // The true location and dimension the cube/bolt/washer on the bed.
+  // The true location and dimension the cube/bolt/washer on the bed.           // 热床上校准用金属方块、螺栓、垫片的实际位置与尺寸
   #define CALIBRATION_OBJECT_CENTER     { 264.0, -22.0,  -2.0 } // (mm)
   #define CALIBRATION_OBJECT_DIMENSIONS {  10.0,  10.0,  10.0 } // (mm)
 
   // Comment out any sides which are unreachable by the probe. For best
   // auto-calibration results, all sides must be reachable.
+  // 注释掉探头无法触碰到的任何面。
+  // 为获得最佳自动校准效果，探头必须能触碰到所有面。
   #define CALIBRATION_MEASURE_RIGHT
   #define CALIBRATION_MEASURE_FRONT
   #define CALIBRATION_MEASURE_LEFT
@@ -1845,12 +1911,14 @@
 
   // Probing at the exact top center only works if the center is flat. If
   // probing on a screw head or hollow washer, probe near the edges.
+  // 仅当校准物顶部中心位置是平面时，才能在正中心进行探测。
+  // 如果探测点在螺丝头或空心垫片上，请在边缘位置探测。
   //#define CALIBRATION_MEASURE_AT_TOP_EDGES
 
   // Define the pin to read during calibration
   #ifndef CALIBRATION_PIN
-    //#define CALIBRATION_PIN -1            // Define here to override the default pin
-    #define CALIBRATION_PIN_INVERTING false // Set to true to invert the custom pin
+    //#define CALIBRATION_PIN -1            // Define here to override the default pin  // 在此处定义，以覆盖默认引脚
+    #define CALIBRATION_PIN_INVERTING false // Set to true to invert the custom pin     // 设置为 true 反转自定义引脚的电平信号
     //#define CALIBRATION_PIN_PULLDOWN
     #define CALIBRATION_PIN_PULLUP
   #endif
@@ -1859,6 +1927,8 @@
 /**
  * Multi-stepping sends steps in bursts to reduce MCU usage for high step-rates.
  * This allows higher feedrates than the MCU could otherwise support.
+ * 多步脉冲模式：批量发送步进脉冲，降低高步数速率下的 MCU（主控芯片）占用率。
+ * 这能实现比主控芯片常规支持更高的打印进给速度。
  */
 #define MULTISTEPPING_LIMIT   16  // :[1, 2, 4, 8, 16, 32, 64, 128]
 
@@ -1867,12 +1937,18 @@
  * below 1kHz (for AVR) or 10kHz (for ARM), where aliasing between axes in multi-axis moves causes audible
  * vibration and surface artifacts. The algorithm adapts to provide the best possible step smoothing at the
  * lowest stepping frequencies.
+ * 自适应步进平滑处理：提升多轴运动的分辨率，尤其在步进频率
+ * 低于 1kHz（AVR 主板）或 10kHz（ARM 主板）时，多轴运动中的轴间信号混叠
+ * 会产生可听见的振动和打印面瑕疵。该算法会自适应调整，
+ * 在最低步进频率下提供最佳的步进平滑效果。
  */
 //#define ADAPTIVE_STEP_SMOOTHING
 
 /**
  * Custom Microstepping
  * Override as-needed for your setup. Up to 3 MS pins are supported.
+ * 自定义细分模式（Custom Microstepping）
+ * 根据你的设备需求覆盖默认设置。最多支持 3 个细分（MS）引脚。
  */
 //#define MICROSTEP1 LOW,LOW,LOW
 //#define MICROSTEP2 HIGH,LOW,LOW
@@ -1882,8 +1958,13 @@
 //#define MICROSTEP32 HIGH,LOW,HIGH
 
 // Microstep settings (Requires a board with pins named X_MS1, X_MS2, etc.)
+// 电机细分设置 (需要主板带有 X_MS1, X_MS2 等专用引脚)
 #define MICROSTEP_MODES { 16, 16, 16, 16, 16, 16 } // [1,2,4,8,16]
+// 上面宏定义里面的 6 个数字，依次对应：X、Y、Z、E0、E1、E2 电机
+// 16 代表 16 细分（最常用、最平衡的设置）
 
+
+//======================================= 步进电机电流参数区 =========================================
 /**
  * @section stepper motor current
  *
@@ -1903,13 +1984,29 @@
  *   M907 - applies to all.
  *   M908 - BQ_ZUM_MEGA_3D, RAMBO, PRINTRBOARD_REVF, RIGIDBOARD_V2 & SCOOVO_X9H
  *   M909, M910 & LCD - only PRINTRBOARD_REVF & RIGIDBOARD_V2
+ * 
+ * 部分主板可通过固件直接设置步进电机电流。
+ * 开机电机电流由以下参数设置：
+ *   PWM_MOTOR_CURRENT - 用于 MINIRAMBO & ULTIMAIN_2
+ *                        兼容芯片：A4982
+ *   DIGIPOT_MOTOR_CURRENT - 用于 BQ_ZUM_MEGA_3D, RAMBO & SCOOVO_X9H
+ *                        兼容芯片：AD5206
+ *   DAC_MOTOR_CURRENT_DEFAULT - 用于 PRINTRBOARD_REVF & RIGIDBOARD_V2
+ *                        兼容芯片：MCP4728
+ *   DIGIPOT_I2C_MOTOR_CURRENTS - 用于 5DPRINT, AZTEEG_X3_PRO, AZTEEG_X5_MINI_WIFI, MIGHTYBOARD_REVE
+ *                        兼容芯片：MCP4451, MCP4018
+ *
+ * 电机电流也可通过 G 代码 M907~M910 或液晶屏设置：
+ *   M907 - 对所有主板生效
+ *   M908 - 用于 BQ_ZUM_MEGA_3D, RAMBO, PRINTRBOARD_REVF, RIGIDBOARD_V2 & SCOOVO_X9H
+ *   M909, M910 & 液晶屏 - 仅 PRINTRBOARD_REVF & RIGIDBOARD_V2
  */
-//#define PWM_MOTOR_CURRENT { 1300, 1300, 1250 }          // Values in milliamps
-//#define DIGIPOT_MOTOR_CURRENT { 135,135,135,135,135 }   // Values 0-255 (RAMBO 135 = ~0.75A, 185 = ~1A)
-//#define DAC_MOTOR_CURRENT_DEFAULT { 70, 80, 90, 80 }    // Default drive percent - X, Y, Z, E axis
+//#define PWM_MOTOR_CURRENT { 1300, 1300, 1250 }          // Values in milliamps                          // 数值单位：毫安 (mA)
+//#define DIGIPOT_MOTOR_CURRENT { 135,135,135,135,135 }   // Values 0-255 (RAMBO 135 = ~0.75A, 185 = ~1A) // 数值范围 0-255 (RAMBO 主板参考：135 ≈ 0.75A, 185 ≈ 1A)
+//#define DAC_MOTOR_CURRENT_DEFAULT { 70, 80, 90, 80 }    // Default drive percent - X, Y, Z, E axis      // 默认驱动电流百分比 - X、Y、Z、挤出机轴
 
 /**
- * I2C-based DIGIPOTs (e.g., Azteeg X3 Pro)
+ * I2C-based DIGIPOTs (e.g., Azteeg X3 Pro)    * 基于 I2C 通讯的数字电位器（例如：Azteeg X3 Pro 主板）
  */
 //#define DIGIPOT_MCP4018             // Requires https://github.com/felias-fogg/SlowSoftI2CMaster
 //#define DIGIPOT_MCP4451
@@ -1918,12 +2015,14 @@
 
   // Actual motor currents in Amps. The number of entries must match DIGIPOT_I2C_NUM_CHANNELS.
   // These correspond to the physical drivers, so be mindful if the order is changed.
+  // 实际电机电流值，单位为安培(A)。填写的项数必须与 DIGIPOT_I2C_NUM_CHANNELS 定义的通道数一致。
+  // 这些数值对应物理驱动芯片的顺序，如果顺序改变请务必注意。
   #define DIGIPOT_I2C_MOTOR_CURRENTS { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 } // AZTEEG_X3_PRO
 
-  //#define DIGIPOT_USE_RAW_VALUES    // Use DIGIPOT_MOTOR_CURRENT raw wiper values (instead of A4988 motor currents)
+  //#define DIGIPOT_USE_RAW_VALUES    // Use DIGIPOT_MOTOR_CURRENT raw wiper values (instead of A4988 motor currents)  // 使用 DIGIPOT_MOTOR_CURRENT 原始数值（而非 A4988 电机电流）
 
   /**
-   * Common slave addresses:
+   * Common slave addresses:   // 常用从机设备地址
    *
    *                        A   (A shifted)   B   (B shifted)  IC
    * Smoothie              0x2C (0x58)       0x2D (0x5A)       MCP4451
