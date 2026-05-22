@@ -3008,6 +3008,8 @@
 
 //#define FAST_BUTTON_POLLING           // Poll buttons at ~1kHz on 8-bit AVR. Set to 'false' for slow polling on 32-bit.  // 8位AVR主板上以约1kHz频率检测按键。32位主板请设为 false，使用低速检测。
 
+
+//========================================== 安全设置 ===========================================
 // @section safety
 
 /**
@@ -3018,6 +3020,14 @@
  * enable WATCHDOG_RESET_MANUAL to use a custom timer instead of WDTO.
  * NOTE: This method is less reliable as it can only catch hangups while
  * interrupts are enabled.
+ * 
+ * 看门狗硬件定时器功能：
+ * 如果固件因负载过高，无法读取温度传感器，
+ * 看门狗会自动复位主板，并关闭所有输出端口。
+ *
+ * 如果发现看门狗复位导致你的 AVR 主板无限卡死，
+ * 启用 WATCHDOG_RESET_MANUAL，使用自定义定时器替代默认的 WDTO。
+ * 注意：这种方式可靠性稍低，它只能在**中断启用**的状态下检测死机。
  */
 #define USE_WATCHDOG
 #if ENABLED(USE_WATCHDOG)
@@ -3032,34 +3042,39 @@
  * axis in the first layer of a print in real-time.
  *
  * Warning: Does not respect endstops!
+ * 
+ * 微步微调功能
+ * 可在不改动坐标数值的前提下，小幅移动坐标轴，主要用于打印首层时实时微调 Z 轴高度
+ * 警告：该功能不受限位开关约束限制
+
  */
 //#define BABYSTEPPING
 #if ENABLED(BABYSTEPPING)
-  //#define EP_BABYSTEPPING                 // M293/M294 babystepping with EMERGENCY_PARSER support
+  //#define EP_BABYSTEPPING                 // M293/M294 babystepping with EMERGENCY_PARSER support                // 支持紧急解析器的 M293 / M294 微步调节指令
   //#define BABYSTEP_WITHOUT_HOMING
-  //#define BABYSTEP_ALWAYS_AVAILABLE       // Allow babystepping at all times (not just during movement)
-  //#define BABYSTEP_XY                     // Also enable X/Y Babystepping. Not supported on DELTA!
-  //#define BABYSTEP_INVERT_Z               // Enable if Z babysteps should go the other way
-  //#define BABYSTEP_MILLIMETER_UNITS       // Specify BABYSTEP_MULTIPLICATOR_(XY|Z) in mm instead of micro-steps
-  #define BABYSTEP_MULTIPLICATOR_Z  1       // (steps or mm) Steps or millimeter distance for each Z babystep
-  #define BABYSTEP_MULTIPLICATOR_XY 1       // (steps or mm) Steps or millimeter distance for each XY babystep
+  //#define BABYSTEP_ALWAYS_AVAILABLE       // Allow babystepping at all times (not just during movement)          // 允许随时进行微步调节（不局限于打印头移动过程中）
+  //#define BABYSTEP_XY                     // Also enable X/Y Babystepping. Not supported on DELTA!               // 同时启用 X / Y 轴微步调节。三角洲（DELTA）机型不支持！
+  //#define BABYSTEP_INVERT_Z               // Enable if Z babysteps should go the other way                       // 若Z轴微步调节方向相反，可开启此选项
+  //#define BABYSTEP_MILLIMETER_UNITS       // Specify BABYSTEP_MULTIPLICATOR_(XY|Z) in mm instead of micro-steps  // 以毫米（mm）为单位设置 BABYSTEP_MULTIPLICATOR_(XY|Z)，而非微步
+  #define BABYSTEP_MULTIPLICATOR_Z  1       // (steps or mm) Steps or millimeter distance for each Z babystep      // (步数 或 毫米) 每次 Z 轴微步调节的移动距离
+  #define BABYSTEP_MULTIPLICATOR_XY 1       // (steps or mm) Steps or millimeter distance for each XY babystep     // (步数 或 毫米) 每次 X / Y 轴微步调节的移动距离
 
-  //#define DOUBLECLICK_FOR_Z_BABYSTEPPING  // Double-click on the Status Screen for Z Babystepping.
+  //#define DOUBLECLICK_FOR_Z_BABYSTEPPING  // Double-click on the Status Screen for Z Babystepping.               // 双击状态屏幕调出Z轴微步调节界面
   #if ENABLED(DOUBLECLICK_FOR_Z_BABYSTEPPING)
-    #define DOUBLECLICK_MAX_INTERVAL 1250   // (ms) Maximum interval between clicks.
-                                            // Note: Extra time may be added to mitigate controller latency.
-    //#define MOVE_Z_WHEN_IDLE              // Jump to the move Z menu on double-click when printer is idle.
+    #define DOUBLECLICK_MAX_INTERVAL 1250   // (ms) Maximum interval between clicks.                               // (毫秒) 双击操作的最大间隔时间
+                                            // Note: Extra time may be added to mitigate controller latency.       // 注意：为了抵消控制器延迟，系统可能会自动额外增加一点时间。
+    //#define MOVE_Z_WHEN_IDLE              // Jump to the move Z menu on double-click when printer is idle.       // 打印机空闲时，双击屏幕直接跳转至Z轴移动菜单
     #if ENABLED(MOVE_Z_WHEN_IDLE)
-      #define MOVE_Z_IDLE_MULTIPLICATOR 1   // Multiply 1mm by this factor for the move step size.
+      #define MOVE_Z_IDLE_MULTIPLICATOR 1   // Multiply 1mm by this factor for the move step size.                 // 将 1mm 乘以该系数，作为 Z 轴移动的步长大小
     #endif
   #endif
 
-  //#define BABYSTEP_DISPLAY_TOTAL          // Display total babysteps since last G28
+  //#define BABYSTEP_DISPLAY_TOTAL          // Display total babysteps since last G28                              // 显示上次回零后累计的微步调节总量
 
-  //#define BABYSTEP_ZPROBE_OFFSET          // Combine M851 Z and Babystepping
+  //#define BABYSTEP_ZPROBE_OFFSET          // Combine M851 Z and Babystepping                                     // 将M851Z轴偏移参数与微步调节数值合并计算
   #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
-    //#define BABYSTEP_HOTEND_Z_OFFSET      // For multiple hotends, babystep relative Z offsets
-    //#define BABYSTEP_GFX_OVERLAY          // Enable graphical overlay on Z-offset editor
+    //#define BABYSTEP_HOTEND_Z_OFFSET      // For multiple hotends, babystep relative Z offsets                   // 多喷头机型时，微步调节将基于相对Z轴偏移量进行
+    //#define BABYSTEP_GFX_OVERLAY          // Enable graphical overlay on Z-offset editor                         // 开启Z偏移编辑界面图形叠加显示
   #endif
 #endif
 
@@ -3079,19 +3094,36 @@
  * print acceleration will be reduced during the affected moves to keep within the limit.
  *
  * See https://marlinfw.org/docs/features/lin_advance.html for full instructions.
+ * 
+ * 线性压力控制 v1.5
+ *
+ * 计算公式：挤出提前量 [步数] = K × (速度变化量 [步数/秒])
+ * K=0 表示关闭此功能。
+ *
+ * 注意：LIN_ADVANCE 1.5 版本的 K 值与旧版本不通用！
+ *
+ * 3mm PLA 直驱挤出机（齿轮到热断距离约6.5厘米）推荐 K 值约 0.22。
+ * 柔性耗材或距离更长时，需要更大的 K 值。
+ * 如果算法计算出的速度偏移超过挤出机承受能力（超过E轴 jerk），
+ * 打印机会在相关移动时自动降低加速度以保证不超限。
+ *
+ * 完整教程：https://marlinfw.org/docs/features/lin_advance.html
  */
 //#define LIN_ADVANCE
 #if ENABLED(LIN_ADVANCE)
   #if ENABLED(DISTINCT_E_FACTORS)
-    #define ADVANCE_K { 0.22 }    // (mm) Compression length per 1mm/s extruder speed, per extruder
+    #define ADVANCE_K { 0.22 }    // (mm) Compression length per 1mm/s extruder speed, per extruder   // (毫米) 每1mm/s挤出速度对应的压缩长度，按每个挤出机单独设置
   #else
-    #define ADVANCE_K 0.22        // (mm) Compression length applying to all extruders
+    #define ADVANCE_K 0.22        // (mm) Compression length applying to all extruders                // (毫米) 应用于所有挤出机的压缩长度
   #endif
-  //#define ADVANCE_K_EXTRA       // Add a second linear advance constant, configurable with M900 L.
-  //#define LA_DEBUG              // Print debug information to serial during operation. Disable for production use.
+  //#define ADVANCE_K_EXTRA       // Add a second linear advance constant, configurable with M900 L.  // 添加第二组线性推进系数，可通过 M900 L 指令进行配置
+                                  //（译者注：上面的用途：切换软硬耗材时不用重新编译固件直驱 + 远程双模式挤出机，高级打印质量微调）
+  //#define LA_DEBUG              // Print debug information to serial during operation. Disable for production use. // 运行时通过串口输出调试信息。正式使用（成品机/日常打印）时请关闭。
   //#define EXPERIMENTAL_I2S_LA   // Allow I2S_STEPPER_STREAM to be used with LA. Performance degrades as the LA step rate reaches ~20kHz.
+                                  // 允许 I2S 步进流与线性推进(LA)同时使用。
+                                  // 当 LA 步进速率接近 20kHz 时，系统性能会下降。
 
-  //#define SMOOTH_LIN_ADVANCE    // Remove limits on acceleration by gradual increase of nozzle pressure
+  //#define SMOOTH_LIN_ADVANCE    // Remove limits on acceleration by gradual increase of nozzle pressure  // 通过逐步增加喷嘴压力来消除加速度限制
   #if ENABLED(SMOOTH_LIN_ADVANCE)
     /**
      * ADVANCE_TAU is also the time ahead that the smoother needs to look
@@ -3099,14 +3131,25 @@
      * For k=0.04 at 10k acceleration and an "Orbiter 2" extruder it can be as low as 0.0075.
      * Adjust by lowering the value until you observe the extruder skipping, then raise slightly.
      * Higher k and higher XY acceleration may require larger ADVANCE_TAU to avoid skipping steps.
+     * 
+     * ADVANCE_TAU 也是平滑算法需要提前“预判”的时间长度，
+     * 因此运动规划器需要加载足够的运动段。
+     * 对于 Orbiter 2 挤出机，加速度 10k、K=0.04 的情况下，
+     * 此值最低可设为 0.0075。
+     *
+     * 调整方法：逐渐降低数值，直到出现挤出机丢步，
+     * 然后再稍微调高一点。
+     *
+     * 更高的 K 值 和 更高的 XY 加速度，
+     * 可能需要更大的 ADVANCE_TAU 来避免丢步。
      */
     #if ENABLED(DISTINCT_E_FACTORS)
-      #define ADVANCE_TAU { 0.02 }   // (s) Smoothing time to reduce extruder acceleration, per extruder
+      #define ADVANCE_TAU { 0.02 }   // (s) Smoothing time to reduce extruder acceleration, per extruder  // (秒) 单个挤出机的平滑时间，用于降低挤出机加速度
     #else
-      #define ADVANCE_TAU 0.02       // (s) Smoothing time to reduce extruder acceleration
+      #define ADVANCE_TAU 0.02       // (s) Smoothing time to reduce extruder acceleration                // (秒) 全局平滑时间，用于降低挤出机加速度
     #endif
-    #define SMOOTH_LIN_ADV_HZ 1000   // (Hz) How often to update extruder speed
-    #define INPUT_SHAPING_E_SYNC     // Synchronize the extruder-shaped XY axes (to increase precision)
+    #define SMOOTH_LIN_ADV_HZ 1000   // (Hz) How often to update extruder speed                           // (赫兹) 挤出机速度的更新频率
+    #define INPUT_SHAPING_E_SYNC     // Synchronize the extruder-shaped XY axes (to increase precision)   // 同步受挤出机影响的XY轴运动（用于提升精度）
   #endif
 #endif
 
@@ -3116,10 +3159,16 @@
  * Control extrusion rate based on instantaneous extruder velocity. Can be used to correct for
  * underextrusion at high extruder speeds that are otherwise well-behaved (i.e., not skipping).
  * For better results also enable ADAPTIVE_STEP_SMOOTHING.
+ * 
+ * 非线性挤出控制
+ *
+ * 根据挤出机的实时速度来调整挤出量。
+ * 可用于修正**高速挤出时出现的缺料**问题（前提是挤出机未发生丢步）。
+ * 想要更好的效果，建议同时开启 ADAPTIVE_STEP_SMOOTHING。
  */
 //#define NONLINEAR_EXTRUSION
 #if ENABLED(NONLINEAR_EXTRUSION)
-  //#define NONLINEAR_EXTRUSION_DEFAULT_ON    // Enable if NLE should be ON by default
+  //#define NONLINEAR_EXTRUSION_DEFAULT_ON    // Enable if NLE should be ON by default   // 设置非线性挤出控制默认开启状态
 #endif
 
 // @section leveling
