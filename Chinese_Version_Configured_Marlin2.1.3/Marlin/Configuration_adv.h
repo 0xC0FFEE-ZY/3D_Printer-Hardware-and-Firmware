@@ -4776,31 +4776,35 @@
 #endif
 
 // @section photo
+// 拍照功能配置区
 
 /**
  * Photo G-code
  * Add the M240 G-code to take a photo.
  * The photo can be triggered by a digital pin or a physical movement.
+ * 拍照 G 代码
+ * 添加 M240 G 代码用于触发拍照。
+ * 可通过数字引脚信号或机械运动来触发拍照动作。
  */
 //#define PHOTO_GCODE
 #if ENABLED(PHOTO_GCODE)
-  // A position to move to (and raise Z) before taking the photo
-  //#define PHOTO_POSITION { X_MAX_POS - 5, Y_MAX_POS, 0 }  // { xpos, ypos, zraise } (M240 X Y Z)
-  //#define PHOTO_DELAY_MS   100                            // (ms) Duration to pause before moving back (M240 P)
-  //#define PHOTO_RETRACT_MM   6.5                          // (mm) E retract/recover for the photo move (M240 R S)
+  // A position to move to (and raise Z) before taking the photo  // 拍照前移动到的目标位置（并抬升 Z 轴）
+  //#define PHOTO_POSITION { X_MAX_POS - 5, Y_MAX_POS, 0 }  // { xpos, ypos, zraise } (M240 X Y Z)                  // {X 坐标，Y 坐标，Z 抬升高度} (M240 X Y Z)
+  //#define PHOTO_DELAY_MS   100                            // (ms) Duration to pause before moving back (M240 P)   // （毫秒）移动回原位前的暂停时长（M240 P）
+  //#define PHOTO_RETRACT_MM   6.5                          // (mm) E retract/recover for the photo move (M240 R S) // （毫米）拍照移动时的挤出机回抽/回抽恢复量（M240 R S）
 
-  // Canon RC-1 or homebrew digital camera trigger
+  // Canon RC-1 or homebrew digital camera trigger          // 佳能 RC‑1 或自制数码相机触发器
   // Data from: https://www.doc-diy.net/photo/rc-1_hacked/
   //#define PHOTOGRAPH_PIN 23
 
-  // Canon Hack Development Kit
+  // Canon Hack Development Kit   // 佳能固件开发工具包（CHDK）
   // https://web.archive.org/web/20200920094805/captain-slow.dk/2014/03/09/3d-printing-timelapses/
   //#define CHDK_PIN        4
 
-  // Optional second move with delay to trigger the camera shutter
+  // Optional second move with delay to trigger the camera shutter    // 可选的第二次移动，并配合延时触发相机快门
   //#define PHOTO_SWITCH_POSITION { X_MAX_POS, Y_MAX_POS }  // { xpos, ypos } (M240 I J)
 
-  // Duration to hold the switch or keep CHDK_PIN high
+  // Duration to hold the switch or keep CHDK_PIN high   // 保持开关闭合或保持 CHDK_PIN 引脚为高电平的持续时间
   //#define PHOTO_SWITCH_MS   50 // (ms) (M240 D)
 
   /**
@@ -4811,10 +4815,15 @@
    *
    *  Example pulse data for Nikon: https://bit.ly/2FKD0Aq
    *                     IR Wiring: https://git.io/JvJf7
+   * 
+   * 拍照脉冲时长需根据主板与相机型号微调
+   * 引脚工作频率必须为48.4千赫兹
+   * 选用升降速足够快的拍照触发引脚
+   * 例：MKS SBase温度传感器引脚响应迟缓，改用J8接口的P1.23引脚
    */
-  //#define PHOTO_PULSES_US { 2000, 27850, 400, 1580, 400, 3580, 400 }  // (µs) Durations for each 48.4kHz oscillation
+  //#define PHOTO_PULSES_US { 2000, 27850, 400, 1580, 400, 3580, 400 }  // (µs) Durations for each 48.4kHz oscillation  // （微秒）每个 48.4kHz 振荡周期的持续时间
   #ifdef PHOTO_PULSES_US
-    #define PHOTO_PULSE_DELAY_US 13 // (µs) Approximate duration of each HIGH and LOW pulse in the oscillation
+    #define PHOTO_PULSE_DELAY_US 13 // (µs) Approximate duration of each HIGH and LOW pulse in the oscillation          // （微秒）振荡中每个高电平、低电平脉冲的大致持续时长
   #endif
 #endif
 
