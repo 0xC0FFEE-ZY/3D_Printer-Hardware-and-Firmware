@@ -2376,33 +2376,38 @@
    * during SD printing. If the recovery file is found at boot time, present
    * an option on the LCD screen to continue the print from the last-known
    * point in the file.
+   * 断电续打功能（创想三维机型适配）
+   * SD 卡打印时，每层打印开始都会将设备当前状态保存至存储卡。
+   * 开机若检测到恢复记录文件，显示屏会弹出选项，可从断电位置接续打印。
    */
   //#define POWER_LOSS_RECOVERY
   #if ENABLED(POWER_LOSS_RECOVERY)
-    #define PLR_ENABLED_DEFAULT       false // Power-Loss Recovery enabled by default. (Set with 'M413 Sn' & M500)
-    //#define PLR_BED_THRESHOLD BED_MAXTEMP // (°C) Skip user confirmation at or above this bed temperature (0 to disable)
+    #define PLR_ENABLED_DEFAULT       false // Power-Loss Recovery enabled by default. (Set with 'M413 Sn' & M500)         // 默认启用断电续打功能。（可通过指令 'M413 Sn' 开启/关闭，并使用 M500 保存设置）
+    //#define PLR_BED_THRESHOLD BED_MAXTEMP // (°C) Skip user confirmation at or above this bed temperature (0 to disable) //（摄氏度）热床温度达到及该数值时，跳过人工确认步骤，设为0则关闭此功能
 
     //#define POWER_LOSS_PIN             44 // Pin to detect power-loss. Set to -1 to disable default pin on boards without module, or comment to use board default.
-    //#define POWER_LOSS_STATE         HIGH // State of pin indicating power-loss
-    //#define POWER_LOSS_PULLUP             // Set pullup / pulldown as appropriate for your sensor
+                                            // 上面配置断电检测引脚。在不带断电检测模块的主板上，设为 -1 以禁用默认引脚；或直接注释掉上面一行，以使用主板默认配置。
+
+    //#define POWER_LOSS_STATE         HIGH // State of pin indicating power-loss                   // 用于指示断电状态的引脚电平
+    //#define POWER_LOSS_PULLUP             // Set pullup / pulldown as appropriate for your sensor // 根据你的传感器/断电检测模块，正确设置上拉电阻或下拉电阻
     //#define POWER_LOSS_PULLDOWN
 
-    //#define POWER_LOSS_ZRAISE        2    // (mm) Z axis raise on resume (on power-loss with UPS)
-    //#define POWER_LOSS_PURGE_LEN    20    // (mm) Length of filament to purge on resume
+    //#define POWER_LOSS_ZRAISE        2    // (mm) Z axis raise on resume (on power-loss with UPS) //（单位：毫米）使用UPS断电续打时，Z轴抬升的高度
+    //#define POWER_LOSS_PURGE_LEN    20    // (mm) Length of filament to purge on resume           //（单位：毫米）断电续打恢复打印时，预挤出（回抽补料）的耗材长度
 
-    // Without a POWER_LOSS_PIN the following option helps reduce wear on the SD card,
-    // especially with "vase mode" printing. Set too high and vases cannot be continued.
-    #define POWER_LOSS_MIN_Z_CHANGE    0.05 // (mm) Minimum Z change before saving power-loss data
+    // Without a POWER_LOSS_PIN the following option helps reduce wear on the SD card,              // 在未使用 POWER_LOSS_PIN 断电检测引脚时，以下选项有助于减少SD卡擦写损耗，
+    // especially with "vase mode" printing. Set too high and vases cannot be continued.            // 尤其在“花瓶模式”打印时效果明显。数值设置过高，会导致花瓶模式打印无法正常续打。（花瓶模式：一层一层螺旋上升，层特别多、保存特别频繁）
+    #define POWER_LOSS_MIN_Z_CHANGE    0.05 // (mm) Minimum Z change before saving power-loss data  //（单位：毫米）保存断电续打数据前，Z轴至少需要移动的最小高度
 
-    //#define BACKUP_POWER_SUPPLY           // Backup power / UPS to move the steppers on power-loss
+    //#define BACKUP_POWER_SUPPLY           // Backup power / UPS to move the steppers on power-loss // 断电时依靠备用电源/UPS驱动步进电机动作
     #if ENABLED(BACKUP_POWER_SUPPLY)
-      //#define POWER_LOSS_RETRACT_LEN   10 // (mm) Length of filament to retract on fail
+      //#define POWER_LOSS_RETRACT_LEN   10 // (mm) Length of filament to retract on fail            //（单位：毫米）断电/打印失败时，耗材回抽长度
     #endif
 
-    // Enable if Z homing is needed for proper recovery. 99.9% of the time this should be disabled!
+    // Enable if Z homing is needed for proper recovery. 99.9% of the time this should be disabled!  // 若断电续打恢复时需要重新Z轴归位，则启用。99.9% 的情况下都应该关闭！
     //#define POWER_LOSS_RECOVER_ZHOME
     #if ENABLED(POWER_LOSS_RECOVER_ZHOME)
-      //#define POWER_LOSS_ZHOME_POS { 0, 0 } // Safe XY position to home Z while avoiding objects on the bed
+      //#define POWER_LOSS_ZHOME_POS { 0, 0 } // Safe XY position to home Z while avoiding objects on the bed  // 安全XY坐标位置：用于Z轴归位，同时避开打印平台上的模型
     #endif
   #endif
 
