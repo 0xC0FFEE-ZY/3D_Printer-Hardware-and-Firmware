@@ -3534,10 +3534,11 @@
 //===========================================================================
 //================================= Buffers =================================
 //===========================================================================
+// 缓冲区配置
 
 // @section gcode
 
-// The number of linear moves that can be in the planner at once.
+// The number of linear moves that can be in the planner at once.  //  planner 中可同时缓存的直线运动指令数量
 #if ALL(HAS_MEDIA, DIRECT_STEPPING)
   #define BLOCK_BUFFER_SIZE  8
 #elif HAS_MEDIA
@@ -3548,7 +3549,7 @@
 
 // @section serial
 
-// The ASCII buffer for serial input
+// The ASCII buffer for serial input  // 串口输入的 ASCII 指令缓冲区
 #define MAX_CMD_SIZE 96
 #define BUFSIZE 4
 
@@ -3560,6 +3561,14 @@
  *  - 128 bytes for the optimal speed of 'debug-echo:'
  *  - Other output doesn't need to be that speedy.
  * :[0, 2, 4, 8, 16, 32, 64, 128, 256]
+ * 
+ * 主机发送缓冲区大小
+ *  - 消耗 386 字节闪存 + TX_BUFFER_SIZE+3 字节内存 (不为 0 时)
+ *  - 简单的 "ok" 响应需要 4 字节
+ *  - 高级状态反馈 (M105) 需要 32 字节
+ *  - debug-echo 调试输出最优速度需要 128 字节
+ *  - 其他输出不需要这么快
+ * :[0, 2, 4, 8, 16, 32, 64, 128, 256]
  */
 #define TX_BUFFER_SIZE 0
 
@@ -3568,22 +3577,33 @@
  * Without XON/XOFF flow control (see SERIAL_XON_XOFF below) 32 bytes should be enough.
  * To use flow control, set this buffer size to at least 1024 bytes.
  * :[0, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
+ * 
+ * 主机接收缓冲区大小
+ * 如果不使用 XON/XOFF 流控（见下方 SERIAL_XON_XOFF），32 字节通常足够。
+ * 如果要使用流控，此缓冲区必须设置为至少 1024 字节。
+ * 可选值：[0, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
  */
 //#define RX_BUFFER_SIZE 1024
 
 #if RX_BUFFER_SIZE >= 1024
   // Enable to have the controller send XON/XOFF control characters to
   // the host to signal the RX buffer is becoming full.
+  // 启用后，控制器会向主机发送 XON/XOFF 控制字符
+  // 用于通知主机：接收缓冲区（RX buffer）即将满了。
   //#define SERIAL_XON_XOFF
 #endif
 
 #if HAS_MEDIA
   // Enable this option to collect and display the maximum
   // RX queue usage after transferring a file to SD.
+  // 启用此选项后，在文件传输到 SD 卡完成后，
+  // 会统计并显示接收缓冲区（RX队列）的**最高使用率**。
   //#define SERIAL_STATS_MAX_RX_QUEUED
 
   // Enable this option to collect and display the number
   // of dropped bytes after a file transfer to SD.
+  // 启用此选项后，在文件传输到 SD 卡完成后，
+  // 会统计并显示传输过程中**丢失的字节数量**。
   //#define SERIAL_STATS_DROPPED_RX
 #endif
 
@@ -3591,6 +3611,10 @@
 // Dump an error to the serial port if the serial receive buffer overflows.
 // If you see these errors, increase the RX_BUFFER_SIZE value.
 // Not supported on all platforms.
+// 监控接收缓冲区（RX）使用情况
+// 如果串口接收缓冲区溢出，会向串口输出错误信息。
+// 如果你看到这类错误，请增大 RX_BUFFER_SIZE 的值。
+// 并非所有平台都支持此功能。
 //#define RX_BUFFER_MONITOR
 
 /**
@@ -3600,6 +3624,13 @@
  * enter the serial receive buffer, so they cannot be blocked.
  * Currently handles M108, M112, M410, M876
  * NOTE: Not yet implemented for all platforms.
+ * 
+ * 紧急指令解析器
+ *
+ * 添加一个底层解析器，在指令进入串口接收缓冲区时**直接拦截特定紧急指令**，
+ * 确保这些指令**永远不会被阻塞、延迟**。
+ * 当前支持：M108、M112、M410、M876
+ * 注意：并非所有平台都已实现此功能。
  */
 //#define EMERGENCY_PARSER
 
@@ -3617,10 +3648,24 @@
  *
  * - During Hold all Emergency Parser commands are available, as usual.
  * - Enable NANODLP_Z_SYNC and NANODLP_ALL_AXIS for move command end-state reports.
+ * 
+ * 实时状态报告（需要先开启 EMERGENCY_PARSER）
+ *
+ * - 报告机器位置和状态（类似 Grbl 控制系统）。
+ * - 在长距离移动过程中自动报告位置。
+ * - 对 CNC / 激光切割机 非常有用。
+ *
+ * 添加支持的指令：
+ *  S000 : 移动时实时报告状态与位置
+ *  P000 : 移动中立即暂停 / 保持
+ *  R000 : 从暂停状态恢复
+ *
+ * - 暂停期间，所有紧急解析器指令均可正常使用。
+ * - 若需要移动指令结束状态报告，请启用 NANODLP_Z_SYNC 和 NANODLP_ALL_AXIS。
  */
 //#define REALTIME_REPORTING_COMMANDS
 #if ENABLED(REALTIME_REPORTING_COMMANDS)
-  //#define FULL_REPORT_TO_HOST_FEATURE   // Auto-report the machine status like Grbl CNC
+  //#define FULL_REPORT_TO_HOST_FEATURE   // Auto-report the machine status like Grbl CNC  // 像 Grbl 数控系统一样，自动报告机器状态
 #endif
 
 /**
@@ -3628,17 +3673,25 @@
  * Therefore some clients abort after 30 seconds in a timeout.
  * Some other clients start sending commands while receiving a 'wait'.
  * This "wait" is only sent when the buffer is empty. 1 second is a good value here.
+ * 
+ * 不稳定的串口连接可能会在发送 'ok' 响应后丢失接收到的指令
+ * 因此部分控制软件会在 30 秒超时后中止传输
+ * 另一些软件在收到 'wait' 响应时会开始重新发送指令
+ * 这个 "wait" 仅在缓冲区为空时发送，设置为 1 秒是个合适的值
  */
 //#define NO_TIMEOUTS 1000 // (ms)
 
 // Some clients will have this feature soon. This could make the NO_TIMEOUTS unnecessary.
+// 部分上位机软件后续将适配该机制，届时无需再启用超时禁用选项
 //#define ADVANCED_OK
 
 // Printrun may have trouble receiving long strings all at once.
 // This option inserts short delays between lines of serial output.
+// Printrun 上位机可能无法一次性接收过长的字符串。
+// 该选项会在串口输出的每行信息之间插入短暂延时。
 #define SERIAL_OVERRUN_PROTECTION
 
-// For serial echo, the number of digits after the decimal point
+// For serial echo, the number of digits after the decimal point   // 串口回显时，小数点后的数字位数
 //#define SERIAL_FLOAT_PRECISION 4
 
 /**
@@ -3647,6 +3700,12 @@
  * controller for more stable and reliable high-speed serial communication.
  * Support is currently limited to some STM32 MCUs and all HC32 MCUs.
  * Note: This has no effect on emulated USB serial ports.
+ * 
+ * 此功能属于**实验性特性**，使用请谨慎，并进行全面测试。
+ * 启用该选项后，将通过板载 DMA 控制器在串口接收数据，
+ * 以实现更稳定、可靠的高速串口通信。
+ * 目前仅支持部分 STM32 主控芯片 及 全部 HC32 主控芯片。
+ * 注意：该功能对**虚拟 USB 串口**无效。
  */
 //#define SERIAL_DMA
 
@@ -3656,6 +3715,11 @@
  *
  * For clients that use a fixed-width font (like OctoPrint), leave this set to 1.0.
  * Otherwise, adjust according to your client and font.
+ * 
+ * 设置比例字体下单个字符占位宽度
+ * 可优化G29 O等网格数据输出的排版对齐效果
+ * 固定宽度字体（如OctoPrint）保持1.0即可
+ * 其余场景按上位机字体样式微调数值
  */
 #define PROPORTIONAL_FONT_RATIO 1.0
 
