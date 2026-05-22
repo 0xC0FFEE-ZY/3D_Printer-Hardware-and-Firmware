@@ -2768,37 +2768,37 @@
 #endif
 
 //
-// Additional options for DGUS / DWIN displays
+// Additional options for DGUS / DWIN displays  // 针对 DGUS / DWIN 彩色触摸屏的额外配置选项
 //
 #if HAS_DGUS_LCD
   #define LCD_BAUDRATE 115200
 
   #define DGUS_RX_BUFFER_SIZE 128
   #define DGUS_TX_BUFFER_SIZE 48
-  //#define SERIAL_STATS_RX_BUFFER_OVERRUNS  // Fix Rx overrun situation (Currently only for AVR)
+  //#define SERIAL_STATS_RX_BUFFER_OVERRUNS  // Fix Rx overrun situation (Currently only for AVR)  // 修复串口接收溢出问题（目前仅适用于 AVR 架构主板）
 
-  #define DGUS_UPDATE_INTERVAL_MS  500    // (ms) Interval between automatic screen updates
+  #define DGUS_UPDATE_INTERVAL_MS  500    // (ms) Interval between automatic screen updates        // 屏幕自动刷新的时间间隔（单位：毫秒）
 
   #if DGUS_UI_IS(FYSETC, MKS, HIPRECY)
-    #define DGUS_PRINT_FILENAME           // Display the filename during printing
-    #define DGUS_PREHEAT_UI               // Display a preheat screen during heatup
+    #define DGUS_PRINT_FILENAME           // Display the filename during printing                  // 打印时在屏幕上显示文件名
+    #define DGUS_PREHEAT_UI               // Display a preheat screen during heatup                // 加热过程中显示专用预热界面
 
     #if DGUS_UI_IS(FYSETC, MKS)
-      //#define DGUS_UI_MOVE_DIS_OPTION   // Disabled by default for FYSETC and MKS
+      //#define DGUS_UI_MOVE_DIS_OPTION   // Disabled by default for FYSETC and MKS                // FYSETC 和 MKS 屏幕默认是关闭的
     #else
-      #define DGUS_UI_MOVE_DIS_OPTION     // Enabled by default for UI_HIPRECY
+      #define DGUS_UI_MOVE_DIS_OPTION     // Enabled by default for UI_HIPRECY                     // 对于 UI_HIPRECY 屏幕，该功能**默认启用**
     #endif
 
     #define DGUS_FILAMENT_LOADUNLOAD
     #if ENABLED(DGUS_FILAMENT_LOADUNLOAD)
       #define DGUS_FILAMENT_PURGE_LENGTH 10
-      #define DGUS_FILAMENT_LOAD_LENGTH_PER_TIME 0.5 // (mm) Adjust in proportion to DGUS_UPDATE_INTERVAL_MS
+      #define DGUS_FILAMENT_LOAD_LENGTH_PER_TIME 0.5 // (mm) Adjust in proportion to DGUS_UPDATE_INTERVAL_MS  // 需与屏幕刷新间隔按比例调整
     #endif
 
-    #define DGUS_UI_WAITING               // Show a "waiting" screen between some screens
+    #define DGUS_UI_WAITING               // Show a "waiting" screen between some screens            // 在部分界面切换过程中显示“等待/加载中”界面
     #if ENABLED(DGUS_UI_WAITING)
       #define DGUS_UI_WAITING_STATUS 10
-      #define DGUS_UI_WAITING_STATUS_PERIOD 8 // Increase to slower waiting status looping
+      #define DGUS_UI_WAITING_STATUS_PERIOD 8 // Increase to slower waiting status looping           // 数值越大，等待状态的动画循环越慢
     #endif
 
   #elif DGUS_UI_IS(E3S1PRO)
@@ -2809,43 +2809,58 @@
      *
      * NOTE: The Advanced SD Card option is affected by the stock touchscreen firmware, so
      *       pages 5 and up will display "4/4". This may get fixed in a screen firmware update.
+     * 
+     * 原厂 Ender-3 S1 Pro/Plus 触屏固件对 SD 卡文件的兼容性欠佳。
+     * 自动滚动功能仅适用于状态信息、文件名及关于页面。
+     * 提示：高级 SD 卡功能受原厂触屏固件限制，第五页及之后页面都会显示为 4/4 分页，该问题有望通过后续屏幕固件更新修复。
      */
-    #define DGUS_SOFTWARE_AUTOSCROLL        // Enable long text software auto-scroll
-    #define DGUS_AUTOSCROLL_START_CYCLES 1  // Refresh cycles without scrolling at the beginning of text strings
-    #define DGUS_AUTOSCROLL_END_CYCLES 1    // ... at the end of text strings
+    #define DGUS_SOFTWARE_AUTOSCROLL        // Enable long text software auto-scroll                              // 启用长文本软件自动滚动（文字太长会自动滚动显示）
+    #define DGUS_AUTOSCROLL_START_CYCLES 1  // Refresh cycles without scrolling at the beginning of text strings  // 文本开头停留的刷新次数（让文字先停一会儿，再开始滚动）
+    #define DGUS_AUTOSCROLL_END_CYCLES 1    // ... at the end of text strings                                     // 文本滚动到末尾时的停留刷新次数
 
-    #define DGUS_ADVANCED_SDCARD            // Allow more than 20 files and navigating directories
-    #define DGUS_USERCONFIRM                // Reuse the SD Card page to show various messages
+    #define DGUS_ADVANCED_SDCARD            // Allow more than 20 files and navigating directories                // 允许显示超过20个文件，并支持浏览文件夹目录
+    #define DGUS_USERCONFIRM                // Reuse the SD Card page to show various messages                    // 重复使用 SD 卡页面来显示各种提示信息
   #endif
 #endif // HAS_DGUS_LCD
 
 //
-// Additional options for AnyCubic Chiron TFT displays
+// Additional options for AnyCubic Chiron TFT displays       // 纵维立方Chiron机型TFT触控屏专属拓展配置
 //
 #if ENABLED(ANYCUBIC_LCD_CHIRON)
   // By default the type of panel is automatically detected.
   // Enable one of these options if you know the panel type.
+  // 默认情况下，面板类型会被自动检测。
+  // 如果你确定自己的屏幕类型，就启用其中一个选项。
   //#define CHIRON_TFT_STANDARD
   //#define CHIRON_TFT_NEW
 
-  // Enable the longer Anycubic powerup startup tune
+  // Enable the longer Anycubic powerup startup tune  // 开启纵维立方机型加长版开机提示音
   //#define AC_DEFAULT_STARTUP_TUNE
 
   /**
    * Display Folders
    * By default the file browser lists all G-code files (including those in subfolders) in a flat list.
    * Enable this option to display a hierarchical file browser.
+   * 
+   * 文件夹显示功能
+   * 默认文件浏览页会将所有 G 代码文件（含子文件夹内文件）平铺展示
+   * 开启该选项即可切换为层级式文件夹浏览视图
    *
    * NOTES:
    * - Without this option it helps to enable SDCARD_SORT_ALPHA so files are sorted before/after folders.
    * - When used with the "new" panel, folder names will also have '.gcode' appended to their names.
    *   This hack is currently required to force the panel to show folders.
+   * 
+   * 注意事项
+   * 未开启文件夹功能时，建议开启文件字母排序功能，让文件与文件夹有序排布
+   * 搭配新款屏幕使用时，文件夹名称后缀会额外附带.gcode标识
+   * 该特殊处理是当前让屏幕正常识别显示文件夹的必要方式
    */
   #define AC_SD_FOLDER_VIEW
 #endif
 
 //
-// Specify additional languages for the UI. Default specified by LCD_LANGUAGE.
+// Specify additional languages for the UI. Default specified by LCD_LANGUAGE.   // 为界面指定额外的语言支持。默认语言由 LCD_LANGUAGE 定义。
 //
 #if ANY(DOGLCD, TFT_COLOR_UI, TOUCH_UI_FTDI_EVE, IS_DWIN_MARLINUI, ANYCUBIC_LCD_VYPER)
   //#define LCD_LANGUAGE_2 fr
@@ -2853,7 +2868,7 @@
   //#define LCD_LANGUAGE_4 es
   //#define LCD_LANGUAGE_5 it
   #ifdef LCD_LANGUAGE_2
-    //#define LCD_LANGUAGE_AUTO_SAVE // Automatically save language to EEPROM on change
+    //#define LCD_LANGUAGE_AUTO_SAVE // Automatically save language to EEPROM on change  // 切换语言后自动存入断电保存区域
   #endif
 #endif
 
@@ -2862,34 +2877,34 @@
 //
 #if ENABLED(TOUCH_UI_FTDI_EVE)
   // Display board used
-  //#define LCD_FTDI_VM800B35A        // FTDI 3.5" with FT800 (320x240)
-  //#define LCD_4DSYSTEMS_4DLCD_FT843 // 4D Systems 4.3" (480x272)
-  //#define LCD_HAOYU_FT800CB         // Haoyu with 4.3" or 5" (480x272)
-  //#define LCD_HAOYU_FT810CB         // Haoyu with 5" (800x480)
-  //#define LCD_LULZBOT_CLCD_UI       // LulzBot Color LCD UI
-  //#define LCD_FYSETC_TFT81050       // FYSETC with 5" (800x480)
-  //#define LCD_EVE3_50G              // Matrix Orbital 5.0", 800x480, BT815
-  //#define LCD_EVE2_50G              // Matrix Orbital 5.0", 800x480, FT813
+  //#define LCD_FTDI_VM800B35A        // FTDI 3.5" with FT800 (320x240)        // 适配3.5英寸FT800主控FTDI显示屏，分辨率320×240
+  //#define LCD_4DSYSTEMS_4DLCD_FT843 // 4D Systems 4.3" (480x272)             // 适配 4D Systems 品牌 4.3英寸显示屏，分辨率 480×272
+  //#define LCD_HAOYU_FT800CB         // Haoyu with 4.3" or 5" (480x272)       // 适配 浩悦（Haoyu）4.3寸 / 5寸显示屏，分辨率 480×272
+  //#define LCD_HAOYU_FT810CB         // Haoyu with 5" (800x480)               // 适配 浩悦（Haoyu）5寸高清显示屏，分辨率 800×480
+  //#define LCD_LULZBOT_CLCD_UI       // LulzBot Color LCD UI                  // 适配 LulzBot 品牌 彩色液晶显示屏 的界面配置
+  //#define LCD_FYSETC_TFT81050       // FYSETC with 5" (800x480)              // 适配 FYSETC 品牌 5寸高清显示屏，分辨率 800×480
+  //#define LCD_EVE3_50G              // Matrix Orbital 5.0", 800x480, BT815   // 适配 Matrix Orbital 品牌 5寸 800x480 显示屏（BT815 主控）
+  //#define LCD_EVE2_50G              // Matrix Orbital 5.0", 800x480, FT813   // 适配 Matrix Orbital 品牌 5寸 800x480 显示屏（FT813 主控）
 
-  // Correct the resolution if not using the stock TFT panel.
+  // Correct the resolution if not using the stock TFT panel.                  // 如果没有使用原装 TFT 屏幕，请在这里修正分辨率。
   //#define TOUCH_UI_320x240
   //#define TOUCH_UI_480x272
   //#define TOUCH_UI_800x480
 
-  // Mappings for boards with a standard RepRapDiscount Display connector
-  //#define AO_EXP1_PINMAP      // LulzBot CLCD UI EXP1 mapping
-  //#define AO_EXP2_PINMAP      // LulzBot CLCD UI EXP2 mapping
-  //#define CR10_TFT_PINMAP     // Rudolph Riedel's CR10 pin mapping
-  //#define S6_TFT_PINMAP       // FYSETC S6 pin mapping
-  //#define F6_TFT_PINMAP       // FYSETC F6 pin mapping
+  // Mappings for boards with a standard RepRapDiscount Display connector      // 针对带有标准 RepRapDiscount 显示屏接口的主板的引脚定义
+  //#define AO_EXP1_PINMAP      // LulzBot CLCD UI EXP1 mapping                // LulzBot 品牌彩色显示屏 EXP1 接口引脚定义
+  //#define AO_EXP2_PINMAP      // LulzBot CLCD UI EXP2 mapping                // LulzBot 品牌彩色显示屏 EXP2 接口引脚定义
+  //#define CR10_TFT_PINMAP     // Rudolph Riedel's CR10 pin mapping           // Rudolph Riedel 定制版 CR-10 引脚映射（修正官方屏接口定义）
+  //#define S6_TFT_PINMAP       // FYSETC S6 pin mapping                       // 富源盛S6主板屏幕引脚定义
+  //#define F6_TFT_PINMAP       // FYSETC F6 pin mapping                       // 富源盛F6主板屏幕引脚定义
 
-  //#define OTHER_PIN_LAYOUT  // Define pins manually below
+  //#define OTHER_PIN_LAYOUT  // Define pins manually below                    // 下方可手动自定义引脚参数
   #if ENABLED(OTHER_PIN_LAYOUT)
-    // Pins for CS and MOD_RESET (PD) must be chosen
+    // Pins for CS and MOD_RESET (PD) must be chosen                           // 必须为 CS 引脚 和 MOD_RESET (PD) 复位引脚 指定引脚号
     #define CLCD_MOD_RESET  9
     #define CLCD_SPI_CS    10
 
-    // If using software SPI, specify pins for SCLK, MOSI, MISO
+    // If using software SPI, specify pins for SCLK, MOSI, MISO                // 若使用软件SPI通信，需指定时钟、主发、主收引脚
     //#define CLCD_USE_SOFT_SPI
     #if ENABLED(CLCD_USE_SOFT_SPI)
       #define CLCD_SOFT_SPI_MOSI 11
@@ -2901,20 +2916,24 @@
   // Display Orientation. An inverted (i.e. upside-down) display
   // is supported on the FT800. The FT810 and beyond also support
   // portrait and mirrored orientations.
+  // 屏幕显示方向。FT800芯片支持倒置显示；FT810及后续芯片还支持竖屏、镜像显示
   //#define TOUCH_UI_INVERTED
   //#define TOUCH_UI_PORTRAIT
   //#define TOUCH_UI_MIRRORED
 
   // UTF8 processing and rendering.
   // Unsupported characters are shown as '?'.
+  // 开启后，屏幕可以处理 UTF8 格式的文字
+  // 如果屏幕不支持某个字符，会自动显示成 ? 代替
   //#define TOUCH_UI_USE_UTF8
   #if ENABLED(TOUCH_UI_USE_UTF8)
-    // Western accents support. These accented characters use
-    // combined bitmaps and require relatively little storage.
+    // Western accents support. These accented characters use   // 西欧语言重音符号支持（法语/德语/西班牙语等特殊字符）
+    // combined bitmaps and require relatively little storage.  // 这些重音字符采用合并位图格式，占用的存储空间非常小。
     #define TOUCH_UI_UTF8_WESTERN_CHARSET
     #if ENABLED(TOUCH_UI_UTF8_WESTERN_CHARSET)
       // Additional character groups. These characters require
       // full bitmaps and take up considerable storage:
+      // 拓展字符集，这类字符需独立完整位图，占用存储空间较多
       //#define TOUCH_UI_UTF8_SUPERSCRIPTS  // ¹ ² ³
       //#define TOUCH_UI_UTF8_COPYRIGHT     // © ®
       //#define TOUCH_UI_UTF8_GERMANIC      // ß
@@ -2927,60 +2946,67 @@
       //#define TOUCH_UI_UTF8_SYMBOLS       // µ ¶ ¦ § ¬
     #endif
 
-    // Cyrillic character set, costs about 27KiB of flash
+    // Cyrillic character set, costs about 27KiB of flash    // 西里尔字符集（俄语等），会占用约 27KiB 的闪存空间
     //#define TOUCH_UI_UTF8_CYRILLIC_CHARSET
   #endif
 
-  // Use a smaller font when labels don't fit buttons
+  // Use a smaller font when labels don't fit buttons        // 当按钮标签文字显示不下时，自动使用更小的字体
   #define TOUCH_UI_FIT_TEXT
 
   // Use a numeric passcode for "Screen lock" keypad.
   // (recommended for smaller displays)
+  // 锁屏界面使用数字密码键盘，小尺寸屏幕建议启用
   //#define TOUCH_UI_PASSCODE
 
-  // Output extra debug info for Touch UI events
+  // Output extra debug info for Touch UI events             // 输出触摸UI事件的额外调试信息
   //#define TOUCH_UI_DEBUG
 
-  // Developer menu (accessed by touching "About Printer" copyright text)
+  // Developer menu (accessed by touching "About Printer" copyright text)  // 开发者菜单，点击打印机关于页面版权文字即可调出
   //#define TOUCH_UI_DEVELOPER_MENU
 #endif // TOUCH_UI_FTDI_EVE
 
 //
-// Classic UI Options
+// Classic UI Options     // 经典界面相关设置
 //
 #if TFT_SCALED_DOGLCD
-  //#define TFT_MARLINUI_COLOR 0xFFFF // White
-  //#define TFT_MARLINBG_COLOR 0x0000 // Black
-  //#define TFT_DISABLED_COLOR 0x0003 // Almost black
-  //#define TFT_BTCANCEL_COLOR 0xF800 // Red
-  //#define TFT_BTARROWS_COLOR 0xDEE6 // 11011 110111 00110 Yellow
-  //#define TFT_BTOKMENU_COLOR 0x145F // 00010 100010 11111 Cyan
+  //#define TFT_MARLINUI_COLOR 0xFFFF // White         // 白色
+  //#define TFT_MARLINBG_COLOR 0x0000 // Black         // 黑色
+  //#define TFT_DISABLED_COLOR 0x0003 // Almost black  // 近乎纯黑色
+  //#define TFT_BTCANCEL_COLOR 0xF800 // Red           // 红色
+  //#define TFT_BTARROWS_COLOR 0xDEE6 // 11011 110111 00110 Yellow  // 黄色
+  //#define TFT_BTOKMENU_COLOR 0x145F // 00010 100010 11111 Cyan    // 青色
 #endif
 
 /**
  * Display Sleep
  * Enable this option to save energy and prevent OLED pixel burn-in.
+ * 
+ * 显示屏休眠
+ * 启用该选项可节约电量，并防止 OLED 屏幕出现像素烧屏。
  */
-//#define DISPLAY_SLEEP_MINUTES 2       // (minutes) Timeout before turning off the screen
+//#define DISPLAY_SLEEP_MINUTES 2       // (minutes) Timeout before turning off the screen     // （分钟）屏幕自动关闭的超时时间
 
 /**
  * LCD Backlight Timeout
  * Requires a display with a controllable backlight
+ * 
+ * LCD 背光超时
+ * 需要显示屏支持背光控制功能
  */
-//#define LCD_BACKLIGHT_TIMEOUT_MINS 1  // (minutes) Timeout before turning off the backlight
+//#define LCD_BACKLIGHT_TIMEOUT_MINS 1  // (minutes) Timeout before turning off the backlight  // （分钟）背光自动关闭的超时时间
 
 #if defined(DISPLAY_SLEEP_MINUTES) || defined(LCD_BACKLIGHT_TIMEOUT_MINS)
-  #define EDITABLE_DISPLAY_TIMEOUT      // Edit sleep / backlight timeout with M255 S<minutes> and a menu item
+  #define EDITABLE_DISPLAY_TIMEOUT      // Edit sleep / backlight timeout with M255 S<minutes> and a menu item  // 通过 M255 S<分钟数> 指令和菜单选项，修改休眠 / 背光超时时间
 #endif
 
 //
-// ADC Button Debounce
+// ADC Button Debounce    // ADC按键消抖
 //
 #if HAS_ADC_BUTTONS
-  #define ADC_BUTTON_DEBOUNCE_DELAY 16  // (count) Increase if buttons bounce or repeat too fast
+  #define ADC_BUTTON_DEBOUNCE_DELAY 16  // (count) Increase if buttons bounce or repeat too fast  // (计数) 如果按键出现抖动或重复触发过快，可增大该数值
 #endif
 
-//#define FAST_BUTTON_POLLING           // Poll buttons at ~1kHz on 8-bit AVR. Set to 'false' for slow polling on 32-bit.
+//#define FAST_BUTTON_POLLING           // Poll buttons at ~1kHz on 8-bit AVR. Set to 'false' for slow polling on 32-bit.  // 8位AVR主板上以约1kHz频率检测按键。32位主板请设为 false，使用低速检测。
 
 // @section safety
 
