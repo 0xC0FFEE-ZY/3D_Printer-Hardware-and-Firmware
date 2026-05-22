@@ -2670,18 +2670,28 @@
  * Some of these options may result in the display lagging behind
  * controller events, as there is a trade-off between reliable
  * printing performance versus fast display updates.
+ * 
+ * === 图形显示屏的额外优化选项 ===
+ *
+ * 使用这些优化可以提升打印性能，
+ * 因为图形界面的绘制操作可能会影响打印速度，
+ * 尤其是在执行大量短距离移动，
+ * 以及在三角洲（DELTA）、SCARA 机型上打印时。
+ *
+ * 其中某些选项可能会导致屏幕显示滞后于控制器事件，
+ * 因为这是在【稳定打印性能】和【屏幕快速刷新】之间做权衡。
  */
 #if HAS_MARLINUI_U8GLIB
-  // Save many cycles by drawing a hollow frame or no frame on the Info Screen
+  // Save many cycles by drawing a hollow frame or no frame on the Info Screen    // 在信息界面上使用空心边框或不显示边框，以此节省大量 CPU 运算资源。
   //#define XYZ_NO_FRAME
   #define XYZ_HOLLOW_FRAME
 
-  // A bigger font is available for edit items. Costs 3120 bytes of flash.
-  // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.
+  // A bigger font is available for edit items. Costs 3120 bytes of flash.        // 编辑项可使用更大的字体。会占用 3120 字节闪存。
+  // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.  // 仅适用于西方字符。不支持 Cyrillic（俄文）、日文假名、土耳其文、希腊文或中文。
   //#define USE_BIG_EDIT_FONT
 
-  // A smaller font may be used on the Info Screen. Costs 2434 bytes of flash.
-  // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.
+  // A smaller font may be used on the Info Screen. Costs 2434 bytes of flash.    // 可在信息屏幕上使用更小的字体。占用 2434 字节闪存。
+  // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.  // 仅适用于西方字符。不支持俄文、日文、土耳其文、希腊文或中文。
   //#define USE_SMALL_INFOFONT
 
   /**
@@ -2695,11 +2705,22 @@
    *
    * Set STATUS_EXPIRE_SECONDS to zero to never clear the status.
    * This will prevent position updates from being displayed.
+   * 
+   * 基于 ST7920 芯片的液晶屏（最常见的 12864 屏）
+   * 可以使用内置字符生成器来模拟 16x4 的纯字符显示，
+   * 这种模式**屏幕刷新速度极快**。
+   * 开启 LIGHTWEIGHT_UI 即可启用这个特殊模式。
+   *
+   * 因为轻量级UI空间有限，坐标位置和状态信息会挤在同一行。
+   * 用 STATUS_EXPIRE_SECONDS 设置状态信息显示多久后消失。
+   *
+   * 设置为 0 表示永远不清除状态信息，
+   * 这样坐标位置就不会显示出来了。
    */
   #if IS_U8GLIB_ST7920
-    // Enable this option and reduce the value to optimize screen updates.
-    // The normal delay is 10µs. Use the lowest value that still gives a reliable display.
-    //#define DOGM_SPI_DELAY_US      5  // (µs) Delay after each SPI transfer
+    // Enable this option and reduce the value to optimize screen updates.                 // 启用此选项并减小数值以优化屏幕刷新速度。
+    // The normal delay is 10µs. Use the lowest value that still gives a reliable display. // 默认延迟为 10µs（微秒）。使用能保证屏幕正常显示、不花屏、不闪烁的**最低稳定值**。
+    //#define DOGM_SPI_DELAY_US      5  // (µs) Delay after each SPI transfer              // 每次 SPI 通信传输后的延迟时间（单位：微秒 µs）
 
     //#define LIGHTWEIGHT_UI
     #if ENABLED(LIGHTWEIGHT_UI)
@@ -2711,35 +2732,39 @@
    * Status (Info) Screen customization
    * These options may affect code size and screen render time.
    * Custom status screens can forcibly override these settings.
+   * 
+   * 状态屏幕（信息屏幕）自定义设置
+   * 这些选项可能会影响固件体积和屏幕渲染速度。
+   * 自定义状态屏幕可以强制覆盖这些设置。
    */
-  //#define STATUS_COMBINE_HEATERS    // Use combined heater images instead of separate ones
-  //#define STATUS_HOTEND_NUMBERLESS  // Use plain hotend icons instead of numbered ones (with 2+ hotends)
-  #define STATUS_HOTEND_INVERTED      // Show solid nozzle bitmaps when heating (Requires STATUS_HOTEND_ANIM for numbered hotends)
-  #define STATUS_HOTEND_ANIM          // Use a second bitmap to indicate hotend heating
-  #define STATUS_BED_ANIM             // Use a second bitmap to indicate bed heating
-  #define STATUS_CHAMBER_ANIM         // Use a second bitmap to indicate chamber heating
-  //#define STATUS_CUTTER_ANIM        // Use a second bitmap to indicate spindle / laser active
-  //#define STATUS_COOLER_ANIM        // Use a second bitmap to indicate laser cooling
-  //#define STATUS_FLOWMETER_ANIM     // Use multiple bitmaps to indicate coolant flow
-  //#define STATUS_ALT_BED_BITMAP     // Use the alternative bed bitmap
-  //#define STATUS_ALT_FAN_BITMAP     // Use the alternative fan bitmap
-  //#define STATUS_FAN_FRAMES 3       // :[0,1,2,3,4] Number of fan animation frames
+  //#define STATUS_COMBINE_HEATERS    // Use combined heater images instead of separate ones                                       // 使用组合式加热图标，而非独立分开的图标
+  //#define STATUS_HOTEND_NUMBERLESS  // Use plain hotend icons instead of numbered ones (with 2+ hotends)                         // 使用简易热端图标，而非带数字编号的图标（适用于 2 个及以上喷头）
+  #define STATUS_HOTEND_INVERTED      // Show solid nozzle bitmaps when heating (Requires STATUS_HOTEND_ANIM for numbered hotends) // 加热时显示实心喷嘴图标（带编号的热端需同时开启 STATUS_HOTEND_ANIM 才能生效）
+  #define STATUS_HOTEND_ANIM          // Use a second bitmap to indicate hotend heating                                            // 使用第二组图标来表示热端（喷嘴）正在加热
+  #define STATUS_BED_ANIM             // Use a second bitmap to indicate bed heating                                               // 使用第二组图标来表示热床正在加热
+  #define STATUS_CHAMBER_ANIM         // Use a second bitmap to indicate chamber heating                                           // 使用第二组图标示意腔体正在加热
+  //#define STATUS_CUTTER_ANIM        // Use a second bitmap to indicate spindle / laser active                                    // 使用第二组图标来表示 主轴/激光器 处于工作状态
+  //#define STATUS_COOLER_ANIM        // Use a second bitmap to indicate laser cooling                                             // 使用第二组图标标识激光冷却状态
+  //#define STATUS_FLOWMETER_ANIM     // Use multiple bitmaps to indicate coolant flow                                             // 使用多组图标标识冷却液流动状态
+  //#define STATUS_ALT_BED_BITMAP     // Use the alternative bed bitmap                                                            // 启用备用样式的热床图标
+  //#define STATUS_ALT_FAN_BITMAP     // Use the alternative fan bitmap                                                            // 启用备用样式的风扇图标
+  //#define STATUS_FAN_FRAMES 3       // :[0,1,2,3,4] Number of fan animation frames                                               // :[0,1,2,3,4] 风扇动画帧数档位
 
-  // Only one STATUS_HEAT_* option can be enabled
-  //#define STATUS_HEAT_PERCENT       // Show heating in a progress bar
-  //#define STATUS_HEAT_POWER         // Show heater output power as a vertical bar
+  // Only one STATUS_HEAT_* option can be enabled                                    // 只能启用 **一个** STATUS_HEAT_* 类选项
+  //#define STATUS_HEAT_PERCENT       // Show heating in a progress bar              // 以进度条形式展示加热进程
+  //#define STATUS_HEAT_POWER         // Show heater output power as a vertical bar  // 以竖条柱状图显示加热器输出功率
 
 #endif // HAS_MARLINUI_U8GLIB
 
 #if HAS_MARLINUI_U8GLIB || IS_DWIN_MARLINUI
-  #define MENU_HOLLOW_FRAME           // Enable to save many cycles by drawing a hollow frame on Menu Screens
-  //#define OVERLAY_GFX_REVERSE       // Swap the CW/CCW indicators in the graphics overlay
+  #define MENU_HOLLOW_FRAME           // Enable to save many cycles by drawing a hollow frame on Menu Screens  // 菜单界面绘制空心边框，减少运算开销、节省运行周期
+  //#define OVERLAY_GFX_REVERSE       // Swap the CW/CCW indicators in the graphics overlay                    // 调换图形层里顺时针、逆时针转向标识
 
   // Frivolous Game Options
   //#define MARLIN_BRICKOUT
   //#define MARLIN_INVADERS
   //#define MARLIN_SNAKE
-  //#define GAMES_EASTER_EGG          // Add extra blank lines above the "Games" sub-menu
+  //#define GAMES_EASTER_EGG          // Add extra blank lines above the "Games" sub-menu                      // 在游戏子菜单上方增加空白行间距
 #endif
 
 //
