@@ -4603,8 +4603,30 @@
    *
    * Comment *_STALL_SENSITIVITY to disable sensorless homing for that axis.
    * @section tmc/stallguard
+   * 
+   * 使用 StallGuard （无传感器归位）功能 进行 X、Y、Z 轴的回零 / 探点
+   *
+   * 仅支持 TMC2130, TMC2160, TMC2209, TMC2240, TMC2660, TMC5130, TMC5160
+   * 需要将驱动的 DIAG1 引脚连接到 X/Y 限位开关引脚
+   * X、Y、Z 轴回零时，会强制使用 spreadCycle 模式（声音变大）
+   *
+   * X/Y/Z_STALL_SENSITIVITY 是堵转检测灵敏度
+   * 使用 M914 X Y Z 指令在运行时设置灵敏度：
+   *
+   *  灵敏度      TMC2209      其他驱动
+   *    最高        255         -64    (太灵敏 => 容易误触发)
+   *    最低         0           63    (太迟钝 => 无法触发)
+   *
+   * 推荐将 HOMING_BUMP_MM 设置为 { 0, 0, 0 }
+   *
+   * SPI_ENDSTOPS  *** 仅 TMC2130 / TMC2240 / TMC5160 支持 ***
+   * 通过 SPI 轮询驱动负载，无需 DIAG1 接线
+   *
+   * IMPROVE_HOMING_RELIABILITY 优化回零参数，提高可靠性
+   *
+   * 注释掉对应轴的 *_STALL_SENSITIVITY 即可关闭该轴无传感器归位
    */
-  //#define SENSORLESS_HOMING // StallGuard capable drivers only
+  //#define SENSORLESS_HOMING // StallGuard capable drivers only   // 仅适用于支持 StallGuard (无传感器归位）功能的驱动
 
   #if ANY(SENSORLESS_HOMING, SENSORLESS_PROBING)
     // TMC2209: 0...255. TMC2130: -64...63
@@ -4637,17 +4659,29 @@
    * Full step positions (128, 384, 640, 896) have the highest holding torque.
    *
    * Values from 0..1023, -1 to disable homing phase for that axis.
+   * 
+   * TMC 回零步进电机相位
+   *
+   * 通过回零到步进电机线圈最近的绝对相位位置，
+   * 提高回零的重复精度。
+   * Trinamic 驱动使用包含 1024 个值的步进相位表，
+   * 覆盖 4 个完整步进，每个步进 256 个位置（总共 1024 个位置）。
+   * 整步位置（128, 384, 640, 896）具有最大的保持扭矩。
+   *
+   * 取值范围 0..1023，设置为 -1 则关闭该轴的回零相位功能。
    */
    //#define TMC_HOME_PHASE { 896, 896, 896 }
 
   /**
-   * Step on both rising and falling edge signals (as with a square wave).
+   * Step on both rising and falling edge signals (as with a square wave).  // 在信号的上升沿和下降沿都执行步进（如同方波信号）
    */
   #define EDGE_STEPPING
 
   /**
    * Enable M122 debugging command for TMC stepper drivers.
    * M122 S0/1 will enable continuous reporting.
+   * 启用 TMC 步进驱动的 M122 调试命令。
+   * M122 S0/1 用于开启/关闭持续状态上报。
    */
   //#define TMC_DEBUG
 
@@ -4660,6 +4694,16 @@
    * #define TMC_ADV() { \
    *   stepperX.diag0_otpw(1); \
    *   stepperY.intpol(0); \
+   * 
+   * 你可以通过填写预定义函数来自定义高级设置。
+   * 可用函数列表请查看库的 GitHub 页面：
+   * https://github.com/teemuatlut/TMCStepper
+   *
+   * 示例：
+   * #define TMC_ADV() { \
+   *   stepperX.diag0_otpw(1); \
+   *   stepperY.intpol(0); \
+ 
    * }
    */
   #define TMC_ADV() {  }
