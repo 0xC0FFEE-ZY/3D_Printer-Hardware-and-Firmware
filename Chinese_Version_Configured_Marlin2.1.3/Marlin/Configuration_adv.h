@@ -3171,12 +3171,18 @@
   //#define NONLINEAR_EXTRUSION_DEFAULT_ON    // Enable if NLE should be ON by default   // 设置非线性挤出控制默认开启状态
 #endif
 
+
+//======================================= 调平相关设置 =========================================
 // @section leveling
 
 /**
  * Use Safe Bed Leveling coordinates to move axes to a useful position before bed probing.
  * For example, after homing a rotational axis the Z probe might not be perpendicular to the bed.
  * Choose values the orient the bed horizontally and the Z-probe vertically.
+ * 
+ * 启用安全调平坐标，探针检测前将轴移动至合适位置
+ * 旋转轴回零后，探针可能无法垂直贴合热床
+ * 设置参数使热床保持水平、探针垂直向下检测
  */
 //#define SAFE_BED_LEVELING_START_X 0.0
 //#define SAFE_BED_LEVELING_START_Y 0.0
@@ -3191,6 +3197,8 @@
 /**
  * Points to probe for all 3-point Leveling procedures.
  * Override if the automatically selected points are inadequate.
+ * 三点调平模式的检测采样点
+ * 自动点位效果不佳时可手动自定义设置
  */
 #if NEEDS_THREE_PROBE_POINTS
   //#define PROBE_PT_1 {  15, 180 }   // (mm) { x, y }
@@ -3216,6 +3224,17 @@
  * should the probe position be modified with M851XY then the
  * probe points will follow. This prevents any change from causing
  * the probe to be unable to reach any points.
+ * 
+ * 调平边界余量
+ *
+ * 可单独设定热床四边的探测边界偏移值
+ * 便于精准定位探测点位，也可规避单侧床板夹具
+ * 喷头兼作探针时支持负值，可在热床范围外探测
+ *
+ * 替换旧版点位参数参考：左侧、前侧数值可直接沿用
+ * 右侧、后侧需按床体尺寸换算反向数值
+ * 编译参数可保持点位一致，通过M851XY指令调整探针偏移后
+ * 探测点位会同步跟随变化，避免出现探测点位超出行程的问题
  */
 #if PROBE_SELECTED && !IS_KINEMATIC
   //#define PROBING_MARGIN_LEFT PROBING_MARGIN
@@ -3225,7 +3244,7 @@
 #endif
 
 #if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL)
-  // Override the mesh area if the automatic (max) area is too large
+  // Override the mesh area if the automatic (max) area is too large   // 当自动生成的最大网格区域过大时，使用此项手动覆盖网格区域
   //#define MESH_MIN_X MESH_INSET
   //#define MESH_MIN_Y MESH_INSET
   //#define MESH_MAX_X X_BED_SIZE - (MESH_INSET)
@@ -3233,12 +3252,15 @@
 #endif
 
 #if ALL(AUTO_BED_LEVELING_UBL, EEPROM_SETTINGS)
-  //#define OPTIMIZED_MESH_STORAGE  // Store mesh with less precision to save EEPROM space
+  //#define OPTIMIZED_MESH_STORAGE  // Store mesh with less precision to save EEPROM space   // 使用较低精度存储网格数据，以节省 EEPROM 空间
 #endif
 
 /**
  * Repeatedly attempt G29 leveling until it succeeds.
  * Stop after G29_MAX_RETRIES attempts.
+ * 
+ * 自动重试调平操作，直至探测成功
+ * 达到最大重试次数后停止尝试
  */
 //#define G29_RETRY_AND_RECOVER
 #if ENABLED(G29_RETRY_AND_RECOVER)
@@ -3247,6 +3269,11 @@
   /**
    * Specify the GCODE commands that will be executed when leveling succeeds,
    * between attempts, and after the maximum number of retries have been tried.
+   * 
+   * 指定在以下场景时执行的自定义 GCode 指令：
+   * 1. 调平成功时
+   * 2. 每次重试之间
+   * 3. 达到最大重试次数后（调平最终失败）
    */
   #define G29_SUCCESS_COMMANDS "M117 Bed leveling done."
   #define G29_RECOVER_COMMANDS "M117 Probe failed. Rewiping.\nG28\nG12 P0 S12 T0"
@@ -3254,6 +3281,8 @@
 
 #endif
 
+
+// 探针配置区
 // @section probes
 
 /**
@@ -3265,59 +3294,87 @@
  * (Extruder temperature/offset values must be calibrated manually.)
  * Use M871 to set temperature/offset values manually.
  * For more details see https://marlinfw.org/docs/features/probe_temp_compensation.html
+ * 
+ * 热探针补偿功能
+ *
+ * 根据探针、热床、/ 或喷头的温度，
+ * 自动修正探针测量的高度偏差，消除温度带来的测量误差。
+ *
+ * 可使用 G76 指令自动校准探针与热床的温度补偿参数。
+ * （喷头温度与偏移量必须手动校准）
+ * 可使用 M871 指令手动设置温度/偏移参数。
+ *
+ * 详细说明见：https://marlinfw.org/docs/features/probe_temp_compensation.html
+ * 
+ * 
+ * （译者注：）
+ * 这是高精度打印的温度补偿功能：
+ * 很多探针（如 BLTouch、电感、电容）温度变了，测量高度就会飘
+ * 热床加热、喷头加热 → 探针受热 → Z 高度不准 → 打印第一层不平
+ * 开启后，打印机会根据温度自动修正 Z 值，让第一层稳定
  */
-//#define PTC_PROBE    // Compensate based on probe temperature
-//#define PTC_BED      // Compensate based on bed temperature
-//#define PTC_HOTEND   // Compensate based on hotend temperature
+//#define PTC_PROBE    // Compensate based on probe temperature   // 基于探针自身温度进行补偿
+//#define PTC_BED      // Compensate based on bed temperature     // 基于热床温度进行补偿
+//#define PTC_HOTEND   // Compensate based on hotend temperature  // 基于喷头（热端）温度进行补偿
 
 #if ANY(PTC_PROBE, PTC_BED, PTC_HOTEND)
   /**
    * If the probe is outside the defined range, use linear extrapolation with the closest
    * point and the point with index PTC_LINEAR_EXTRAPOLATION. e.g., If set to 4 it will use the
    * linear extrapolation between data[0] and data[4] for values below PTC_PROBE_START.
+   * 
+   * 当探针温度超出预设校准范围时，使用最近点 + 指定索引点做线性外推计算
+   * 示例：若设置为 4，则低于校准起始温度时，使用 data[0] 与 data[4] 两点进行外推补偿
    */
   //#define PTC_LINEAR_EXTRAPOLATION 4
 
   #if ENABLED(PTC_PROBE)
     // Probe temperature calibration generates a table of values starting at PTC_PROBE_START
     // (e.g., 30), in steps of PTC_PROBE_RES (e.g., 5) with PTC_PROBE_COUNT (e.g., 10) samples.
+    // 探针温度校准会生成一张数值表
+    // 起始温度：PTC_PROBE_START（例如 30℃）
+    // 温度步长：PTC_PROBE_RES（例如 5℃）
+    // 采样点数：PTC_PROBE_COUNT（例如 10 个点）
     #define PTC_PROBE_START   30    // (°C)
     #define PTC_PROBE_RES      5    // (°C)
     #define PTC_PROBE_COUNT   10
-    #define PTC_PROBE_ZOFFS   { 0 } // (µm) Z adjustments per sample
+    #define PTC_PROBE_ZOFFS   { 0 } // (µm) Z adjustments per sample  // (微米) 每个采样点的 Z 轴补偿值
   #endif
 
   #if ENABLED(PTC_BED)
-    // Bed temperature calibration builds a similar table.
+    // Bed temperature calibration builds a similar table.            // 热床温度校准会生成一张结构相同的补偿数据表
     #define PTC_BED_START     60    // (°C)
     #define PTC_BED_RES        5    // (°C)
     #define PTC_BED_COUNT     10
-    #define PTC_BED_ZOFFS     { 0 } // (µm) Z adjustments per sample
+    #define PTC_BED_ZOFFS     { 0 } // (µm) Z adjustments per sample  // (微米) 每个采样点的 Z 轴补偿值
   #endif
 
   #if ENABLED(PTC_HOTEND)
-    // Note: There is no automatic calibration for the hotend. Use M871.
+    // Note: There is no automatic calibration for the hotend. Use M871. // 注意：热端（喷头）温度补偿不支持自动校准，必须使用 M871 指令手动设置
     #define PTC_HOTEND_START 180    // (°C)
     #define PTC_HOTEND_RES     5    // (°C)
     #define PTC_HOTEND_COUNT  20
-    #define PTC_HOTEND_ZOFFS  { 0 } // (µm) Z adjustments per sample
+    #define PTC_HOTEND_ZOFFS  { 0 } // (µm) Z adjustments per sample  // (微米) 每个采样点的 Z 轴补偿值
   #endif
 
   // G76 options
   #if ALL(PTC_PROBE, PTC_BED)
-    // Park position to wait for probe cooldown
+    // Park position to wait for probe cooldown  // 探针冷却等待停靠位置
     #define PTC_PARK_POS   { 0, 0, 100 }
 
-    // Probe position to probe and wait for probe to reach target temperature
-    //#define PTC_PROBE_POS  { 12.0f, 7.3f } // Example: MK52 magnetic heatbed
+    // Probe position to probe and wait for probe to reach target temperature       // 探测定位点位，在此等待探针温度达标
+    //#define PTC_PROBE_POS  { 12.0f, 7.3f } // Example: MK52 magnetic heatbed      // 示例：MK52磁吸热床
     #define PTC_PROBE_POS  { 90, 100 }
 
     // The temperature the probe should be at while taking measurements during
-    // bed temperature calibration.
+    // bed temperature calibration.                                                 // 热床校准时，探针需达到的测量温度
     #define PTC_PROBE_TEMP    30  // (°C)
 
     // Height above Z=0.0 to raise the nozzle. Lowering this can help the probe to heat faster.
     // Note: The Z=0.0 offset is determined by the probe Z offset (e.g., as set with M851 Z).
+    // 喷头抬升高度（相对于 Z=0.0 的位置）
+    // 降低此值可以让探针更快被加热
+    // 注意：Z=0.0 基准由探针 Z 偏移量决定（例如通过 M851 Z 设置）
     #define PTC_PROBE_HEATING_OFFSET 0.5  // (mm)
   #endif
 #endif // PTC_PROBE || PTC_BED || PTC_HOTEND
