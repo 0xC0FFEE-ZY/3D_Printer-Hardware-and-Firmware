@@ -3731,6 +3731,12 @@
  *   'M106 P<fan> T3-255' : Set a secondary speed for <fan>
  *   'M106 P<fan> T2'     : Use the set secondary speed
  *   'M106 P<fan> T1'     : Restore the previous fan speed
+ * 
+ * 额外风扇转速
+ * 为每个打印冷却风扇增加一个备用转速档位。
+ *   'M106 P<风扇编号> T3-255' ：设置该风扇的备用转速
+ *   'M106 P<风扇编号> T2'     ：启用备用转速
+ *   'M106 P<风扇编号> T1'     ：恢复原来的风扇转速
  */
 //#define EXTRA_FAN_SPEED
 
@@ -3749,24 +3755,37 @@
  * Be sure to turn off auto-retract during filament change.
  *
  * Note that M207 / M208 / M209 settings are saved to EEPROM.
+ * 
+ * 基于固件 & 由LCD控制的回抽（退料）功能
+ *
+ * 添加 G10 / G11 指令，用于自动执行固件级回抽 / 回抽恢复
+ * 使用 M207 和 M208 来设置回抽 / 恢复的参数
+ *
+ * 使用 M209 开启或关闭自动回抽
+ * 开启自动回抽后，所有在设定范围内的 G1 E 挤出移动
+ * 都会被转换为固件级的回抽 / 恢复动作
+ *
+ * 更换耗材时，请务必关闭自动回抽
+ *
+ * 注意：M207 / M208 / M209 的设置会被保存到 EEPROM
  */
 //#define FWRETRACT
 #if ENABLED(FWRETRACT)
-  #define FWRETRACT_AUTORETRACT             // Override slicer retractions
+  #define FWRETRACT_AUTORETRACT             // Override slicer retractions         // 覆盖（替换）切片软件生成的回抽指令
   #if ENABLED(FWRETRACT_AUTORETRACT)
-    #define MIN_AUTORETRACT             0.1 // (mm) Don't convert E moves under this length
-    #define MAX_AUTORETRACT            10.0 // (mm) Don't convert E moves over this length
+    #define MIN_AUTORETRACT             0.1 // (mm) Don't convert E moves under this length   // (毫米) 小于此长度的 E 轴移动，不转换为固件回抽
+    #define MAX_AUTORETRACT            10.0 // (mm) Don't convert E moves over this length    // (毫米) 超过此长度的 E 轴移动，不转换为固件回抽
   #endif
-  #define RETRACT_LENGTH                3   // (mm) Default retract length (positive value)
-  #define RETRACT_LENGTH_SWAP          13   // (mm) Default swap retract length (positive value)
-  #define RETRACT_FEEDRATE             45   // (mm/s) Default feedrate for retracting
-  #define RETRACT_ZRAISE                0   // (mm) Default retract Z-raise
-  #define RETRACT_RECOVER_LENGTH        0   // (mm) Default additional recover length (added to retract length on recover)
-  #define RETRACT_RECOVER_LENGTH_SWAP   0   // (mm) Default additional swap recover length (added to retract length on recover from toolchange)
-  #define RETRACT_RECOVER_FEEDRATE      8   // (mm/s) Default feedrate for recovering from retraction
-  #define RETRACT_RECOVER_FEEDRATE_SWAP 8   // (mm/s) Default feedrate for recovering from swap retraction
+  #define RETRACT_LENGTH                3   // (mm) Default retract length (positive value)   // (毫米) 默认回抽长度（请使用正数）
+  #define RETRACT_LENGTH_SWAP          13   // (mm) Default swap retract length (positive value)  // (毫米) 默认交换回抽长度（使用正值）
+  #define RETRACT_FEEDRATE             45   // (mm/s) Default feedrate for retracting             // (毫米/秒) 默认回抽速度
+  #define RETRACT_ZRAISE                0   // (mm) Default retract Z-raise                       // (毫米) 回抽同步Z轴抬升高度
+  #define RETRACT_RECOVER_LENGTH        0   // (mm) Default additional recover length (added to retract length on recover)                       // (毫米) 默认额外恢复长度（恢复时，在回抽长度基础上额外增加的长度）
+  #define RETRACT_RECOVER_LENGTH_SWAP   0   // (mm) Default additional swap recover length (added to retract length on recover from toolchange)  // (毫米) 切换喷头后的额外恢复长度（在回抽长度基础上额外增加）
+  #define RETRACT_RECOVER_FEEDRATE      8   // (mm/s) Default feedrate for recovering from retraction                                            // (毫米/秒) 回抽恢复（补料）的默认速度
+  #define RETRACT_RECOVER_FEEDRATE_SWAP 8   // (mm/s) Default feedrate for recovering from swap retraction                                       // (毫米/秒) 切换喷头后回抽恢复的默认补料速度
   #if ENABLED(MIXING_EXTRUDER)
-    //#define RETRACT_SYNC_MIXING           // Retract and restore all mixing steppers simultaneously
+    //#define RETRACT_SYNC_MIXING           // Retract and restore all mixing steppers simultaneously   // 同步回抽与复位所有混色挤出步进电机
   #endif
 #endif
 
@@ -3775,61 +3794,75 @@
 /**
  * Universal tool change settings.
  * Applies to all types of extruders except where explicitly noted.
+ * 
+ * 通用喷头切换设置。
+ * 适用于所有类型的挤出机，除非有特别注明。
  */
 #if HAS_MULTI_EXTRUDER
-  // Z raise distance for tool-change, as needed for some extruders
+  // Z raise distance for tool-change, as needed for some extruders     // 切换喷头时Z轴抬升高度，部分挤出机构需此项设置
   #define TOOLCHANGE_ZRAISE                 2 // (mm)
-  //#define TOOLCHANGE_ZRAISE_BEFORE_RETRACT  // Apply raise before swap retraction (if enabled)
-  //#define TOOLCHANGE_NO_RETURN              // Never return to previous position on tool-change
+  //#define TOOLCHANGE_ZRAISE_BEFORE_RETRACT  // Apply raise before swap retraction (if enabled)    // 切换回抽前先执行Z轴抬升（功能开启时生效）
+  //#define TOOLCHANGE_NO_RETURN              // Never return to previous position on tool-change   // 切换喷头后不回归原先坐标位置
   #if ENABLED(TOOLCHANGE_NO_RETURN)
-    //#define EVENT_GCODE_AFTER_TOOLCHANGE "G12X"   // Extra G-code to run after tool-change
+    //#define EVENT_GCODE_AFTER_TOOLCHANGE "G12X"   // Extra G-code to run after tool-change        // 喷头切换完成后额外执行的G代码
   #endif
 
   /**
    * Extra G-code to run while executing tool-change commands. Can be used to use an additional
    * stepper motor (e.g., I axis in Configuration.h) to drive the tool-changer.
+   * 
+   * 执行喷头切换指令时，额外运行的自定义G代码。
+   * 可用于驱动额外的步进电机（例如 Configuration.h 中的 I 轴）
+   * 来控制自动换刀/换头装置。
    */
-  //#define EVENT_GCODE_TOOLCHANGE_T0 "G28 A\nG1 A0"  // Extra G-code to run while executing tool-change command T0
-  //#define EVENT_GCODE_TOOLCHANGE_T1 "G1 A10"        // Extra G-code to run while executing tool-change command T1
-  //#define EVENT_GCODE_TOOLCHANGE_ALWAYS_RUN         // Always execute above G-code sequences. Use with caution!
+  //#define EVENT_GCODE_TOOLCHANGE_T0 "G28 A\nG1 A0"  // Extra G-code to run while executing tool-change command T0  // 执行T0喷头切换指令时额外运行的G代码
+  //#define EVENT_GCODE_TOOLCHANGE_T1 "G1 A10"        // Extra G-code to run while executing tool-change command T1  // 执行T1喷头切换指令时额外运行的G代码
+  //#define EVENT_GCODE_TOOLCHANGE_ALWAYS_RUN         // Always execute above G-code sequences. Use with caution!    // 始终执行上述G代码序列，谨慎启用！
 
   /**
    * Consider coordinates for EVENT_GCODE_TOOLCHANGE_Tx as relative to T0
    * so that moves in the specified axes are the same for all tools.
+   * 
+   * 将换头事件G代码（EVENT_GCODE_TOOLCHANGE_Tx）的坐标视为相对于 T0 喷头
+   * 使所有喷头在指定轴上的移动行为保持一致
    */
-  //#define TC_GCODE_USE_GLOBAL_X   // Use X position relative to Tool 0
-  //#define TC_GCODE_USE_GLOBAL_Y   // Use Y position relative to Tool 0
-  //#define TC_GCODE_USE_GLOBAL_Z   // Use Z position relative to Tool 0
+  //#define TC_GCODE_USE_GLOBAL_X   // Use X position relative to Tool 0  // X轴位置使用相对于 0 号喷头（T0）的坐标
+  //#define TC_GCODE_USE_GLOBAL_Y   // Use Y position relative to Tool 0  // Y轴位置使用相对于 0 号喷头（T0）的坐标
+  //#define TC_GCODE_USE_GLOBAL_Z   // Use Z position relative to Tool 0  // Z轴位置使用相对于 0 号喷头（T0）的坐标
 
   /**
    * Tool Sensors detect when tools have been picked up or dropped.
    * Requires the pins TOOL_SENSOR1_PIN, TOOL_SENSOR2_PIN, etc.
+   * 
+   * 工具传感器用于检测喷头抓取与释放状态
+   * 需要配置TOOL_SENSOR1_PIN、TOOL_SENSOR2_PIN等引脚
    */
   //#define TOOL_SENSOR
 
   /**
    * Retract and prime filament on tool-change to reduce
    * ooze and stringing and to get cleaner transitions.
+   * 切换喷头时回缩并预挤出耗材，减少拉丝溢料，提升换料过渡效果
    */
   //#define TOOLCHANGE_FILAMENT_SWAP
   #if ENABLED(TOOLCHANGE_FILAMENT_SWAP)
-    // Load / Unload
-    #define TOOLCHANGE_FS_LENGTH              12  // (mm) Load / Unload length
-    #define TOOLCHANGE_FS_EXTRA_RESUME_LENGTH  0  // (mm) Extra length for better restart. Adjust with LCD or M217 B.
-    #define TOOLCHANGE_FS_RETRACT_SPEED   (50*60) // (mm/min) (Unloading)
-    #define TOOLCHANGE_FS_UNRETRACT_SPEED (25*60) // (mm/min) (On SINGLENOZZLE or Bowden loading must be slowed down)
+    // Load / Unload                              // 进料 / 退料 相关参数
+    #define TOOLCHANGE_FS_LENGTH              12  // (mm) Load / Unload length                                        // (毫米) 耗材装入 / 退出长度
+    #define TOOLCHANGE_FS_EXTRA_RESUME_LENGTH  0  // (mm) Extra length for better restart. Adjust with LCD or M217 B. //（毫米）补料余量，优化重启出料效果，可通过屏幕或M217 B指令调整
+    #define TOOLCHANGE_FS_RETRACT_SPEED   (50*60) // (mm/min) (Unloading)                                             // (毫米/分钟) 退料速度（卸载耗材）
+    #define TOOLCHANGE_FS_UNRETRACT_SPEED (25*60) // (mm/min) (On SINGLENOZZLE or Bowden loading must be slowed down) // (毫米/分钟) 进料速度    (单喷嘴机型 或 鲍登管结构 必须降低进料速度)
 
-    // Longer prime to clean out a SINGLENOZZLE
+    // Longer prime to clean out a SINGLENOZZLE   // 加长预挤出行程，清理单喷嘴残留耗材
     #define TOOLCHANGE_FS_EXTRA_PRIME          0  // (mm) Extra priming length
     #define TOOLCHANGE_FS_PRIME_SPEED    (4.6*60) // (mm/min) Extra priming feedrate
     #define TOOLCHANGE_FS_WIPE_RETRACT         0  // (mm) Cutting retraction out of park, for less stringing, better wipe, etc. Adjust with LCD or M217 G.
 
-    // Cool after prime to reduce stringing
+    // Cool after prime to reduce stringing       // 预挤出后冷却喷嘴，减少拉丝
     #define TOOLCHANGE_FS_FAN                 -1  // Fan index or -1 to skip
     #define TOOLCHANGE_FS_FAN_SPEED          255  // 0-255
     #define TOOLCHANGE_FS_FAN_TIME            10  // (seconds)
 
-    // Use TOOLCHANGE_FS_PRIME_SPEED feedrate the first time each extruder is primed
+    // Use TOOLCHANGE_FS_PRIME_SPEED feedrate the first time each extruder is primed   // 每个挤出机首次预挤出时，使用 TOOLCHANGE_FS_PRIME_SPEED 设定的进给速度
     //#define TOOLCHANGE_FS_SLOW_FIRST_PRIME
 
     /**
@@ -3838,6 +3871,13 @@
      * If disabled, no priming on T0 until switching back to T0 from another extruder:
      *  [ Power-On -> T0 { T0 Activated } -> T1 { Activate & Prime T1 } -> T0 { Retract T1, Activate & Prime T0 } ]
      * Enable with M217 V1 before printing to avoid unwanted priming on host connect.
+     * 
+     * 首次发送 T0 指令到打印机时，对 T0 喷头进行预挤出（Prime）：
+     *  【开机 -> T0 { 激活并预挤出 T0 } -> T1 { 回抽 T0，激活并预挤出 T1 }】
+     * 如果禁用：
+     *  从其他挤出机切回 T0 之前，T0 不会执行预挤出
+     *  【开机 -> T0 { 仅激活 T0 } -> T1 { 激活并预挤出 T1 } -> T0 { 回抽 T1，激活并预挤出 T0 }】
+     * 打印前可用 M217 V1 启用，避免连接主机时产生不必要的预挤出动作
      */
     //#define TOOLCHANGE_FS_PRIME_FIRST_USED
 
@@ -3850,6 +3890,15 @@
      *   - Change filament color without interruption
      *   - Switch spools automatically on filament runout
      *   - Switch to a different nozzle on an extruder jam
+     * 
+     * 工具切换迁移功能
+     * 该功能提供G代码和屏幕菜单选项，支持打印中途切换喷头/工具
+     * 切换时会自动迁移所有相关的喷头参数，确保打印可无缝继续
+     * 要求各喷头/工具参数高度匹配，且可能存在其他使用限制
+     * 适用场景：
+     *   - 不中断打印更换耗材颜色
+     *   - 耗材断料时自动切换线轴
+     *   - 挤出机堵头时切换到备用喷嘴
      */
     #define TOOLCHANGE_MIGRATION_FEATURE
     #if ENABLED(TOOLCHANGE_MIGRATION_FEATURE)
@@ -3857,13 +3906,17 @@
       // By default tool migration uses regular toolchange settings.
       // With a prime tower, tool-change swapping/priming occur inside the bed.
       // When migrating to a new unprimed tool you can set override values below.
+      // 覆盖工具切换参数
+      // 默认情况下，工具迁移功能使用常规的工具切换设置。
+      // 使用打印塔（Prime Tower）时，工具切换、换料、预挤出会在打印平台区域内完成。
+      // 当切换到一个未进行过预挤出的新工具时，你可以在下方设置覆盖值。
       //#define MIGRATION_ZRAISE            0 // (mm)
 
       // Longer prime to clean out
-      //#define MIGRATION_FS_EXTRA_PRIME    0 // (mm) Extra priming length
-      //#define MIGRATION_FS_WIPE_RETRACT   0 // (mm) Retract before cooling for less stringing, better wipe, etc.
+      //#define MIGRATION_FS_EXTRA_PRIME    0 // (mm) Extra priming length                                         //（毫米）额外预挤出长度
+      //#define MIGRATION_FS_WIPE_RETRACT   0 // (mm) Retract before cooling for less stringing, better wipe, etc. //（毫米）冷却前回抽耗材，减少拉丝、提升抹料效果
 
-      // Cool after prime to reduce stringing
+      // Cool after prime to reduce stringing                   // 预挤出后降温，削减拉丝现象
       //#define MIGRATION_FS_FAN_SPEED    255 // 0-255
       //#define MIGRATION_FS_FAN_TIME       0 // (seconds)
     #endif
@@ -3872,15 +3925,18 @@
   /**
    * Position to park head during tool change.
    * Doesn't apply to SWITCHING_TOOLHEAD, DUAL_X_CARRIAGE, or PARKING_EXTRUDER
+   * 
+   * 换刀时机头停靠位置
+   * 不适用于可切换喷头、双X轴滑座、可收纳挤出机机型
    */
   //#define TOOLCHANGE_PARK
   #if ENABLED(TOOLCHANGE_PARK)
     #define TOOLCHANGE_PARK_XY    { X_MIN_POS + 10, Y_MIN_POS + 10 }
     #define TOOLCHANGE_PARK_XY_FEEDRATE 6000  // (mm/min)
-    //#define TOOLCHANGE_PARK_X_ONLY          // X axis only move
-    //#define TOOLCHANGE_PARK_Y_ONLY          // Y axis only move
+    //#define TOOLCHANGE_PARK_X_ONLY          // X axis only move  // 仅沿 X 轴移动
+    //#define TOOLCHANGE_PARK_Y_ONLY          // Y axis only move  // 仅沿 Y 轴移动
     #if ENABLED(TOOLCHANGE_MIGRATION_FEATURE)
-      //#define TOOLCHANGE_MIGRATION_DO_PARK  // Force park (or no-park) on migration
+      //#define TOOLCHANGE_MIGRATION_DO_PARK  // Force park (or no-park) on migration  // 工具迁移时强制停靠（或不停靠）喷头
     #endif
   #endif
 #endif // HAS_MULTI_EXTRUDER
