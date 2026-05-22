@@ -2038,31 +2038,34 @@
 //===========================================================================
 //=============================Additional Features===========================
 //===========================================================================
+// 附加功能 / 扩展功能区
 
+
+//============================================ 显示屏配置板块 ===============================================
 // @section lcd
 
 #if HAS_MANUAL_MOVE_MENU
-  #define MANUAL_FEEDRATE { 50*60, 50*60, 4*60, 2*60 } // (mm/min) Feedrates for manual moves along X, Y, Z, E from panel
-  #define FINE_MANUAL_MOVE 0.025    // (mm) Smallest manual move (< 0.1mm) applying to Z on most machines
+  #define MANUAL_FEEDRATE { 50*60, 50*60, 4*60, 2*60 } // (mm/min) Feedrates for manual moves along X, Y, Z, E from panel // (mm/min) 从操作面板手动移动 X、Y、Z、E 轴的速度
+  #define FINE_MANUAL_MOVE 0.025    // (mm) Smallest manual move (< 0.1mm) applying to Z on most machines                 // (mm) 手动模式下最小移动距离 (< 0.1mm)，大多数机器仅对 Z 轴生效
   #if IS_ULTIPANEL
-    #define MANUAL_E_MOVES_RELATIVE // Display extruder move distance rather than "position"
-    #define ULTIPANEL_FEEDMULTIPLY  // Encoder sets the feedrate multiplier on the Status Screen
-    //#define ULTIPANEL_FLOWPERCENT // Encoder sets the flow percentage on the Status Screen
+    #define MANUAL_E_MOVES_RELATIVE // Display extruder move distance rather than "position"      // 显示挤出机的移动距离，而非“绝对坐标位置”（开启后显示相对位置，关闭后显示绝对位置）
+    #define ULTIPANEL_FEEDMULTIPLY  // Encoder sets the feedrate multiplier on the Status Screen  // 旋钮可在状态屏幕直接调整【打印速度倍率】
+    //#define ULTIPANEL_FLOWPERCENT // Encoder sets the flow percentage on the Status Screen      // 旋钮可在状态屏幕直接调整【挤出流量/出料百分比】
   #endif
 #endif
 
-// Change values more rapidly when the encoder is rotated faster
+// Change values more rapidly when the encoder is rotated faster                     // 旋钮转动越快，参数数值变化幅度越大
 #define ENCODER_RATE_MULTIPLIER
 #if ENABLED(ENCODER_RATE_MULTIPLIER)
-  #define ENCODER_10X_STEPS_PER_SEC   30  // (steps/s) Encoder rate for 10x speed
-  #define ENCODER_100X_STEPS_PER_SEC  80  // (steps/s) Encoder rate for 100x speed
+  #define ENCODER_10X_STEPS_PER_SEC   30  // (steps/s) Encoder rate for 10x speed    // (步/秒) 旋钮十倍速调节触发阈值
+  #define ENCODER_100X_STEPS_PER_SEC  80  // (steps/s) Encoder rate for 100x speed   // (步/秒) 旋钮百倍速调节触发阈值
 #endif
 
-// Play a beep when the feedrate is changed from the Status Screen
+// Play a beep when the feedrate is changed from the Status Screen                   // 在状态界面调整打印速度时，蜂鸣器发出提示音
 //#define BEEP_ON_FEEDRATE_CHANGE
 #if ENABLED(BEEP_ON_FEEDRATE_CHANGE)
-  #define FEEDRATE_CHANGE_BEEP_DURATION   10
-  #define FEEDRATE_CHANGE_BEEP_FREQUENCY 440
+  #define FEEDRATE_CHANGE_BEEP_DURATION   10   // 提示音时长
+  #define FEEDRATE_CHANGE_BEEP_FREQUENCY 440   // 提示音频率
 #endif
 
 /**
@@ -2073,6 +2076,14 @@
  *  - Measures the bed height at the configured position with the probe.
  *  - Moves the nozzle to the same position for a "paper" measurement.
  *  - The difference is used to set the probe Z offset.
+
+ * 探针偏移校准向导
+ * 在显示屏菜单新增探针Z轴偏移校准选项
+ * 借助该功能可精准获取M851 Z探针偏移参数
+ * 启动后自动完成校准流程：
+ * - 探针在指定点位测量热床高度
+ * - 打印嘴移动至同位置，以纸片法手动校验间隙
+ * - 依据高度差值自动设定探针Z轴偏移值
  */
 #if HAS_BED_PROBE && ANY(HAS_MARLINUI_MENU, HAS_TFT_LVGL_UI)
   //#define PROBE_OFFSET_WIZARD
@@ -2081,10 +2092,14 @@
      * Enable to init the Probe Z-Offset when starting the Wizard.
      * Use a height slightly above the estimated nozzle-to-probe Z offset.
      * For example, with an offset of -5, consider a starting height of -4.
+
+     * 开启后，启动校准向导时初始化探针Z轴偏移值
+     * 初始高度取值略高于预估的喷嘴与探针Z向偏移量
+     * 示例：实际偏移为-5时，初始高度可设为-4
      */
     //#define PROBE_OFFSET_WIZARD_START_Z -4.0
 
-    // Set a convenient position to do the calibration (probing point and nozzle/bed-distance)
+    // Set a convenient position to do the calibration (probing point and nozzle/bed-distance)  // 设置校准点位（探针检测与喷嘴测间隙共用位置）
     //#define PROBE_OFFSET_WIZARD_XY_POS { X_CENTER, Y_CENTER }
   #endif
 #endif
@@ -2093,30 +2108,33 @@
 
   #if HAS_BED_PROBE
 
-    // Show Deploy / Stow Probe options in the Motion menu.
+    // Show Deploy / Stow Probe options in the Motion menu.                                // 在运动菜单显示探针伸出/收回操作选项
     #define PROBE_DEPLOY_STOW_MENU
 
-    // Add calibration in the Probe Offsets menu to compensate for X-axis twist.
+    // Add calibration in the Probe Offsets menu to compensate for X-axis twist.           // 在探针偏移菜单添加校准项，用于补偿X轴形变偏差
     //#define X_AXIS_TWIST_COMPENSATION
     #if ENABLED(X_AXIS_TWIST_COMPENSATION)
       /**
        * Enable to init the Probe Z-Offset when starting the Wizard.
        * Use a height slightly above the estimated nozzle-to-probe Z offset.
        * For example, with an offset of -5, consider a starting height of -4.
+       * 启用此项可在启动校准向导时自动初始化探针 Z 偏移值
+       * 初始值请设置为**略高于**你预估的喷嘴 - 探针 Z 偏移量
+       * 示例：若实际偏移值为 -5，建议初始高度设为 -4
        */
       #define XATC_START_Z 0.0
-      #define XATC_MAX_POINTS 3             // Number of points to probe in the wizard
-      #define XATC_Y_POSITION Y_CENTER      // (mm) Y position to probe
-      #define XATC_Z_OFFSETS { 0, 0, 0 }    // Z offsets for X axis sample points
+      #define XATC_MAX_POINTS 3             // Number of points to probe in the wizard    // 校准向导中使用的探针采样点数（译者注）：这个参数设置 Z 轴偏移校准向导 会用多少个点去测量热床，然后取平均值计算最终的 Z 偏移。
+      #define XATC_Y_POSITION Y_CENTER      // (mm) Y position to probe                   // (mm) 探针采样的 Y 轴坐标位置（译者注）：这个参数用来设置自动调平探针在进行测量时，移动到的Y 轴坐标点。
+      #define XATC_Z_OFFSETS { 0, 0, 0 }    // Z offsets for X axis sample points         // X 轴采样点对应的 Z 轴偏移量
     #endif
 
   #endif
 
-  // Include a page of printer information in the LCD Main Menu
+  // Include a page of printer information in the LCD Main Menu                                    // 在液晶主菜单中加入打印机信息页面
   //#define LCD_INFO_MENU
   #if ENABLED(LCD_INFO_MENU)
-    //#define LCD_PRINTER_INFO_IS_BOOTSCREEN // Show bootscreen(s) instead of Printer Info pages
-    //#define BUILD_INFO_MENU_ITEM           // Add a menu item to display the build date and time
+    //#define LCD_PRINTER_INFO_IS_BOOTSCREEN // Show bootscreen(s) instead of Printer Info pages   // 开机展示启动画面，替代打印机信息页面
+    //#define BUILD_INFO_MENU_ITEM           // Add a menu item to display the build date and time // 在菜单中添加一项，用于显示固件编译的日期与时间
   #endif
 
   /**
@@ -2124,6 +2142,10 @@
    * Values are displayed as-defined, so always use plain numbers here.
    * Axis moves <= 1/2 the axis length and Extruder moves <= EXTRUDE_MAXLENGTH
    * will be shown in the move submenus.
+   * MarlinUI “移动轴”菜单的移动距离。用逗号分隔的列表。
+   * 数值会按定义直接显示，因此这里必须使用纯数字。
+   * 轴移动距离 <= 轴长度的 1/2，挤出机移动距离 <= EXTRUDE_MAXLENGTH
+   * 才会在移动子菜单中显示。
    */
 
   #define MANUAL_MOVE_DISTANCE_MM                    10, 1.0, 0.1  // (mm)
@@ -2135,26 +2157,26 @@
   //#define MANUAL_MOVE_DISTANCE_IN          1.000, 0.500, 0.100, 0.010, 0.001  // (in)
   //#define MANUAL_MOVE_DISTANCE_IN   5.000, 1.000, 0.500, 0.100, 0.010, 0.001  // (in)
 
-  // Manual move distances for rotational axes
+  // Manual move distances for rotational axes                                      // 旋转轴的手动移动距离（快捷移动步距）
   #define MANUAL_MOVE_DISTANCE_DEG             90, 45, 22.5, 5, 1  // (°)
 
-  // BACK menu items keep the highlight at the top
+  // BACK menu items keep the highlight at the top                                  // 返回（BACK）菜单项会保持高亮选中状态在顶部
   //#define TURBO_BACK_MENU_ITEM
 
-  // BACK menu items show "Back" instead of the previous menu name
+  // BACK menu items show "Back" instead of the previous menu name                  // 返回菜单项显示 "Back" 文字，而不是上一级菜单的名称
   //#define GENERIC_BACK_MENU_ITEM
 
-  // Insert a menu for preheating at the top level to allow for quick access
+  // Insert a menu for preheating at the top level to allow for quick access        // 在一级菜单嵌入预热选项，方便快速调用
   //#define PREHEAT_SHORTCUT_MENU_ITEM
 
-  // Add Configuration > Debug Menu > Endstop Test for endstop/probe/runout testing
+  // Add Configuration > Debug Menu > Endstop Test for endstop/probe/runout testing // 在配置-调试菜单添加限位开关测试项，可检测限位、探针、断料传感器
   //#define LCD_ENDSTOP_TEST
 
 #endif // HAS_MARLINUI_MENU
 
 #if HAS_DISPLAY
   /**
-   * *** VENDORS PLEASE READ ***
+   * *** VENDORS PLEASE READ ***   // 厂商须知
    *
    * Marlin allows you to add a custom boot image for Graphical LCDs.
    * With this option Marlin will first show your custom screen followed
@@ -2162,122 +2184,127 @@
    *
    * We encourage you to take advantage of this new feature and we also
    * respectfully request that you retain the unmodified Marlin boot screen.
+   * Marlin支持为图形液晶屏幕添加自定义开机画面
+   * 开启后会先展示自定义画面，再显示默认Marlin标识、版本号与官网地址
+   * 官方建议使用该自定义功能，同时保留原版开机界面不作删减
    */
-  #define SHOW_BOOTSCREEN                 // Show the Marlin bootscreen on startup. ** ENABLE FOR PRODUCTION **
+  #define SHOW_BOOTSCREEN                 // Show the Marlin bootscreen on startup. ** ENABLE FOR PRODUCTION **    // 开机显示Marlin默认启动画面，量产机型建议启用
   #if ENABLED(SHOW_BOOTSCREEN)
-    #define BOOTSCREEN_TIMEOUT 3000       // (ms) Total Duration to display the boot screen(s)
+    #define BOOTSCREEN_TIMEOUT 3000       // (ms) Total Duration to display the boot screen(s)                     // (毫秒) 开机画面总共显示时长
     #if ANY(HAS_MARLINUI_U8GLIB, TFT_COLOR_UI)
-      #define BOOT_MARLIN_LOGO_SMALL      // Show a smaller Marlin logo on the Boot Screen (saving lots of flash)
+      #define BOOT_MARLIN_LOGO_SMALL      // Show a smaller Marlin logo on the Boot Screen (saving lots of flash)  // 在启动画面上显示更小的 Marlin Logo（可节省大量闪存空间）
     #endif
     #if HAS_MARLINUI_U8GLIB
-      //#define BOOT_MARLIN_LOGO_ANIMATED // Animated Marlin logo. Costs ~3260 (or ~940) bytes of flash.
+      //#define BOOT_MARLIN_LOGO_ANIMATED // Animated Marlin logo. Costs ~3260 (or ~940) bytes of flash.           // 动态 Marlin Logo。会消耗约 3260（或约 940）字节的闪存
     #endif
     #if ANY(HAS_MARLINUI_U8GLIB, TOUCH_UI_FTDI_EVE, HAS_MARLINUI_HD44780)
-      //#define SHOW_CUSTOM_BOOTSCREEN    // Show the bitmap in Marlin/_Bootscreen.h on startup.
+      //#define SHOW_CUSTOM_BOOTSCREEN    // Show the bitmap in Marlin/_Bootscreen.h on startup.                   // 开机加载Marlin/_Bootscreen.h内的位图画面
     #endif
   #endif
 
   #if HAS_MARLINUI_U8GLIB
-    //#define CUSTOM_STATUS_SCREEN_IMAGE  // Show the bitmap in Marlin/_Statusscreen.h on the status screen.
+    //#define CUSTOM_STATUS_SCREEN_IMAGE  // Show the bitmap in Marlin/_Statusscreen.h on the status screen.       // 在打印机状态屏幕上显示 Marlin/_Statusscreen.h 中的位图
   #endif
 
-  //#define SOUND_MENU_ITEM   // Add a mute option to the LCD menu
-  #define SOUND_ON_DEFAULT    // Buzzer/speaker default enabled state
+  //#define SOUND_MENU_ITEM   // Add a mute option to the LCD menu                        // 在液晶屏菜单中添加静音选项
+  #define SOUND_ON_DEFAULT    // Buzzer/speaker default enabled state                     // 蜂鸣器/扬声器 默认开启状态
 
   #if ENABLED(U8GLIB_SSD1309)
-    //#define LCD_DOUBLE_BUFFER           // Optimize display updates. Costs ~1K of SRAM.
+    //#define LCD_DOUBLE_BUFFER           // Optimize display updates. Costs ~1K of SRAM. // 优化屏幕显示刷新效率，消耗约 1K 字节的静态内存
   #endif
 
   #if HAS_WIRED_LCD
-    //#define DOUBLE_LCD_FRAMERATE        // Not recommended for slow boards.
+    //#define DOUBLE_LCD_FRAMERATE        // Not recommended for slow boards.             // 不推荐在低速/老旧主板上使用
   #endif
 
-  // The timeout to return to the status screen from sub-menus
+  // The timeout to return to the status screen from sub-menus               // 菜单闲置超时自动返回主状态屏幕的时间
   //#define LCD_TIMEOUT_TO_STATUS 15000   // (ms)
 
-  // Scroll a longer status message into view
+  // Scroll a longer status message into view                                // 滚动显示较长的状态信息（文字太长时自动滚动展示）
   //#define STATUS_MESSAGE_SCROLLING
 
-  // Apply a timeout to low-priority status messages
+  // Apply a timeout to low-priority status messages                         // 对低优先级的状态提示信息应用超时自动消失功能
   //#define STATUS_MESSAGE_TIMEOUT_SEC 30 // (seconds)
 
-  // On the Info Screen, display XY with one decimal place when possible
+  // On the Info Screen, display XY with one decimal place when possible     // 在信息界面，XY坐标尽可能显示一位小数
   //#define LCD_DECIMAL_SMALL_XY
 
-  // Show the E position (filament used) during printing
+  // Show the E position (filament used) during printing                     // 打印时显示 E 轴位置（耗材消耗量）
   //#define LCD_SHOW_E_TOTAL
 
-  // Display a negative temperature instead of "err"
+  // Display a negative temperature instead of "err"                         // 显示负温度值，而不是显示 "err" 错误
   //#define SHOW_TEMPERATURE_BELOW_ZERO
 
   /**
    * LED Control Menu
    * Add LED Control to the LCD menu
+   * LED灯光控制菜单
+   * 在液晶屏菜单中添加灯光控制选项
    */
   //#define LED_CONTROL_MENU
   #if ENABLED(LED_CONTROL_MENU)
-    #define LED_COLOR_PRESETS                 // Enable the Preset Color menu option
-    //#define NEO2_COLOR_PRESETS              // Enable a second NeoPixel Preset Color menu option
+    #define LED_COLOR_PRESETS                 // Enable the Preset Color menu option                // 启用预设色彩菜单选项
+    //#define NEO2_COLOR_PRESETS              // Enable a second NeoPixel Preset Color menu option  // 启用第二组 NeoPixel 预设色彩菜单选项
     #if ENABLED(LED_COLOR_PRESETS)
-      #define LED_USER_PRESET_RED        255  // User defined RED value
-      #define LED_USER_PRESET_GREEN      128  // User defined GREEN value
-      #define LED_USER_PRESET_BLUE         0  // User defined BLUE value
-      #define LED_USER_PRESET_WHITE      255  // User defined WHITE value
-      #define LED_USER_PRESET_BRIGHTNESS 255  // User defined intensity
+      #define LED_USER_PRESET_RED        255  // User defined RED value                             // 用户自定义红色数值
+      #define LED_USER_PRESET_GREEN      128  // User defined GREEN value                           // 用户自定义绿色数值
+      #define LED_USER_PRESET_BLUE         0  // User defined BLUE value                            // 用户自定义蓝色数值
+      #define LED_USER_PRESET_WHITE      255  // User defined WHITE value                           // 用户自定义白色数值
+      #define LED_USER_PRESET_BRIGHTNESS 255  // User defined intensity                             // 用户自定义亮度强度
       //#define LED_USER_PRESET_STARTUP       // Have the printer display the user preset color on startup
     #endif
     #if ENABLED(NEO2_COLOR_PRESETS)
-      #define NEO2_USER_PRESET_RED        255 // User defined RED value
-      #define NEO2_USER_PRESET_GREEN      128 // User defined GREEN value
-      #define NEO2_USER_PRESET_BLUE         0 // User defined BLUE value
-      #define NEO2_USER_PRESET_WHITE      255 // User defined WHITE value
-      #define NEO2_USER_PRESET_BRIGHTNESS 255 // User defined intensity
-      //#define NEO2_USER_PRESET_STARTUP      // Have the printer display the user preset color on startup for the second strip
+      #define NEO2_USER_PRESET_RED        255 // User defined RED value                             // 用户自定义红色通道数值
+      #define NEO2_USER_PRESET_GREEN      128 // User defined GREEN value                           // 用户自定义绿色数值
+      #define NEO2_USER_PRESET_BLUE         0 // User defined BLUE value                            // 用户自定义蓝色数值
+      #define NEO2_USER_PRESET_WHITE      255 // User defined WHITE value                           // 用户自定义白色数值
+      #define NEO2_USER_PRESET_BRIGHTNESS 255 // User defined intensity                             // 用户自定义亮度强度
+      //#define NEO2_USER_PRESET_STARTUP      // Have the printer display the user preset color on startup for the second strip // 打印机启动时，自动显示第二组灯条的用户预设颜色
     #endif
   #endif
 
 #endif // HAS_DISPLAY
 
-// Some displays offer Feedrate / Flow editing.
+// Some displays offer Feedrate / Flow editing. // 部分屏幕支持进给速度、挤出流量手动编辑调节
 #if ANY(HAS_MARLINUI_MENU, DWIN_CREALITY_LCD, DWIN_LCD_PROUI, MALYAN_LCD, TOUCH_SCREEN, ULTIPANEL_FEEDMULTIPLY)
-  #define SPEED_EDIT_MIN    10  // (%) Feedrate percentage edit range minimum
-  #define SPEED_EDIT_MAX   999  // (%) Feedrate percentage edit range maximum
+  #define SPEED_EDIT_MIN    10  // (%) Feedrate percentage edit range minimum  // 进给速率（Feedrate）调整百分比的最小值
+  #define SPEED_EDIT_MAX   999  // (%) Feedrate percentage edit range maximum  // 进给速率（Feedrate）调整百分比的最大值
 #endif
 #if ANY(HAS_MARLINUI_MENU, DWIN_CREALITY_LCD, DWIN_LCD_PROUI, MALYAN_LCD, TOUCH_SCREEN)
-  #define FLOW_EDIT_MIN     10  // (%) Flow percentage edit range minimum
-  #define FLOW_EDIT_MAX    999  // (%) Flow percentage edit range maximum
+  #define FLOW_EDIT_MIN     10  // (%) Flow percentage edit range minimum      // 挤出流量（Flow）百分比调整范围的最小值
+  #define FLOW_EDIT_MAX    999  // (%) Flow percentage edit range maximum      // 挤出流量（Flow）百分比调整范围的最大值
 #endif
 
-// Add 'M73' to set print job progress, overrides Marlin's built-in estimate
+// Add 'M73' to set print job progress, overrides Marlin's built-in estimate   // 添加 M73 指令用于设置打印任务进度，覆盖 Marlin 内置的估算功能
 //#define SET_PROGRESS_MANUALLY
 #if ENABLED(SET_PROGRESS_MANUALLY)
-  #define SET_PROGRESS_PERCENT            // Add 'P' parameter to set percentage done
-  #define SET_REMAINING_TIME              // Add 'R' parameter to set remaining time
-  //#define SET_INTERACTION_TIME          // Add 'C' parameter to set time until next filament change or other user interaction
-  //#define M73_REPORT                    // Report M73 values to host
+  #define SET_PROGRESS_PERCENT            // Add 'P' parameter to set percentage done   // 为指令添加 'P' 参数，用于设置【打印完成百分比】
+  #define SET_REMAINING_TIME              // Add 'R' parameter to set remaining time    // 为指令添加 'R' 参数，用于设置【剩余打印时间】
+  //#define SET_INTERACTION_TIME          // Add 'C' parameter to set time until next filament change or other user interaction  // 为指令添加 'C' 参数，用于设置【距离下一次换料/用户操作的剩余时间】
+  //#define M73_REPORT                    // Report M73 values to host                  // 将 M73 指令的进度数据（打印百分比、剩余时间等）上报给上位机
   #if ALL(M73_REPORT, HAS_MEDIA)
-    #define M73_REPORT_SD_ONLY            // Report only when printing from SD
+    #define M73_REPORT_SD_ONLY            // Report only when printing from SD          // 仅在从SD卡打印时，才上报打印进度数据
   #endif
 #endif
 
-// LCD Print Progress options. Multiple times may be displayed in turn.
+// LCD Print Progress options. Multiple times may be displayed in turn.        // LCD 打印进度显示选项。可循环显示多项时间/进度信息
 #if HAS_DISPLAY && ANY(HAS_MEDIA, SET_PROGRESS_MANUALLY)
-  #define SHOW_PROGRESS_PERCENT           // Show print progress percentage (doesn't affect progress bar)
-  #define SHOW_ELAPSED_TIME               // Display elapsed printing time (prefix 'E')
-  //#define SHOW_REMAINING_TIME           // Display estimated time to completion (prefix 'R')
+  #define SHOW_PROGRESS_PERCENT           // Show print progress percentage (doesn't affect progress bar)       // 显示打印进度百分比（不影响进度条）
+  #define SHOW_ELAPSED_TIME               // Display elapsed printing time (prefix 'E')                         // 显示已打印时间（前缀标记为 E = Elapsed）
+  //#define SHOW_REMAINING_TIME           // Display estimated time to completion (prefix 'R')                  // 显示预计剩余打印时间（前缀标记为 R = Remaining）
   #if ENABLED(SET_INTERACTION_TIME)
-    #define SHOW_INTERACTION_TIME         // Display time until next user interaction ('C' = filament change)
+    #define SHOW_INTERACTION_TIME         // Display time until next user interaction ('C' = filament change)   // 显示距下次手动操作的剩余时间，C标识代表换料提醒
   #endif
-  //#define PRINT_PROGRESS_SHOW_DECIMALS  // Show/report progress with decimal digits, not all UIs support this
+  //#define PRINT_PROGRESS_SHOW_DECIMALS  // Show/report progress with decimal digits, not all UIs support this // 以带小数点的精度显示/上报打印进度（并非所有界面都支持）
 
   #if ANY(HAS_MARLINUI_HD44780, IS_TFTGLCD_PANEL)
-    //#define LCD_PROGRESS_BAR            // Show a progress bar on HD44780 LCDs for SD printing
+    //#define LCD_PROGRESS_BAR            // Show a progress bar on HD44780 LCDs for SD printing           // 在 HD44780 字符屏上显示 SD 打印进度条
     #if ENABLED(LCD_PROGRESS_BAR)
-      #define PROGRESS_BAR_BAR_TIME 2000  // (ms) Amount of time to show the bar
-      #define PROGRESS_BAR_MSG_TIME 3000  // (ms) Amount of time to show the status message
-      #define PROGRESS_MSG_EXPIRE      0  // (ms) Amount of time to retain the status message (0=forever)
-      //#define PROGRESS_MSG_ONCE         // Show the message for MSG_TIME then clear it
-      //#define LCD_PROGRESS_BAR_TEST     // Add a menu item to test the progress bar
+      #define PROGRESS_BAR_BAR_TIME 2000  // (ms) Amount of time to show the bar                           // (毫秒) 进度条在屏幕上显示的持续时间
+      #define PROGRESS_BAR_MSG_TIME 3000  // (ms) Amount of time to show the status message                // (毫秒) 状态信息显示的持续时间
+      #define PROGRESS_MSG_EXPIRE      0  // (ms) Amount of time to retain the status message (0=forever)  // (ms) 状态信息的保持显示时间（0=永久显示）
+      //#define PROGRESS_MSG_ONCE         // Show the message for MSG_TIME then clear it                   // 显示 MSG_TIME（时间信息）后自动清除该消息
+      //#define LCD_PROGRESS_BAR_TEST     // Add a menu item to test the progress bar                      // 添加一个菜单项，用于【测试进度条】是否正常显示
     #endif
   #endif
 #endif
