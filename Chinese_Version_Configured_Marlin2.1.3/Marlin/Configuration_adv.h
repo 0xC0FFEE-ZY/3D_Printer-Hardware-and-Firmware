@@ -4013,6 +4013,8 @@
   #define CONFIGURE_FILAMENT_CHANGE               // Add M603 G-code and menu items. Requires ~1.3K bytes of flash.                  // 添加 M603 配置指令与菜单（占用闪存）
 #endif
 
+
+//========================================= TMC 静音驱动 ==========================================
 // @section tmc_smart
 
 /**
@@ -4035,37 +4037,75 @@
  *   https://github.com/teemuatlut/TMCStepper
  *
  * @section tmc/config
+ * 
+ * Trinamic 智能驱动
+ *
+ * 使用 SPI 模式的 TMC2130、TMC2160、TMC2240、TMC2660、TMC5130、TMC5160 驱动时：
+ *  - 将 SPI 引脚连接到主板的硬件 SPI 接口。
+ *    部分主板只需简单跳线即可！详见主板说明书。
+ *  - 在你的 `pins_你的主板.h` 文件中定义所需的步进电机 CS 引脚。
+ *    （例如参考 RAMPS 主板的引脚定义）
+ *  - 也可以使用 GPIO 引脚实现软件 SPI，替代硬件 SPI。
+ *
+ * 使用串口 UART 模式的 TMC220x 系列驱动（TMC2208/2209）时：
+ *  - 通过 1K 电阻将 PDN_UART 引脚连接到 #_SERIAL_TX_PIN 发送引脚。
+ *    如需读取驱动数据，还需将 PDN_UART 直接连接到 #_SERIAL_RX_PIN 接收引脚（无电阻）。
+ *    部分主板只需简单跳线即可！详见主板说明书。
+ *  - 这类驱动也可以使用硬件串口。
+ *
+ * 使用所有 TMC 系列步进驱动，都需要安装 TMCStepper 库。
+ *   https://github.com/teemuatlut/TMCStepper
  */
 #if HAS_TRINAMIC_CONFIG
 
-  #define HOLD_MULTIPLIER    0.5  // Scales down the holding current from run current
+  #define HOLD_MULTIPLIER    0.5  // Scales down the holding current from run current       // 将待机保持电流 从 运行电流 按比例缩小
 
-  //#define EDITABLE_HOMING_CURRENT   // Add a G-code and menu to modify the Homing Current
+  //#define EDITABLE_HOMING_CURRENT   // Add a G-code and menu to modify the Homing Current // 添加 G 代码和屏幕菜单，用于修改 回零电流（寻原点电流）
 
   /**
    * Interpolate microsteps to 256
    * Override for each driver with <driver>_INTERPOLATE settings below
+   * 
+   * 微步细分插值到 256 细分
+   * 可通过下方的 <driver>_INTERPOLATE 设置为每个驱动单独覆盖此功能
    */
   #define INTERPOLATE      true
 
   #if HAS_DRIVER(TMC2240)
-    #define TMC2240_RREF        12000   // (Ω) 12000 .. 60000. (FLY TMC2240 = 12300)
-    // Max Current. Lower for more internal resolution. Raise to run cooler.
+    #define TMC2240_RREF        12000   // (Ω) 12000 .. 60000. (FLY TMC2240 = 12300)  // (欧姆) 取值范围 12000 ~ 60000。(FLY 主板使用 TMC2240 驱动 = 12300)
+    // Max Current. Lower for more internal resolution. Raise to run cooler.          // 最大电流设置。数值越低 → 内部分辨率越高  数值越高 → 驱动运行温度越低（更凉快）
+
     #define TMC2240_CURRENT_RANGE   1   // :{ 0:'RMS=690mA PEAK=1A', 1:'RMS=1410mA PEAK=2A', 2:'RMS=2120mA PEAK=3A', 3:'RMS=2110mA PEAK=3A' }
-    // Slope Control: Lower is more silent. Higher runs cooler.
+// 可选档位对照表：
+// 0: 有效值电流 690mA / 峰值电流 1A
+// 1: 有效值电流 1410mA / 峰值电流 2A
+// 2: 有效值电流 2120mA / 峰值电流 3A
+// 3: 有效值电流 2110mA / 峰值电流 3A
+
+
+    // Slope Control: Lower is more silent. Higher runs cooler.                                         // 斜率控制：数值越低越静音，数值越高散热越好（运行更凉）
     #define TMC2240_SLOPE_CONTROL   0   // :{ 0:'100V/µs', 1:'200V/µs', 2:'400V/µs', 3:'800V/µs' }
+// 可选档位：
+// 0: 100V/µs（最静音）
+// 1: 200V/µs
+// 2: 400V/µs
+// 3: 800V/µs（发热最低、声音最大）
   #endif
 
   #if AXIS_IS_TMC_CONFIG(X)
-    #define X_CURRENT       800        // (mA) RMS current. Multiply by 1.414 for peak current.
-    #define X_CURRENT_HOME  X_CURRENT  // (mA) RMS current for homing. (Typically lower than *_CURRENT.)
+    #define X_CURRENT       800        // (mA) RMS current. Multiply by 1.414 for peak current.            // (毫安) 有效值电流 (RMS)。乘以 1.414 即可得到峰值电流 (Peak Current)。
+    #define X_CURRENT_HOME  X_CURRENT  // (mA) RMS current for homing. (Typically lower than *_CURRENT.)   // (毫安) 回零（寻原点）时使用的有效值电流（RMS）。通常设置为 **低于** 正常运行电流 (*_CURRENT)。
     #define X_MICROSTEPS     16        // 0..256
     #define X_RSENSE          0.11
-    #define X_CHAIN_POS      -1        // -1..0: Not chained. 1: MCU MOSI connected. 2: Next in chain, ...
-    //#define X_INTERPOLATE  true      // Enable to override 'INTERPOLATE' for the X axis
-    //#define X_HOLD_MULTIPLIER 0.5    // Enable to override 'HOLD_MULTIPLIER' for the X axis
+    #define X_CHAIN_POS      -1        // -1..0: Not chained. 1: MCU MOSI connected. 2: Next in chain, ...// -1 ~ 0：不串联（独立驱动） 1：连接到主控 MCU 的 MOSI 引脚； 2：串联链中的下一个驱动...
+    //#define X_INTERPOLATE  true      // Enable to override 'INTERPOLATE' for the X axis                 // 启用此项以单独覆盖 X 轴的微步插值（INTERPOLATE）设置
+    //#define X_HOLD_MULTIPLIER 0.5    // Enable to override 'HOLD_MULTIPLIER' for the X axis             // 启用此项以单独覆盖 X 轴的待机电流比例（HOLD_MULTIPLIER）设置
   #endif
 
+
+  //（译者注）：
+  // 这是所有轴（X/Y/Z/E）的电流、细分、插值配置
+  // 注释同上。
   #if AXIS_IS_TMC_CONFIG(X2)
     #define X2_CURRENT      X_CURRENT
     #define X2_CURRENT_HOME X_CURRENT_HOME
@@ -4272,6 +4312,10 @@
    * Use the homing current for all probing. (e.g., Current may be reduced to the
    * point where a collision makes the motor skip instead of damaging the bed,
    * though this is unlikely to save delicate probes from being damaged.
+   * 
+   * 探测动作全部沿用回零档位电流
+   * 适当降低电流，发生磕碰时电机易丢步打滑，可减少热床受损风险
+   * 但无法避免精密探针硬件损坏
    */
   //#define PROBING_USE_CURRENT_HOME
 
@@ -4280,7 +4324,13 @@
   /**
    * Override default SPI pins for TMC2130, TMC2160, TMC2240, TMC2660, TMC5130 and TMC5160 drivers here.
    * The default pins can be found in your board's pins file.
+   * 
+   * 在此处覆盖 TMC2130 / TMC2160 / TMC2240 / TMC2660 / TMC5130 / TMC5160 驱动的默认 SPI 引脚
+   * 默认引脚定义可以在你主板的引脚文件（pins_xxx.h）中找到
    */
+
+   //（译者注）：
+   // 如果你用的是 TMC2208 / TMC2209（UART 模式），可以直接忽略这些了。
   //#define X_CS_PIN      -1
   //#define Y_CS_PIN      -1
   //#define Z_CS_PIN      -1
@@ -4308,17 +4358,26 @@
    * Software option for SPI driven drivers (TMC2130, TMC2160, TMC2240, TMC2660, TMC5130 and TMC5160).
    * The default SW SPI pins are defined the respective pins files,
    * but you can override or define them here.
+   * 针对 SPI 驱动（TMC2130、TMC2160、TMC2240、TMC2660、TMC5130、TMC5160）的软件SPI配置选项。
+   * 默认的软件 SPI 引脚已在对应的主板引脚文件中定义，
+   * 但你可以在这里覆盖或重新定义它们。
    */
   //#define TMC_USE_SW_SPI
   //#define TMC_SPI_MOSI  -1
   //#define TMC_SPI_MISO  -1
   //#define TMC_SPI_SCK   -1
 
+
+  //================================== TMC 串口（UART）配置区域 =========================================
   // @section tmc/serial
 
   /**
    * Four TMC2209 drivers can use the same HW/SW serial port with hardware configured addresses.
    * Set the address using jumpers on pins MS1 and MS2.
+   * 
+   * 最多可将 4 个 TMC2209 驱动共用同一个硬件/软件串口，
+   * 只需通过硬件配置不同的地址即可。
+   * 使用驱动上的 MS1 和 MS2 引脚跳线来设置地址。
    * Address | MS1  | MS2
    *       0 | LOW  | LOW
    *       1 | HIGH | LOW
@@ -4327,6 +4386,10 @@
    *
    * Set *_SERIAL_TX_PIN and *_SERIAL_RX_PIN to match for all drivers
    * on the same serial port, either here or in your board's pins file.
+   * 
+   * 设置 *_SERIAL_TX_PIN 和 *_SERIAL_RX_PIN，
+   * 让同一串口中的所有驱动都使用相同的 TX / RX 引脚。
+   * 可以在这里设置，也可以在主板的引脚文件中设置。
    */
   //#define  X_SLAVE_ADDRESS 0
   //#define  Y_SLAVE_ADDRESS 0
@@ -4352,21 +4415,30 @@
   //#define E7_SLAVE_ADDRESS 0
 
   // @section tmc/smart
+  // TMC 智能功能配置区
 
   /**
    * Software enable
    *
    * Use for drivers that do not use a dedicated enable pin, but rather handle the same
    * function through a communication line such as SPI or UART.
+   * 
+   * 软件使能功能
+   * 适用于没有专用使能引脚，而是通过 SPI 或 UART 这类通信线来实现相同（电机启停）功能的驱动模块。
    */
   //#define SOFTWARE_DRIVER_ENABLE
 
   // @section tmc/stealthchop
+  //  TMC 静音驱动模式
 
   /**
    * TMC2130, TMC2160, TMC2208, TMC2209, TMC2240, TMC5130 and TMC5160 only
    * Use Trinamic's ultra quiet stepping mode.
    * When disabled, Marlin will use spreadCycle stepping mode.
+   * 
+   * 仅适用于 TMC2130、TMC2160、TMC2208、TMC2209、TMC2240、TMC5130、TMC5160 驱动
+   * 启用 Trinamic 官方的超静音步进模式（StealthChop）。
+   * 禁用时，Marlin 会使用 spreadCycle 步进模式（普通模式，声音更大、动力更强）。
    */
   #if HAS_STEALTHCHOP
     #define STEALTHCHOP_XY
@@ -4394,13 +4466,27 @@
    *
    * Define your own with:
    * { <off_time[1..15]>, <hysteresis_end[-3..12]>, hysteresis_start[1..8] }
+   * 
+   * 通过预定义参数组优化 spreadCycle 斩波参数
+   * 或者使用库中提供的示例自行配置
+   * 提供的参数组包括：
+   * CHOPPER_DEFAULT_12V   12V 默认
+   * CHOPPER_DEFAULT_19V   19V 默认
+   * CHOPPER_DEFAULT_24V   24V 默认（最常用）
+   * CHOPPER_DEFAULT_36V   36V 默认
+   * CHOPPER_09STEP_24V    0.9度步进电机专用（24V）
+   * CHOPPER_PRUSAMK3_24V  Prusa MK3 专用参数
+   * CHOPPER_MARLIN_119    老版本Marlin默认参数
+   * 
+   * 自定义参数格式（极复杂，新手绝对不要碰）：
+   * { <off_time[1..15]>, <hysteresis_end[-3..12]>, hysteresis_start[1..8] }
    */
-  #define CHOPPER_TIMING CHOPPER_DEFAULT_12V        // All axes (override below)
-  //#define CHOPPER_TIMING_X  CHOPPER_TIMING        // For X Axes (override below)
+  #define CHOPPER_TIMING CHOPPER_DEFAULT_12V        // All axes (override below)       // 所有轴统一设置（下方可单独覆盖）
+  //#define CHOPPER_TIMING_X  CHOPPER_TIMING        // For X Axes (override below)     // 用于 X 轴（可在下方单独覆盖设置）
   //#define CHOPPER_TIMING_X2 CHOPPER_TIMING_X
-  //#define CHOPPER_TIMING_Y  CHOPPER_TIMING        // For Y Axes (override below)
+  //#define CHOPPER_TIMING_Y  CHOPPER_TIMING        // For Y Axes (override below)     // 用于 Y 轴（可在下方单独覆盖设置）
   //#define CHOPPER_TIMING_Y2 CHOPPER_TIMING_Y
-  //#define CHOPPER_TIMING_Z  CHOPPER_TIMING        // For Z Axes (override below)
+  //#define CHOPPER_TIMING_Z  CHOPPER_TIMING        // For Z Axes (override below)     // 用于 Z 轴（可在下方单独覆盖设置）
   //#define CHOPPER_TIMING_Z2 CHOPPER_TIMING_Z
   //#define CHOPPER_TIMING_Z3 CHOPPER_TIMING_Z
   //#define CHOPPER_TIMING_Z4 CHOPPER_TIMING_Z
@@ -4410,7 +4496,7 @@
   //#define CHOPPER_TIMING_U  CHOPPER_TIMING        // For U Axis
   //#define CHOPPER_TIMING_V  CHOPPER_TIMING        // For V Axis
   //#define CHOPPER_TIMING_W  CHOPPER_TIMING        // For W Axis
-  //#define CHOPPER_TIMING_E  CHOPPER_TIMING        // For Extruders (override below)
+  //#define CHOPPER_TIMING_E  CHOPPER_TIMING        // For Extruders (override below)  // 用于挤出机（可在下方单独覆盖设置）
   //#define CHOPPER_TIMING_E1 CHOPPER_TIMING_E
   //#define CHOPPER_TIMING_E2 CHOPPER_TIMING_E
   //#define CHOPPER_TIMING_E3 CHOPPER_TIMING_E
@@ -4420,6 +4506,7 @@
   //#define CHOPPER_TIMING_E7 CHOPPER_TIMING_E
 
   // @section tmc/status
+  // TMC 驱动状态监控
 
   /**
    * Monitor Trinamic drivers
@@ -4431,6 +4518,16 @@
    * M911 - Report stepper driver overtemperature pre-warn condition.
    * M912 - Clear stepper driver overtemperature pre-warn condition flag.
    * M122 - Report driver parameters (Requires TMC_DEBUG)
+   * 
+   * 监控 Trinamic（TMC）驱动状态
+   * 检测诸如过热、对地短路等故障。
+   * 当检测到过热时，Marlin 会自动降低电机电流，直到故障解除。
+   * 其他检测到的故障会触发停止当前打印的保护机制。
+   * 相关G代码指令：
+   * M906 - 设置或读取电机电流（单位：毫安），使用 X/Y/Z/E 指定轴，无参数则报告所有轴电流。
+   * M911 - 报告驱动是否处于过热预警状态。
+   * M912 - 清除驱动过热预警标志。
+   * M122 - 报告驱动详细参数（需要开启 TMC_DEBUG 调试模式）。
    */
   //#define MONITOR_DRIVER_STATUS
 
@@ -4441,6 +4538,7 @@
   #endif
 
   // @section tmc/hybrid
+  // TMC 混合模式配置
 
   /**
    * TMC2130, TMC2160, TMC2208, TMC2209, TMC2240, TMC5130 and TMC5160 only
@@ -4448,6 +4546,12 @@
    * This mode allows for faster movements at the expense of higher noise levels.
    * STEALTHCHOP_(XY|Z|E) must be enabled to use HYBRID_THRESHOLD.
    * M913 X/Y/Z/E to live tune the setting
+   * 
+   * 仅适用于 TMC2130、TMC2160、TMC2208、TMC2209、TMC2240、TMC5130、TMC5160 驱动
+   * 当步进电机速度超过 HYBRID_THRESHOLD（混合阈值）时，驱动会自动切换到 spreadCycle 模式。
+   * 此模式支持更快的运动速度，但代价是噪音会变大。
+   * 必须启用 STEALTHCHOP_(XY|Z|E)（静音模式）才能使用混合阈值功能。
+   * 可使用 M913 X/Y/Z/E 指令实时调参。
    */
   //#define HYBRID_THRESHOLD
 
@@ -4459,9 +4563,9 @@
   #define Z2_HYBRID_THRESHOLD      3
   #define Z3_HYBRID_THRESHOLD      3
   #define Z4_HYBRID_THRESHOLD      3
-  #define I_HYBRID_THRESHOLD       3  // [linear=mm/s, rotational=°/s]
-  #define J_HYBRID_THRESHOLD       3  // [linear=mm/s, rotational=°/s]
-  #define K_HYBRID_THRESHOLD       3  // [linear=mm/s, rotational=°/s]
+  #define I_HYBRID_THRESHOLD       3  // [linear=mm/s, rotational=°/s]  //直线轴（X、Y、Z）的单位是：毫米 / 秒，旋转轴 / 挤出机的单位是：度 / 秒
+  #define J_HYBRID_THRESHOLD       3  // [linear=mm/s, rotational=°/s]  //直线轴（X、Y、Z）的单位是：毫米 / 秒，旋转轴 / 挤出机的单位是：度 / 秒
+  #define K_HYBRID_THRESHOLD       3  // [linear=mm/s, rotational=°/s]  //直线轴（X、Y、Z）的单位是：毫米 / 秒，旋转轴 / 挤出机的单位是：度 / 秒
   #define U_HYBRID_THRESHOLD       3  // [mm/s]
   #define V_HYBRID_THRESHOLD       3
   #define W_HYBRID_THRESHOLD       3
