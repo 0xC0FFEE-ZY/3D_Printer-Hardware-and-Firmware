@@ -5232,6 +5232,9 @@
  *
  * Enables G53 and G54-G59.3 commands to select coordinate systems
  * and G92.1 to reset the workspace to native machine space.
+ * 
+ * CNC 坐标系
+ * 启用 G53、G54-G59.3 坐标系切换指令，以及 G92.1 机床坐标复位指令
  */
 //#define CNC_COORDINATE_SYSTEMS
 
@@ -5241,13 +5244,18 @@
  * Expected Printer Check
  * Add the M16 G-code to compare a string to the MACHINE_NAME.
  * M16 with a non-matching string causes the printer to halt.
+ * 
+ * 预期打印机校验
+ *
+ * 添加 M16 G代码，用于将字符串与固件中设置的打印机名称（MACHINE_NAME）进行比对。
+ * 如果 M16 指令携带的字符串与固件名称不匹配，打印机将立即停止运行。
  */
 //#define EXPECTED_PRINTER_CHECK
 
 // @section volumetrics
 
 /**
- * Disable all Volumetric extrusion options
+ * Disable all Volumetric extrusion options  // 禁用所有体积挤出功能选项
  */
 //#define NO_VOLUMETRICS
 
@@ -5259,6 +5267,14 @@
    *
    * M200 D0 to disable, M200 Dn to set a new diameter (and enable volumetric).
    * M200 S0/S1 to disable/enable volumetric extrusion.
+   * 
+   * 体积挤出默认状态
+   * 启用后，将体积挤出设为默认方式，
+   * 并使用 DEFAULT_NOMINAL_FILAMENT_DIA 作为默认耗材直径。
+   *
+   * M200 D0 ：关闭体积挤出
+   * M200 Dn ：设置新的耗材直径（并启用体积挤出）
+   * M200 S0/S1 ：关闭 / 启用体积挤出
    */
   //#define VOLUMETRIC_DEFAULT_ON
 
@@ -5269,6 +5285,11 @@
      * This factory setting applies to all extruders.
      * Use 'M200 [T<extruder>] L<limit>' to override and 'M502' to reset.
      * A non-zero value activates Volume-based Extrusion Limiting.
+     * 
+     * 默认体积挤出速度限制，单位：立方毫米/秒 (mm^3/sec)
+     * 此出厂设置适用于所有挤出机
+     * 使用 'M200 [T<挤出机序号>] L<限制值>' 覆盖设置，使用 'M502' 恢复默认
+     * 设置为**非0值**时，将启用**基于体积的挤出限速**功能
      */
     #define DEFAULT_VOLUMETRIC_EXTRUDER_LIMIT  0.00     // (mm^3/sec)
     #define VOLUMETRIC_EXTRUDER_LIMIT_MAX     20        // (mm^3/sec)
@@ -5278,43 +5299,49 @@
 // @section reporting
 
 /**
- * Extra options for the M114 "Current Position" report
+ * Extra options for the M114 "Current Position" report  // M114 "当前位置" 报告的额外选项
  */
-//#define M114_DETAIL         // Use 'M114 D' for details to check planner calculations
-//#define M114_REALTIME       // Real current position based on forward kinematics
-//#define M114_LEGACY         // M114 used to synchronize on every call. Enable if needed.
+//#define M114_DETAIL         // Use 'M114 D' for details to check planner calculations     // 使用 "M114 D" 指令可查看详细信息，用于检查规划器（运动计算）的运算结果
+//#define M114_REALTIME       // Real current position based on forward kinematics          // 基于正向运动学计算的 **真实实时位置**
+//#define M114_LEGACY         // M114 used to synchronize on every call. Enable if needed.  // 以往 M114 指令每次调用时都会执行同步操作。如需要此功能可启用。
 
 /**
  * Auto-report fan speed with M123 S<seconds>
  * Requires fans with tachometer pins
+ * 
+ * 通过M123 S<秒数>自动上报风扇转速
+ * 需配备带测速引脚的风扇
  */
 //#define AUTO_REPORT_FANS
 
-//#define REPORT_FAN_CHANGE   // Report the new fan speed when changed by M106 (and others)
+//#define REPORT_FAN_CHANGE   // Report the new fan speed when changed by M106 (and others) // 当风扇转速通过 M106 指令（或其他方式）修改时，上报新的风扇转速
 
 /**
- * Auto-report temperatures with M155 S<seconds>
+ * Auto-report temperatures with M155 S<seconds>     // 使用 M155 S<秒数> 自动上报温度
  */
 #define AUTO_REPORT_TEMPERATURES
 #if ENABLED(AUTO_REPORT_TEMPERATURES) && TEMP_SENSOR_REDUNDANT
-  //#define AUTO_REPORT_REDUNDANT // Include the "R" sensor in the auto-report
+  //#define AUTO_REPORT_REDUNDANT // Include the "R" sensor in the auto-report     // 在自动温度报告中包含 R 传感器的数据
 #endif
 
 /**
- * Auto-report position with M154 S<seconds>
+ * Auto-report position with M154 S<seconds>   // 使用 M154 S<秒数> 自动上报当前位置
  */
 //#define AUTO_REPORT_POSITION
 #if ENABLED(AUTO_REPORT_POSITION)
-  //#define AUTO_REPORT_REAL_POSITION // Auto-report the real position
+  //#define AUTO_REPORT_REAL_POSITION // Auto-report the real position    // 自动报告 **真实实时位置**
 #endif
 
 /**
  * M115 - Report capabilites. Disable to save ~1150 bytes of flash.
  *        Some hosts (and serial TFT displays) rely on this feature.
+ * 
+ * M115 - 报告打印机固件的功能与配置。禁用此项可节省约 1150 字节的闪存空间。
+ *        部分上位机软件（如串口屏、控制软件）依赖此功能正常工作。
  */
 #define CAPABILITIES_REPORT
 #if ENABLED(CAPABILITIES_REPORT)
-  // Include capabilities in M115 output
+  // Include capabilities in M115 output  // 在 M115 指令的返回信息中包含打印机完整功能列表
   #define EXTENDED_CAPABILITIES_REPORT
   #if ENABLED(EXTENDED_CAPABILITIES_REPORT)
     //#define M115_GEOMETRY_REPORT
