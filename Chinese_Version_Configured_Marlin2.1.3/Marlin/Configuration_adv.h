@@ -5126,6 +5126,7 @@
 #endif
 
 // @section filament width
+//================================== 耗材直径 / 耗材宽度 ====================================
 
 /**
  * Filament Width Sensor
@@ -5144,19 +5145,35 @@
  * 301 RAMBO       : Analog input 3
  *
  * Note: May require analog pins to be defined for other boards.
+ * 
+ * 耗材直径传感器
+ *
+ * 实时测量耗材直径，并自动调整
+ * 挤出流量以补偿直径不均匀的问题。
+ *
+ * 也可以使用测得的直径来设定
+ * 挤出速率，因此切片软件只需指定挤出体积即可。
+ *
+ * 目前仅支持单个挤出机。
+ *
+ *  34 RAMPS_14    : AUX2 接口上的模拟输入 5
+ *  81 PRINTRBOARD : Exp1 接口上的模拟输入 2（版本 B,C,D,E）
+ * 301 RAMBO       : 模拟输入 3
+ *
+ * 注意：其他主板可能需要定义模拟引脚。
  */
 //#define FILAMENT_WIDTH_SENSOR
 
 #if ENABLED(FILAMENT_WIDTH_SENSOR)
-  #define FILAMENT_SENSOR_EXTRUDER_NUM 0    // Index of the extruder that has the filament sensor. :[0,1,2,3,4]
-  #define MEASUREMENT_DELAY_CM        14    // (cm) The distance from the filament sensor to the melting chamber
+  #define FILAMENT_SENSOR_EXTRUDER_NUM 0    // Index of the extruder that has the filament sensor. :[0,1,2,3,4]   // 安装了耗材直径传感器的挤出机序号（可选值：0、1、2、3、4）
+  #define MEASUREMENT_DELAY_CM        14    // (cm) The distance from the filament sensor to the melting chamber  // (厘米) 从耗材传感器到加热腔的距离
 
-  #define FILWIDTH_ERROR_MARGIN        1.0  // (mm) If a measurement differs too much from nominal width ignore it
-  #define MAX_MEASUREMENT_DELAY       20    // (bytes) Buffer size for stored measurements (1 byte per cm). Must be larger than MEASUREMENT_DELAY_CM.
+  #define FILWIDTH_ERROR_MARGIN        1.0  // (mm) If a measurement differs too much from nominal width ignore it // (毫米) 如果测量值与标称直径偏差过大，则忽略该数据
+  #define MAX_MEASUREMENT_DELAY       20    // (bytes) Buffer size for stored measurements (1 byte per cm). Must be larger than MEASUREMENT_DELAY_CM.  // (字节) 存储测量数据的缓冲区大小（每厘米占用1个字节）。必须大于 MEASUREMENT_DELAY_CM 的值。
 
-  #define DEFAULT_MEASURED_FILAMENT_DIA DEFAULT_NOMINAL_FILAMENT_DIA // Set measured to nominal initially
+  #define DEFAULT_MEASURED_FILAMENT_DIA DEFAULT_NOMINAL_FILAMENT_DIA // Set measured to nominal initially      // 初始时，将测量到的耗材直径设定为标称直径
 
-  // Display filament width on the LCD status line. Status messages will expire after 5 seconds.
+  // Display filament width on the LCD status line. Status messages will expire after 5 seconds.    // 在液晶屏状态栏显示耗材直径数值，状态信息5秒后自动消失
   //#define FILAMENT_LCD_DISPLAY
 #endif
 
