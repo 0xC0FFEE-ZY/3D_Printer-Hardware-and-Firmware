@@ -5177,6 +5177,8 @@
   //#define FILAMENT_LCD_DISPLAY
 #endif
 
+
+//======================================= 电源 ===============================================
 // @section power
 
 /**
@@ -5187,19 +5189,25 @@
  *
  * The current sensor feeds DC voltage (relative to the measured current) to an analog pin
  * The voltage sensor feeds DC voltage (relative to the measured voltage) to an analog pin
+ * 
+ * 电源监测
+ * 监测电压、电流，条件满足时可监测功率
+ * 可通过 M430 指令读取与配置相关参数
+ * 电流传感器将对应电流值转换成直流电压，传输至模拟引脚
+ * 电压传感器将对应电压值转换成直流电压，传输至模拟引脚
  */
-//#define POWER_MONITOR_CURRENT   // Monitor the system current
-//#define POWER_MONITOR_VOLTAGE   // Monitor the system voltage
+//#define POWER_MONITOR_CURRENT   // Monitor the system current   // 监测系统电流
+//#define POWER_MONITOR_VOLTAGE   // Monitor the system voltage   // 监测系统电压
 
 #if ENABLED(POWER_MONITOR_CURRENT)
-  #define POWER_MONITOR_VOLTS_PER_AMP    0.05000  // Input voltage to the MCU analog pin per amp  - DO NOT apply more than ADC_VREF!
-  #define POWER_MONITOR_CURRENT_OFFSET   0        // Offset (in amps) applied to the calculated current
-  #define POWER_MONITOR_FIXED_VOLTAGE   13.6      // Voltage for a current sensor with no voltage sensor (for power display)
+  #define POWER_MONITOR_VOLTS_PER_AMP    0.05000  // Input voltage to the MCU analog pin per amp  - DO NOT apply more than ADC_VREF!  // 每安培电流对应的输入到MCU模拟引脚的电压，注意：绝对不要超过 ADC_VREF（参考电压）！
+  #define POWER_MONITOR_CURRENT_OFFSET   0        // Offset (in amps) applied to the calculated current    // 应用到计算电流值上的偏移量（单位：安培）
+  #define POWER_MONITOR_FIXED_VOLTAGE   13.6      // Voltage for a current sensor with no voltage sensor (for power display)  // 在未安装电压传感器时，为电流传感器设定的电压值（用于功率计算显示）
 #endif
 
 #if ENABLED(POWER_MONITOR_VOLTAGE)
-  #define POWER_MONITOR_VOLTS_PER_VOLT  0.077933  // Input voltage to the MCU analog pin per volt - DO NOT apply more than ADC_VREF!
-  #define POWER_MONITOR_VOLTAGE_OFFSET  0         // Offset (in volts) applied to the calculated voltage
+  #define POWER_MONITOR_VOLTS_PER_VOLT  0.077933  // Input voltage to the MCU analog pin per volt - DO NOT apply more than ADC_VREF!  // 每伏特电压对应的、输入到MCU模拟引脚的电压值。注意：绝对不要超过 ADC_VREF（参考电压）！
+  #define POWER_MONITOR_VOLTAGE_OFFSET  0         // Offset (in volts) applied to the calculated voltage     // 应用到计算电压值上的偏移量（单位：伏特）
 #endif
 
 // @section safety
@@ -5210,6 +5218,10 @@
  * If the SAFE_POWER_PIN is defined for your board, Marlin will check
  * that stepper drivers are properly plugged in before applying power.
  * Disable protection if your stepper drivers don't support the feature.
+ * 
+ * 步进驱动防故障保护
+ * 若主板定义了安全电源引脚，Marlin 上电前会检测步进驱动是否正常插接。
+ * 驱动芯片不支持该功能时，可关闭此项保护。
  */
 //#define DISABLE_DRIVER_SAFE_POWER_PROTECT
 
