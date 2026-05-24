@@ -5351,26 +5351,29 @@
 // @section gcode
 
 /**
- * Spend 28 bytes of SRAM to optimize the G-code parser
+ * Spend 28 bytes of SRAM to optimize the G-code parser   // 花费 28 字节内存，用于优化 G-code 解析器
  */
 #define FASTER_GCODE_PARSER
 #if ENABLED(FASTER_GCODE_PARSER)
-  //#define GCODE_QUOTED_STRINGS  // Support for quoted string parameters
+  //#define GCODE_QUOTED_STRINGS  // Support for quoted string parameters   // 支持带引号的字符串参数
 #endif
 
 /**
- * Support for MeatPack G-code compression (https://github.com/scottmudge/OctoPrint-MeatPack)
+ * Support for MeatPack G-code compression (https://github.com/scottmudge/OctoPrint-MeatPack)   // 支持 MeatPack G-code 压缩格式
  */
 //#define MEATPACK_ON_SERIAL_PORT_1
 //#define MEATPACK_ON_SERIAL_PORT_2
 
-//#define GCODE_CASE_INSENSITIVE  // Accept G-code sent to the firmware in lowercase
+//#define GCODE_CASE_INSENSITIVE  // Accept G-code sent to the firmware in lowercase  // 接受 **小写格式** 的 G-code 指令
 
-//#define REPETIER_GCODE_M360     // Add commands originally from Repetier FW
+//#define REPETIER_GCODE_M360     // Add commands originally from Repetier FW         // 添加源自 Repetier 固件的原生指令
 
 /**
  * Enable M111 debug flags 1=ECHO, 2=INFO, 4=ERRORS (unimplemented).
  * Disable to save some flash. Some hosts (Repetier Host) may rely on this feature.
+ * 
+ * 启用 M111 调试标志：1=指令回显, 2=信息, 4=错误(未实现)。
+ * 禁用可节省部分闪存空间。部分上位机（如 Repetier Host）可能依赖此功能。
  */
 #define DEBUG_FLAGS_GCODE
 
@@ -5378,11 +5381,15 @@
  * Enable this option for a leaner build of Marlin that removes
  * workspace offsets to slightly optimize performance.
  * G92 will revert to its behavior from Marlin 1.0.
+ * 
+ * 启用此选项将编译一个更精简的 Marlin 固件，
+ * 通过移除工作区偏移功能来轻微优化性能。
+ * G92 指令将恢复为 Marlin 1.0 版本的旧行为。
  */
 //#define NO_WORKSPACE_OFFSETS
 
 /**
- * Disable M206 and M428 if you don't need home offsets.
+ * Disable M206 and M428 if you don't need home offsets.  // 如果不需要原点偏移，禁用 M206 和 M428 指令
  */
 //#define NO_HOME_OFFSETS
 
@@ -5391,20 +5398,28 @@
  * Support CNC-style G-code dialects used by laser cutters, drawing machine cams, etc.
  * Note that G0 feedrates should be used with care for 3D printing (if used at all).
  * High feedrates may cause ringing and harm print quality.
+ * 
+ * CNC G-code 选项
+ * 支持激光切割机、绘图机等设备使用的 CNC 风格 G-code 指令
+ * 注意：3D 打印时应谨慎使用 G0 移动速度（如果必须使用）
+ * 过高的移动速度可能导致振纹，影响打印质量
  */
-//#define PAREN_COMMENTS      // Support for parentheses-delimited comments
-//#define GCODE_MOTION_MODES  // Remember the motion mode (G0 G1 G2 G3 G5 G38.X) and apply for X Y Z E F, etc.
+//#define PAREN_COMMENTS      // Support for parentheses-delimited comments   // 支持用小括号 ( ) 包裹的注释内容
+//#define GCODE_MOTION_MODES  // Remember the motion mode (G0 G1 G2 G3 G5 G38.X) and apply for X Y Z E F, etc.  // 记录当前运动模式（G0 G1 G2 G3 G5 G38.X），并自动应用到后续的 X Y Z E F 等指令
 
-// Enable and set a (default) feedrate for all G0 moves
+// Enable and set a (default) feedrate for all G0 moves    // 启用并为所有 G0 移动设置默认移动速度
 //#define G0_FEEDRATE 3000 // (mm/min)
 #ifdef G0_FEEDRATE
-  //#define VARIABLE_G0_FEEDRATE // The G0 feedrate is set by F in G0 motion mode
+  //#define VARIABLE_G0_FEEDRATE // The G0 feedrate is set by F in G0 motion mode  // G0 的移动速度由 G0 指令中的 F 参数直接设定
 #endif
 
 /**
  * Startup commands
  *
  * Execute certain G-code commands immediately after power-on.
+ * 
+ * 开机启动指令
+ * 上电后立即自动执行预设G代码
  */
 //#define STARTUP_COMMANDS "M17 Z"
 
@@ -5413,16 +5428,24 @@
  *
  * Add G-codes M810-M819 to define and run G-code macros.
  * Macros are not saved to EEPROM.
+ * 
+ * G-code 宏指令
+ *
+ * 添加 G-code 指令 M810~M819 用于定义和运行自定义宏指令。
+ * 宏指令不会保存到 EEPROM（断电不保存）。
  */
 //#define GCODE_MACROS
 #if ENABLED(GCODE_MACROS)
-  #define GCODE_MACROS_SLOTS       5  // Up to 10 may be used
-  #define GCODE_MACROS_SLOT_SIZE  50  // Maximum length of a single macro
+  #define GCODE_MACROS_SLOTS       5  // Up to 10 may be used             // 最多可使用 10 个宏指令
+  #define GCODE_MACROS_SLOT_SIZE  50  // Maximum length of a single macro // 单个宏指令的最大长度
 #endif
 
 /**
  * User-defined menu items to run custom G-code.
  * Up to 25 may be defined, but the actual number is LCD-dependent.
+ * 
+ * 用户自定义菜单项目（可运行自定义 G-code）
+ * 最多可定义 25 个，但实际数量取决于你的显示屏型号
  */
 
 // @section custom main menu
