@@ -5449,19 +5449,19 @@
  */
 
 // @section custom main menu
-
+// 自定义菜单：主菜单
 // Custom Menu: Main Menu
 //#define CUSTOM_MENU_MAIN
 #if ENABLED(CUSTOM_MENU_MAIN)
   //#define CUSTOM_MENU_MAIN_TITLE "Custom Commands"
   #define CUSTOM_MENU_MAIN_SCRIPT_DONE "M117 User Script Done"
   #define CUSTOM_MENU_MAIN_SCRIPT_AUDIBLE_FEEDBACK
-  //#define CUSTOM_MENU_MAIN_SCRIPT_RETURN   // Return to status screen after a script
-  #define CUSTOM_MENU_MAIN_ONLY_IDLE         // Only show custom menu when the machine is idle
+  //#define CUSTOM_MENU_MAIN_SCRIPT_RETURN   // Return to status screen after a script          // 脚本执行完毕后自动返回状态界面
+  #define CUSTOM_MENU_MAIN_ONLY_IDLE         // Only show custom menu when the machine is idle  // 仅设备空闲时显示自定义菜单
 
   #define MAIN_MENU_ITEM_1_DESC "Home & UBL Info"
   #define MAIN_MENU_ITEM_1_GCODE "G28\nG29 W"
-  //#define MAIN_MENU_ITEM_1_CONFIRM          // Show a confirmation dialog before this action
+  //#define MAIN_MENU_ITEM_1_CONFIRM          // Show a confirmation dialog before this action  // 执行操作前弹出确认提示框
 
   #define MAIN_MENU_ITEM_2_DESC "Preheat for " PREHEAT_1_LABEL
   #define MAIN_MENU_ITEM_2_GCODE "M140 S" STRINGIFY(PREHEAT_1_TEMP_BED) "\nM104 S" STRINGIFY(PREHEAT_1_TEMP_HOTEND)
@@ -5481,19 +5481,19 @@
 #endif
 
 // @section custom config menu
-
+// 自定义菜单：配置菜单
 // Custom Menu: Configuration Menu
 //#define CUSTOM_MENU_CONFIG
 #if ENABLED(CUSTOM_MENU_CONFIG)
   //#define CUSTOM_MENU_CONFIG_TITLE "Custom Commands"
   #define CUSTOM_MENU_CONFIG_SCRIPT_DONE "M117 Wireless Script Done"
   #define CUSTOM_MENU_CONFIG_SCRIPT_AUDIBLE_FEEDBACK
-  //#define CUSTOM_MENU_CONFIG_SCRIPT_RETURN  // Return to status screen after a script
-  #define CUSTOM_MENU_CONFIG_ONLY_IDLE        // Only show custom menu when the machine is idle
+  //#define CUSTOM_MENU_CONFIG_SCRIPT_RETURN  // Return to status screen after a script         // 脚本执行完毕后自动返回状态界面
+  #define CUSTOM_MENU_CONFIG_ONLY_IDLE        // Only show custom menu when the machine is idle // 仅设备空闲时显示自定义菜单
 
   #define CONFIG_MENU_ITEM_1_DESC "Wifi ON"
   #define CONFIG_MENU_ITEM_1_GCODE "M118 [ESP110] WIFI-STA pwd=12345678"
-  //#define CONFIG_MENU_ITEM_1_CONFIRM        // Show a confirmation dialog before this action
+  //#define CONFIG_MENU_ITEM_1_CONFIRM        // Show a confirmation dialog before this action  // 执行操作前弹出确认提示框
 
   #define CONFIG_MENU_ITEM_2_DESC "Bluetooth ON"
   #define CONFIG_MENU_ITEM_2_GCODE "M118 [ESP110] BT pwd=12345678"
@@ -5517,15 +5517,17 @@
 /**
  * User-defined buttons to run custom G-code.
  * Up to 25 may be defined.
+ * 用户自定义按键，可执行自定义G代码
+ * 最多支持设置25个按键
  */
 //#define CUSTOM_USER_BUTTONS
 #if ENABLED(CUSTOM_USER_BUTTONS)
   //#define BUTTON1_PIN -1
   #if PIN_EXISTS(BUTTON1)
-    #define BUTTON1_HIT_STATE     LOW       // State of the triggered button. NC=LOW. NO=HIGH.
-    #define BUTTON1_WHEN_PRINTING false     // Button allowed to trigger during printing?
+    #define BUTTON1_HIT_STATE     LOW       // State of the triggered button. NC=LOW. NO=HIGH.  // 触发按钮的状态类型。NC=低电平。NO=高电平。
+    #define BUTTON1_WHEN_PRINTING false     // Button allowed to trigger during printing?       // 打印过程中是否允许触发该按键
     #define BUTTON1_GCODE         "G28"
-    #define BUTTON1_DESC          "Homing"  // Optional string to set the LCD status
+    #define BUTTON1_DESC          "Homing"  // Optional string to set the LCD status            // 可选文字，用于设置 LCD 屏幕状态提示
   #endif
 
   //#define BUTTON2_PIN -1
