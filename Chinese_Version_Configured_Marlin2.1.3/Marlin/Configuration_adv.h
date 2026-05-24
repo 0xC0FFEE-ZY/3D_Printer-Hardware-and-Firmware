@@ -4828,6 +4828,7 @@
 #endif
 
 // @section cnc
+// CNC 功能配置区
 
 /**
  * Spindle & Laser control
@@ -4843,37 +4844,54 @@
  * hardware PWM pin for the speed control and a pin for the rotation direction.
  *
  * See https://marlinfw.org/docs/configuration/2.0.9/laser_spindle.html for more config details.
+ * 
+ * 主轴与激光控制
+ *
+ * 添加 M3、M4、M5 指令，用于控制主轴/激光的开启与关闭，并
+ * 设置主轴转速、主轴旋转方向以及激光功率。
+ *
+ * SuperPID 是 CNC 数控铣削领域常用的路由器/主轴转速控制器。
+ * Marlin 固件可控制主轴启停，也能设置
+ * 5000 至 30000 转/分钟的主轴转速。
+ *
+ * 你需要为启停功能指定一个引脚，还可额外选择一个 0-5V
+ * 硬件 PWM 引脚用于转速控制，以及一个引脚用于旋转方向控制。
  */
 //#define SPINDLE_FEATURE
 //#define LASER_FEATURE
 #if ANY(SPINDLE_FEATURE, LASER_FEATURE)
-  #define SPINDLE_LASER_ACTIVE_STATE    LOW    // Set to "HIGH" if SPINDLE_LASER_ENA_PIN is active HIGH
+  #define SPINDLE_LASER_ACTIVE_STATE    LOW    // Set to "HIGH" if SPINDLE_LASER_ENA_PIN is active HIGH                            // 若主轴/激光使能引脚为高电平有效，请设置为 "HIGH"
 
-  #define SPINDLE_LASER_USE_PWM                // Enable if your controller supports setting the speed/power
+  #define SPINDLE_LASER_USE_PWM                // Enable if your controller supports setting the speed/power                       // 若控制器支持调节转速/功率，则启用此选项
   #if ENABLED(SPINDLE_LASER_USE_PWM)
-    #define SPINDLE_LASER_PWM_INVERT    false  // Set to "true" if the speed/power goes up when you want it to go slower
+    #define SPINDLE_LASER_PWM_INVERT    false  // Set to "true" if the speed/power goes up when you want it to go slower           // 若实际转速/功率与设置方向相反（想减速却变快），请设为 "true"
     #define SPINDLE_LASER_FREQUENCY     2500   // (Hz) Spindle/laser frequency (only on supported HALs: AVR, ESP32, and LPC)
                                                // ESP32: If SPINDLE_LASER_PWM_PIN is onboard then <=78125Hz. For I2S expander
                                                //  the frequency determines the PWM resolution. 2500Hz = 0-100, 977Hz = 0-255, ...
                                                //  (250000 / SPINDLE_LASER_FREQUENCY) = max value.
+                                               //（赫兹）主轴/激光频率（仅支持以下硬件抽象层：AVR、ESP32 和 LPC）
+                                               // ESP32 说明：若主轴/激光 PWM 引脚为板载引脚，频率需 ≤78125Hz。
+                                               // 若是 I2S 扩展引脚，频率决定 PWM 分辨率：
+                                               // 2500Hz = 0-100 档位，977Hz = 0-255 档位……
+                                               // 计算公式：(250000 / 主轴/激光频率) = 最大档位值
   #endif
 
-  //#define AIR_EVACUATION                     // Cutter Vacuum / Laser Blower motor control with G-codes M10-M11
+  //#define AIR_EVACUATION                     // Cutter Vacuum / Laser Blower motor control with G-codes M10-M11 // 通过 G 代码 M10-M11 控制切割吸尘器 / 激光鼓风机电机
   #if ENABLED(AIR_EVACUATION)
-    #define AIR_EVACUATION_ACTIVE       LOW    // Set to "HIGH" if the on/off function is active HIGH
-    //#define AIR_EVACUATION_PIN        42     // Override the default Cutter Vacuum or Laser Blower pin
+    #define AIR_EVACUATION_ACTIVE       LOW    // Set to "HIGH" if the on/off function is active HIGH             // 若启停功能为**高电平有效**，请设置为 "HIGH"
+    //#define AIR_EVACUATION_PIN        42     // Override the default Cutter Vacuum or Laser Blower pin          // 覆盖默认的切割吸尘器 / 激光鼓风机引脚
   #endif
 
-  //#define AIR_ASSIST                         // Air Assist control with G-codes M8-M9
+  //#define AIR_ASSIST                         // Air Assist control with G-codes M8-M9                           // 通过 G 代码 M8-M9 控制空气辅助吹气装置
   #if ENABLED(AIR_ASSIST)
-    #define AIR_ASSIST_ACTIVE           LOW    // Active state on air assist pin
-    //#define AIR_ASSIST_PIN            44     // Override the default Air Assist pin
+    #define AIR_ASSIST_ACTIVE           LOW    // Active state on air assist pin                                  // 空气辅助引脚的有效电平状态
+    //#define AIR_ASSIST_PIN            44     // Override the default Air Assist pin                             // 自定义空气辅助引脚，覆盖默认引脚配置
   #endif
 
-  //#define SPINDLE_SERVO                      // A servo converting an angle to spindle power
+  //#define SPINDLE_SERVO                      // A servo converting an angle to spindle power                    // 舵机角度映射为主轴功率
   #ifdef SPINDLE_SERVO
-    #define SPINDLE_SERVO_NR   0               // Index of servo used for spindle control
-    #define SPINDLE_SERVO_MIN 10               // Minimum angle for servo spindle
+    #define SPINDLE_SERVO_NR   0               // Index of servo used for spindle control                         // 用于控制主轴的舵机序号
+    #define SPINDLE_SERVO_MIN 10               // Minimum angle for servo spindle                                 // 主轴控制舵机的最小角度
   #endif
 
   /**
@@ -4882,6 +4900,12 @@
    *  - PERCENT (S0 - S100)
    *  - RPM     (S0 - S50000)  Best for use with a spindle
    *  - SERVO   (S0 - S180)
+   * 
+   * 转速 / 功率可通过 M3 S 指令设置，并支持以下单位显示：
+   * PWM255 （数值范围 S0 ~ S255）
+   * 百分比（S0 ~ S100）
+   * 转速 （S0 ~ S50000 转 / 分钟）最适合主轴使用
+   * 舵机角度（S0 ~ S180 度）
    */
   #define CUTTER_POWER_UNIT PWM255
 
@@ -4892,16 +4916,25 @@
    * so input powers of 0...255 correspond to SPEED_POWER_MIN...SPEED_POWER_MAX
    * instead of normal range (0 to SPEED_POWER_MAX).
    * Best used with (e.g.) SuperPID router controller: S0 = 5,000 RPM and S255 = 30,000 RPM
+   * 
+   * 相对切割功率
+   * 通常情况下，使用 'M3 O <功率>' 指令进行设置
+   * O 参数对应的功率是基于 SPEED_POWER_MIN（最小功率）~ SPEED_POWER_MAX（最大功率） 范围的相对值
+   * 因此输入功率 0~255 会直接映射为 SPEED_POWER_MIN ~ SPEED_POWER_MAX
+   * 而非常规的 0 ~ SPEED_POWER_MAX 范围
+   * 最适合搭配 SuperPID 主轴控制器使用：
+   * 例如 S0 = 5000 转 / 分钟，S255 = 30000 转 / 分钟
+   *
    */
-  //#define CUTTER_POWER_RELATIVE              // Set speed proportional to [SPEED_POWER_MIN...SPEED_POWER_MAX]
+  //#define CUTTER_POWER_RELATIVE              // Set speed proportional to [SPEED_POWER_MIN...SPEED_POWER_MAX]    // 将转速按比例映射到 [最小转速/功率 ... 最大转速/功率] 区间
 
   #if ENABLED(SPINDLE_FEATURE)
-    //#define SPINDLE_CHANGE_DIR               // Enable if your spindle controller can change spindle direction
-    #define SPINDLE_CHANGE_DIR_STOP            // Enable if the spindle should stop before changing spin direction
-    #define SPINDLE_INVERT_DIR          false  // Set to "true" if the spin direction is reversed
+    //#define SPINDLE_CHANGE_DIR               // Enable if your spindle controller can change spindle direction   // 若你的主轴控制器支持切换主轴旋转方向，则启用此项
+    #define SPINDLE_CHANGE_DIR_STOP            // Enable if the spindle should stop before changing spin direction // 若主轴在切换旋转方向前需要先停止运转，则启用此项
+    #define SPINDLE_INVERT_DIR          false  // Set to "true" if the spin direction is reversed                  // 若主轴旋转方向与预期相反，请设为 "true"（反转方向）
 
-    #define SPINDLE_LASER_POWERUP_DELAY   5000 // (ms) Delay to allow the spindle/laser to come up to speed/power
-    #define SPINDLE_LASER_POWERDOWN_DELAY 5000 // (ms) Delay to allow the spindle to stop
+    #define SPINDLE_LASER_POWERUP_DELAY   5000 // (ms) Delay to allow the spindle/laser to come up to speed/power  //（毫秒）主轴/激光达到设定转速/功率所需的延迟时间
+    #define SPINDLE_LASER_POWERDOWN_DELAY 5000 // (ms) Delay to allow the spindle to stop                          //（毫秒）主轴完全停止所需的延迟时间
 
     /**
      * M3/M4 Power Equation
@@ -4911,31 +4944,39 @@
      *
      * Speed/Power = (PWMDC / 255 * 100 - SPEED_POWER_INTERCEPT) / SPEED_POWER_SLOPE
      * PWMDC = (spdpwr - SPEED_POWER_MIN) / (SPEED_POWER_MAX - SPEED_POWER_MIN) / SPEED_POWER_SLOPE
+     * 
+     * M3/M4 功率计算公式
+     *
+     * 不同设备（主轴/激光）的转速/功率控制范围不同，
+     * 这些参数用于在设备功率单位与 PWM 信号之间进行换算。
+     *
+     * 转速/功率 = (PWM占空比 / 255 * 100 - 功率截距) / 功率斜率
+     * PWM占空比 = (设定转速/功率 - 最小转速/功率) / (最大转速/功率 - 最小转速/功率) / 功率斜率
      */
     #if ENABLED(SPINDLE_LASER_USE_PWM)
-      #define SPEED_POWER_INTERCEPT       0    // (%) 0-100 i.e., Minimum power percentage
+      #define SPEED_POWER_INTERCEPT       0    // (%) 0-100 i.e., Minimum power percentage      // (%) 0-100 i.e., Minimum power percentage
       #define SPEED_POWER_MIN          5000    // (RPM)
       #define SPEED_POWER_MAX         30000    // (RPM) SuperPID router controller 0 - 30,000 RPM
-      #define SPEED_POWER_STARTUP     25000    // (RPM) M3/M4 speed/power default (with no arguments)
+      #define SPEED_POWER_STARTUP     25000    // (RPM) M3/M4 speed/power default (with no arguments)   // (转/分钟) 不带参数执行 M3/M4 时，默认使用的转速/功率值
 
-      //#define DEFAULT_ACCELERATION_SPINDLE   1000 // (°/s/s) Default spindle acceleration (speed change with time)
+      //#define DEFAULT_ACCELERATION_SPINDLE   1000 // (°/s/s) Default spindle acceleration (speed change with time)  // (度/秒²) 默认主轴加速度（转速随时间的变化率）
     #endif
 
   #else
 
     #if ENABLED(SPINDLE_LASER_USE_PWM)
-      #define SPEED_POWER_INTERCEPT       0    // (%) 0-100 i.e., Minimum power percentage
+      #define SPEED_POWER_INTERCEPT       0    // (%) 0-100 i.e., Minimum power percentage     // (%) 0-100 i.e., Minimum power percentage
       #define SPEED_POWER_MIN             0    // (%) 0-100
       #define SPEED_POWER_MAX           100    // (%) 0-100
-      #define SPEED_POWER_STARTUP        80    // (%) M3/M4 speed/power default (with no arguments)
+      #define SPEED_POWER_STARTUP        80    // (%) M3/M4 speed/power default (with no arguments)     // (%) 不带参数执行 M3/M4 时，默认使用的转速/功率值
     #endif
 
-    // Define the minimum and maximum test pulse time values for a laser test fire function
-    #define LASER_TEST_PULSE_MIN           1   // (ms) Used with Laser Control Menu
-    #define LASER_TEST_PULSE_MAX         999   // (ms) Caution: Menu may not show more than 3 characters
+    // Define the minimum and maximum test pulse time values for a laser test fire function          // 定义激光测试点火功能的最小、最大测试脉冲时间值
+    #define LASER_TEST_PULSE_MIN           1   // (ms) Used with Laser Control Menu                  // (毫秒) 配合激光控制菜单使用
+    #define LASER_TEST_PULSE_MAX         999   // (ms) Caution: Menu may not show more than 3 characters  // (毫秒) 注意：控制面板菜单可能无法显示超过3位的数字
 
-    #define SPINDLE_LASER_POWERUP_DELAY   50   // (ms) Delay to allow the spindle/laser to come up to speed/power
-    #define SPINDLE_LASER_POWERDOWN_DELAY 50   // (ms) Delay to allow the spindle to stop
+    #define SPINDLE_LASER_POWERUP_DELAY   50   // (ms) Delay to allow the spindle/laser to come up to speed/power  //（毫秒）启动延时：等待主轴/激光达到设定的转速/功率后再开始加工
+    #define SPINDLE_LASER_POWERDOWN_DELAY 50   // (ms) Delay to allow the spindle to stop            //（毫秒）停机延时：等待主轴完全停止转动后再执行后续操作
 
    /**
     * Laser Safety Timeout
@@ -4944,6 +4985,14 @@
     * Consider material flammability, cut rate, and G-code order when setting this
     * value. Too low and it could turn off during a very slow move; too high and
     * the material could ignite.
+    * 
+    * 激光安全超时（自动断电）
+    *
+    * 当设备长时间无任何移动时，激光将自动关闭。
+    *
+    * 设置此值时，请综合考虑材料易燃性、切割速度和 G-code 执行顺序。
+    * 数值设置过小：可能在极慢速移动过程中意外关闭激光；
+    * 数值设置过大：可能因激光长时间停留在一点，导致材料起火燃烧。
     */
     #define LASER_SAFETY_TIMEOUT_MS     1000   // (ms)
 
@@ -4962,6 +5011,22 @@
      * More refined power control such as compensation for accel/decel will be addressed in future releases.
      *
      * M5 I clears inline mode and set power to 0, M5 sets the power output to 0 but leaves inline mode on.
+     * 
+     * 任意带有 'I' 参数的 M3 或 G1/2/3/5 指令，将启用**连续联机功率模式**。
+     *
+     * 例如：'M3 I' 启用连续联机功率模式，由运动规划器处理。
+     * 功率值会存储在运动段中，并在步进中断服务程序处理运动段时同步施加。
+     *
+     * 'M4 I' 设置**动态功率模式**，该模式根据当前进给速率计算激光的 PWM 功率值。
+     *
+     * 动态模式下的所有运动，都会使用当前进给速率计算激光功率。
+     * 进给速率由运动指令中的 F 参数设定，例如：G1 X0 Y10 F6000
+     * 激光功率通过**右移 8 位**计算得出（二进制运算，等同于除以 256）。
+     * 该计算得出的 PWM 值范围为 0~255，F 值超过 65535 时，功率固定为 255（最大值）。
+     * 更精细的功率控制（如加减速补偿）将在后续版本中实现。
+     *
+     * M5 I：清除联机模式，并将功率设为 0。
+     * M5：仅将功率输出设为 0，但**保留**联机模式开启状态。
      */
 
     /**
@@ -4969,6 +5034,12 @@
      * This feature enables any M3 S-value to be injected into the block buffers while in
      * CUTTER_MODE_CONTINUOUS. The option allows M3 laser power to be committed without waiting
      * for a planner synchronization
+     * 
+     * 启用 M3 指令用于激光模式 联机功率规划器同步
+     *
+     * 该功能启用后，在连续切割模式（CUTTER_MODE_CONTINUOUS）下，
+     * 任意 M3 S参数 设定的功率值可直接注入运动缓冲队列。
+     * 此选项允许 M3 激光功率立即生效，无需等待运动规划器同步。
      */
     //#define LASER_POWER_SYNC
 
@@ -4978,29 +5049,35 @@
      * - Sets the entry power proportional to the entry speed over the nominal speed.
      * - Ramps the power up every N steps to approximate the speed trapezoid.
      * - Due to the limited power resolution this is only approximate.
+     * 
+     * 根据运动速率 按比例调节激光功率
+     *
+     * - 根据实际运动速度与额定速度的比例，设置激光起始功率
+     * - 每隔 N 个步进脉冲提升一次功率，模拟速度梯形曲线变化
+     * - 受限于功率分辨率，此调节仅为近似匹配
      */
     //#define LASER_POWER_TRAP
 
     //
-    // Laser I2C Ammeter (High precision INA226 low/high side module)
+    // Laser I2C Ammeter (High precision INA226 low/high side module)  // 激光 I2C 电流表（高精度 INA226 高 / 低侧模块）
     //
     //#define I2C_AMMETER
     #if ENABLED(I2C_AMMETER)
-      #define I2C_AMMETER_IMAX            0.1    // (Amps) Calibration value for the expected current range
-      #define I2C_AMMETER_SHUNT_RESISTOR  0.1    // (Ohms) Calibration shunt resistor value
+      #define I2C_AMMETER_IMAX            0.1    // (Amps) Calibration value for the expected current range  // (安培) 预期电流范围的校准值
+      #define I2C_AMMETER_SHUNT_RESISTOR  0.1    // (Ohms) Calibration shunt resistor value                  // (欧姆) 校准用分流电阻（采样电阻）阻值
     #endif
 
     //
-    // Laser Coolant Flow Meter
+    // Laser Coolant Flow Meter    // 激光冷却液流量计
     //
     //#define LASER_COOLANT_FLOW_METER
     #if ENABLED(LASER_COOLANT_FLOW_METER)
-      #define FLOWMETER_PIN         20  // Requires an external interrupt-enabled pin (e.g., RAMPS 2,3,18,19,20,21)
-      #define FLOWMETER_PPL       5880  // (pulses/liter) Flow meter pulses-per-liter on the input pin
-      #define FLOWMETER_INTERVAL  1000  // (ms) Flow rate calculation interval in milliseconds
-      #define FLOWMETER_SAFETY          // Prevent running the laser without the minimum flow rate set below
+      #define FLOWMETER_PIN         20  // Requires an external interrupt-enabled pin (e.g., RAMPS 2,3,18,19,20,21)  // 需要一个支持外部中断的引脚（例如：RAMPS 主板的 2、3、18、19、20、21 号引脚）
+      #define FLOWMETER_PPL       5880  // (pulses/liter) Flow meter pulses-per-liter on the input pin               // (脉冲/升) 输入引脚连接的流量计，每升水对应的脉冲数量
+      #define FLOWMETER_INTERVAL  1000  // (ms) Flow rate calculation interval in milliseconds                       // (毫秒) 水流量计算的时间间隔
+      #define FLOWMETER_SAFETY          // Prevent running the laser without the minimum flow rate set below         // 如果未达到下面设置的最小水流速度，则禁止开启激光
       #if ENABLED(FLOWMETER_SAFETY)
-        #define FLOWMETER_MIN_LITERS_PER_MINUTE 1.5 // (liters/min) Minimum flow required when enabled
+        #define FLOWMETER_MIN_LITERS_PER_MINUTE 1.5 // (liters/min) Minimum flow required when enabled               // (升/分钟) 启用保护后，系统要求的**最小水流速度**
       #endif
     #endif
 
@@ -5016,6 +5093,14 @@
  * speeds with much more exact timing for improved print fidelity.
  *
  * NOTE: This option sacrifices some cooling fan speed options.
+ * 
+ * 基于M106/M107指令实现激光同步控制
+ *
+ * Marlin默认在运动规划块处理完成后，延迟一小段时间才执行M106/M107风扇调速指令。
+ * 若将PWM/TTL激光模块外接至风扇接口（常见改装激光套件用法），该时序偏差会造成控制精度不足。
+ * 开启此项后，风扇/激光功率指令可精准时序执行，提升雕刻成型质量。
+ *
+ * 注意：启用该功能会缩减部分散热风扇的调速可用选项。
  */
 //#define LASER_SYNCHRONOUS_M106_M107
 
@@ -5025,13 +5110,19 @@
  * Add the M7, M8, and M9 commands to turn mist or flood coolant on and off.
  *
  * Note: COOLANT_MIST_PIN and/or COOLANT_FLOOD_PIN must also be defined.
+ * 
+ * 冷却液控制
+ *
+ * 添加 M7、M8、M9 指令，用于开启或关闭喷雾式冷却液 / 洪水式冷却液。
+ *
+ * 注意：必须同时定义 COOLANT_MIST_PIN 和/或 COOLANT_FLOOD_PIN 引脚。
  */
 //#define COOLANT_CONTROL
 #if ENABLED(COOLANT_CONTROL)
-  #define COOLANT_MIST                // Enable if mist coolant is present
-  #define COOLANT_FLOOD               // Enable if flood coolant is present
-  #define COOLANT_MIST_INVERT  false  // Set "true" if the on/off function is reversed
-  #define COOLANT_FLOOD_INVERT false  // Set "true" if the on/off function is reversed
+  #define COOLANT_MIST                // Enable if mist coolant is present             // 如果安装了喷雾冷却装置，则启用此项
+  #define COOLANT_FLOOD               // Enable if flood coolant is present            // 如果安装了洪水式冷却装置，则启用此项
+  #define COOLANT_MIST_INVERT  false  // Set "true" if the on/off function is reversed // 如果开关功能是反向的，请设置为 "true"
+  #define COOLANT_FLOOD_INVERT false  // Set "true" if the on/off function is reversed // 如果开关功能是反向的，请设置为 "true"
 #endif
 
 // @section filament width
