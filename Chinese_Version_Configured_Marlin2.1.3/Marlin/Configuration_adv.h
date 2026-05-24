@@ -5562,16 +5562,29 @@
  *
  * Host Prompt Support enables Marlin to use the host for user prompts so
  * filament runout and other processes can be managed from the host side.
+ * 
+ * 主机操作指令
+ *
+ * 定义符合标准的主机流控动作指令
+ *
+ * 参考：https://reprap.org/wiki/G-code#Action_commands
+ * 常用指令 ........ 关机、暂停、已暂停、继续、已继续、取消
+ * G29 重试与恢复 .. 探针重新清洁、探针失败
+ *
+ * 部分功能会添加原因代码来扩展这些指令。
+ *
+ * 主机提示支持 使固件可以通过主机端进行用户提示，
+ * 因此断料检测等流程可由主机端管理。
  */
 //#define HOST_ACTION_COMMANDS
 #if ENABLED(HOST_ACTION_COMMANDS)
-  //#define HOST_PAUSE_M76                // Tell the host to pause in response to M76
-  //#define HOST_PROMPT_SUPPORT           // Initiate host prompts to get user feedback
+  //#define HOST_PAUSE_M76                // Tell the host to pause in response to M76              // 响应 M76 指令，通知主机（上位机）暂停打印
+  //#define HOST_PROMPT_SUPPORT           // Initiate host prompts to get user feedback             // 启动主机提示以获取用户反馈
   #if ENABLED(HOST_PROMPT_SUPPORT)
-    //#define HOST_STATUS_NOTIFICATIONS   // Send some status messages to the host as notifications
+    //#define HOST_STATUS_NOTIFICATIONS   // Send some status messages to the host as notifications // 向主机发送一些状态消息作为通知
   #endif
-  //#define HOST_START_MENU_ITEM          // Add a menu item that tells the host to start
-  //#define HOST_SHUTDOWN_MENU_ITEM       // Add a menu item that tells the host to shut down
+  //#define HOST_START_MENU_ITEM          // Add a menu item that tells the host to start           // 新增菜单选项，可指令主机启动打印任务
+  //#define HOST_SHUTDOWN_MENU_ITEM       // Add a menu item that tells the host to shut down       // 增加菜单选项，可指令主机执行关机操作
 #endif
 
 // @section extras
