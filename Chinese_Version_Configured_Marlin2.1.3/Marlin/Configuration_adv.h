@@ -5877,6 +5877,7 @@
   //#include "Configuration_Secure.h" // External file with WiFi SSID / Password  // 存放 WiFi 名称(SSID) 和 密码的外部文件
 #endif
 
+//=============================================== 多耗材打印 ===============================================
 // @section multi-material
 
 /**
@@ -5885,6 +5886,10 @@
  *
  * These devices allow a single stepper driver on the board to drive
  * multi-material feeders with any number of stepper motors.
+ * Průša 多物料单元（MMU）
+ * 需在 Configuration.h 中启用该功能
+ *
+ * 该硬件可让主板上单个步进电机驱动器，驱动多物料送料机构的多路步进电机。
  */
 #if HAS_PRUSA_MMU1
   /**
@@ -5893,36 +5898,44 @@
    *
    * Override the default DIO selector pins here, if needed.
    * Some pins files may provide defaults for these pins.
+   * 
+   * 此选项仅允许多路复用器在**切换工具/耗材时**进行切换。
+   * 用于配置自定义挤出机移动的额外选项尚未添加。
+   *
+   * 如有需要，可在此处覆盖默认的 DIO 选择引脚。
+   * 部分引脚文件可能已提供这些引脚的默认值。
    */
-  //#define E_MUX0_PIN 40  // Always Required
-  //#define E_MUX1_PIN 42  // Needed for 3 to 8 inputs
-  //#define E_MUX2_PIN 44  // Needed for 5 to 8 inputs
+  //#define E_MUX0_PIN 40  // Always Required          // 始终必需（开启/配置）
+  //#define E_MUX1_PIN 42  // Needed for 3 to 8 inputs // 3 到 8 路输入时需要（开启/配置）
+  //#define E_MUX2_PIN 44  // Needed for 5 to 8 inputs // 5 到 8 路输入时需要（开启/配置）
 
 #elif HAS_PRUSA_MMU2 || HAS_PRUSA_MMU3
   // Common settings for MMU2/MMU2S/MMU3
   // Serial port used for communication with MMU2/MMU2S/MMU3.
+  // MMU2 / MMU2S / MMU3 的通用设置
+  // 用于与 MMU2 / MMU2S / MMU3 通信的串口
   #define MMU_SERIAL_PORT 2
   #define MMU_BAUD 115200
 
-  //#define MMU_RST_PIN 23    // Define this pin to use Hardware Reset for MMU2/MMU2S/MMU3
+  //#define MMU_RST_PIN 23    // Define this pin to use Hardware Reset for MMU2/MMU2S/MMU3 // 定义该引脚，用于对 MMU2/MMU2S/MMU3 进行硬件复位
 
-  //#define MMU_MENUS         // Add an LCD menu for MMU2/MMU2S/MMU3
+  //#define MMU_MENUS         // Add an LCD menu for MMU2/MMU2S/MMU3                       // 为 MMU2/MMU2S/MMU3 多耗材模块添加 LCD 屏幕菜单
 
-  //#define MMU_DEBUG         // Write debug info to serial output
+  //#define MMU_DEBUG         // Write debug info to serial output                         // 将调试信息输出到串口
 
-  // Options pertaining to MMU2 and MMU2S
+  // Options pertaining to MMU2 and MMU2S        // 与 MMU2 / MMU2S 多耗材模块相关的配置选项
   #if HAS_PRUSA_MMU2
-    // Enable if the MMU2 has 12V stepper motors (MMU2 Firmware 1.0.2 and up)
+    // Enable if the MMU2 has 12V stepper motors (MMU2 Firmware 1.0.2 and up)         // 如果 MMU2 使用 12V 步进电机，请启用此选项（MMU2 固件 1.0.2 及以上版本）
     //#define MMU2_MODE_12V
 
-    // Settings for filament load / unload from the LCD menu.
-    // This is for Průša MK3-style extruders. Customize for your hardware.
+    // Settings for filament load / unload from the LCD menu.                         // 用于在 LCD 菜单中加载 / 卸载耗材的设置。
+    // This is for Průša MK3-style extruders. Customize for your hardware.            // 适用于 Průša MK3 风格的挤出机。请根据你的硬件进行自定义调整。
     #define MMU2_FILAMENTCHANGE_EJECT_FEED 80.0
 
-    // G-code to execute when MMU2 F.I.N.D.A. probe detects filament runout
+    // G-code to execute when MMU2 F.I.N.D.A. probe detects filament runout           // 当 MMU2 的 F.I.N.D.A. 探针检测到耗材耗尽时，执行的 G-code 指令
     #define MMU2_FILAMENT_RUNOUT_SCRIPT "M600"
 
-    // MMU2 sequences use mm/min. Not compatible with MMU3, which use mm/sec.
+    // MMU2 sequences use mm/min. Not compatible with MMU3, which use mm/sec.         // MMU2 的动作序列使用 毫米/分钟(mm/min) 单位。与 MMU3 不兼容，因为 MMU3 使用 毫米/秒(mm/sec) 单位。
     #define MMU2_LOAD_TO_NOZZLE_SEQUENCE \
       {  4.4,  871 }, \
       { 10.0, 1393 }, \
@@ -5948,9 +5961,12 @@
    * Options pertaining to MMU2S devices
    * Requires the MK3S extruder with a sensor at the extruder idler, like the MMU2S.
    * See https://help.prusa3d.com/guide/3b-mk3s-mk2-5s-extruder-upgrade_41560#42048, step 11
+   * 与 MMU2S 设备相关的配置选项
+   * 需要搭配 MK3S 挤出机，并在挤出机惰轮处安装传感器（类似 MMU2S）
+   * 详见链接：Prusa 官方升级指南，第11步
    */
   #if HAS_PRUSA_MMU2S
-    #define MMU2_C0_RETRY   5             // Number of retries (total time = timeout*retries)
+    #define MMU2_C0_RETRY   5             // Number of retries (total time = timeout*retries)  // 重试次数（总超时时间 = 单次超时时间 × 重试次数）
 
     /**
      * This is called after the filament runout sensor is triggered to check if
@@ -5966,6 +5982,18 @@
      * In that case use {0, MMU2_CAN_LOAD_FEEDRATE}
      *
      * Adjust MMU2_CAN_LOAD_SEQUENCE according to your setup.
+     * 
+     * 该功能在耗材耗尽传感器触发后调用，用于检查耗材是否正确加载。
+     * 原理是：前后移动耗材，观察耗材耗尽传感器是否会再次触发。
+     * 如果耗材已正确加载，传感器**不应该**再次被触发。
+     *
+     * 因此，MMU2_CAN_LOAD_SEQUENCE 应包含一些**向前**和**向后**的移动。
+     * 向前移动的距离应**大于**向后移动的距离。
+     *
+     * 如果你的耗材耗尽传感器离齿轮很远，此功能无效。
+     * 在这种情况下，请使用 {0, MMU2_CAN_LOAD_FEEDRATE} 
+     *
+     * 请根据你的硬件配置调整 MMU2_CAN_LOAD_SEQUENCE。
      */
     #define MMU2_CAN_LOAD_FEEDRATE 800    // (mm/min)
     #define MMU2_CAN_LOAD_SEQUENCE \
@@ -5973,21 +6001,21 @@
       {  15.0, MMU2_CAN_LOAD_FEEDRATE }, \
       { -10.0, MMU2_CAN_LOAD_FEEDRATE }
 
-    #define MMU2_CAN_LOAD_RETRACT   6.0   // (mm) Keep under the distance between Load Sequence values
-    #define MMU2_CAN_LOAD_DEVIATION 0.8   // (mm) Acceptable deviation
+    #define MMU2_CAN_LOAD_RETRACT   6.0   // (mm) Keep under the distance between Load Sequence values  // (毫米) 数值必须小于加载序列中设置的移动距离
+    #define MMU2_CAN_LOAD_DEVIATION 0.8   // (mm) Acceptable deviation                                  // (mm) 允许的偏差值 / 可接受误差范围
 
-    #define MMU2_CAN_LOAD_INCREMENT 0.2   // (mm) To reuse within MMU2 module
+    #define MMU2_CAN_LOAD_INCREMENT 0.2   // (mm) To reuse within MMU2 module                           // (毫米) 供 MMU2 模块内部重复使用的参数
     #define MMU2_CAN_LOAD_INCREMENT_SEQUENCE \
       { -MMU2_CAN_LOAD_INCREMENT, MMU2_CAN_LOAD_FEEDRATE }
 
-    // Continue unloading if sensor detects filament after the initial unload move
+    // Continue unloading if sensor detects filament after the initial unload move   // 如果在初始退料动作后，传感器仍检测到耗材，则继续执行退料
     //#define MMU_IR_UNLOAD_MOVE
 
   #elif HAS_PRUSA_MMU3
 
-    // MMU3 settings
+    // MMU3 settings  // MMU3 设置项
 
-    #define MMU3_HAS_CUTTER     // Enable cutter related functionality
+    #define MMU3_HAS_CUTTER     // Enable cutter related functionality   // 启用切刀相关功能
 
     #define MMU3_MAX_RETRIES 3  // Number of retries (total time = timeout*retries)
 
@@ -5998,6 +6026,12 @@
     // Beware - this value is used to initialize the MMU logic layer - it will be sent to the MMU upon line up (written into its 8bit register 0x0b)
     // However - in the G-code we can get a request to set the extra load distance at runtime to something else (M708 A0xb Xsomething).
     // The printer intercepts such a call and sets its extra load distance to match the new value as well.
+    // 正如我们与 PrusaSlicer 配置文件讨论的那样
+    // - 换刀操作不应将耗材推送到喷嘴的最顶端
+    //   保留一些空间，以便在配置文件中通过额外的 G-code 调整挤出耗材长度
+    // 注意 - 此值用于初始化 MMU 逻辑层 - 它会在对齐时发送给 MMU（写入其 8 位寄存器 0x0b）
+    // 但是 - 在 G-code 中，我们可以在运行时通过指令 (M708 A0xb X数值) 请求设置额外的加载距离
+    // 打印机会拦截此类调用，并同时将其额外加载距离设置为新值
     #define MMU3_FILAMENT_SENSOR_E_POSITION  0   // (mm)
     #define _MMU3_LOAD_DISTANCE_PAST_GEARS   5   // (mm)
     #define MMU3_TOOL_CHANGE_LOAD_LENGTH (MMU3_FILAMENT_SENSOR_E_POSITION + _MMU3_LOAD_DISTANCE_PAST_GEARS) // (mm)
@@ -6005,16 +6039,21 @@
     #define MMU3_LOAD_TO_NOZZLE_FEED_RATE        20.0 // (mm/s)
 
     #define MMU3_VERIFY_LOAD_TO_NOZZLE_FEED_RATE 50.0 // (mm/s)
-    #define _MMU3_VERIFY_LOAD_TO_NOZZLE_TWEAK    -5.0 // (mm) Amount to adjust the length for verifying load-to-nozzle
+    #define _MMU3_VERIFY_LOAD_TO_NOZZLE_TWEAK    -5.0 // (mm) Amount to adjust the length for verifying load-to-nozzle  // (毫米) 用于校准“加载到喷嘴”验证流程的长度调整值
 
     // The first thing the MMU does is initialize its axis.
     // Meanwhile the E-motor will unload 20mm of filament in about 1 second.
+    // MMU 模块执行的第一步是初始化其运动轴。
+    // 与此同时，挤出机E轴电机会在约1秒内回退20毫米的耗材。
     #define MMU3_RETRY_UNLOAD_TO_FINDA_LENGTH    80.0 // (mm)
     #define MMU3_RETRY_UNLOAD_TO_FINDA_FEED_RATE 80.0 // (mm/s)
 
     // After loading a new filament, the printer will extrude this length of filament
     // then retract to the original position. This is used to check if the filament sensor
     // reading flickers or filament is jammed.
+    // 加载新耗材后，打印机会挤出这段长度的耗材
+    // 然后回退到原始位置。
+    // 用于检查耗材传感器读数是否闪烁不稳定，或耗材是否卡住。
     #define _MMU_EXTRUDER_PTFE_LENGTH            42.3 // (mm)
     #define _MMU_EXTRUDER_HEATBREAK_LENGTH       17.7 // (mm)
     #define MMU3_CHECK_FILAMENT_PRESENCE_EXTRUSION_LENGTH (MMU3_FILAMENT_SENSOR_E_POSITION + _MMU_EXTRUDER_PTFE_LENGTH + _MMU_EXTRUDER_HEATBREAK_LENGTH + _MMU3_VERIFY_LOAD_TO_NOZZLE_TWEAK) // (mm)
@@ -6034,13 +6073,26 @@
      * will be left between the extruder gears (thinking that the filament
      * sensor is triggered through the gears) and the end of the PTFE tube and
      * can cause filament load issues.
+     * 
+     * SpoolJoin 耗尽全部耗材 —— 实验性功能
+     *
+     * SpoolJoin 功能默认在打印时 FINDA 传感器未检测到耗材时触发。
+     * 这是默认行为，在触发换料前不会用尽当前料盘的所有耗材。
+     * 这会在当前料槽中残留一部分耗材，切换到下一个料槽前会将其退出。
+     *
+     * 启用此选项后，只有在打印期间 FINDA 传感器 和 耗材耗尽传感器 同时触发时，
+     * 才会执行换料操作，并允许在换料前**完全耗尽**当前料槽中的所有耗材。
+     * 但这可能会引发问题：少量耗材会残留在挤出机齿轮与 PTFE 管末端之间，
+     * （因为齿轮间的耗材会让传感器误以为耗材仍在位），从而导致加载耗材失败。
      */
     //#define MMU3_SPOOL_JOIN_CONSUMES_ALL_FILAMENT
 
     // MMU3 sequences use mm/sec. Not compatible with MMU2 which use mm/min.
+    // MMU3 的动作序列使用 毫米/秒(mm/sec) 单位。
+    // 与 MMU2 不兼容，因为 MMU2 使用 毫米/分钟(mm/min) 单位。
     #define MMU3_LOAD_TO_NOZZLE_SEQUENCE \
-      { _MMU_EXTRUDER_PTFE_LENGTH,      MMM_TO_MMS(810) }, /* (13.5 mm/s) Fast load ahead of heatbreak */ \
-      { _MMU_EXTRUDER_HEATBREAK_LENGTH, MMM_TO_MMS(198) }  /* ( 3.3 mm/s) Slow load after heatbreak */
+      { _MMU_EXTRUDER_PTFE_LENGTH,      MMM_TO_MMS(810) }, /* (13.5 mm/s) Fast load ahead of heatbreak */ \  // (13.5 毫米/秒) 向加热块前方快速进料
+      { _MMU_EXTRUDER_HEATBREAK_LENGTH, MMM_TO_MMS(198) }  /* ( 3.3 mm/s) Slow load after heatbreak */  // ( 3.3 mm/s) 过加热块后慢速进料 
 
     #define MMU3_RAMMING_SEQUENCE \
       { 0.2816,  MMM_TO_MMS(1339.0) }, \
@@ -6074,10 +6126,21 @@
      * During loading the extruder will stop when the sensor is triggered, then do a last
      * move up to the gears. If no filament is detected, the MMU2 can make some more attempts.
      * If all attempts fail, a filament runout will be triggered.
+     * 
+     * MMU2 挤出机传感器
+     *
+     * 支持使用 Průša（或其他）红外传感器检测挤出机附近的耗材，
+     * 让耗材加载更可靠。
+     * 适用于配备了**距离齿轮小于 38mm** 耗材传感器的挤出机。
+     *
+     * 加载过程中，当传感器被触发时挤出机将停止，
+     * 然后执行最后一段移动直到齿轮处。
+     * 如果未检测到耗材，MMU2 会进行更多尝试。
+     * 如果所有尝试都失败，将触发耗材耗尽报警。
      */
     //#define MMU2_EXTRUDER_SENSOR
     #if ENABLED(MMU2_EXTRUDER_SENSOR)
-      #define MMU2_LOADING_ATTEMPTS_NR 5  // Number of times to try loading filament before failure
+      #define MMU2_LOADING_ATTEMPTS_NR 5  // Number of times to try loading filament before failure  // 耗材加载失败前的最大重试次数
     #endif
 
   #endif
