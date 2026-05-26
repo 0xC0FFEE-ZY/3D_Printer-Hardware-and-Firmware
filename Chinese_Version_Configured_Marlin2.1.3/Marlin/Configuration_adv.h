@@ -5835,26 +5835,29 @@
 
 /**
  * Ethernet. Use M552 to enable and set the IP address.
+ * 以太网功能。使用 M552 指令启用并设置IP地址。
  * @section network
  */
 #if HAS_ETHERNET
-  #define MAC_ADDRESS { 0xDE, 0xAD, 0xBE, 0xEF, 0xF0, 0x0D }  // A MAC address unique to your network
+  #define MAC_ADDRESS { 0xDE, 0xAD, 0xBE, 0xEF, 0xF0, 0x0D }  // A MAC address unique to your network  // 你的网络中唯一的 MAC 地址
 #endif
 
 /**
- * Native ESP32 board with WiFi or add-on ESP32 WiFi-101 module
+ * Native ESP32 board with WiFi or add-on ESP32 WiFi-101 module    * 自带 WiFi 的原生 ESP32 主板，或外接 ESP32 WiFi-101 扩展模块
  */
-//#define WIFISUPPORT         // Marlin embedded WiFi management. Not needed for simple WiFi serial port.
+//#define WIFISUPPORT         // Marlin embedded WiFi management. Not needed for simple WiFi serial port.  // Marlin 内置 WiFi 管理功能。仅作为简单 WiFi 串口使用时不需要开启。
 //#define ESP3D_WIFISUPPORT   // ESP3D Library WiFi management (https://github.com/luc-github/ESP3DLib)
 
 /**
  * Extras for an ESP32-based motherboard with WIFISUPPORT
  * These options don't apply to add-on WiFi modules based on ESP32 WiFi101.
+ * 针对  自带 ESP32 芯片且开启了 WiFi 功能  的主板的额外扩展功能
+ * 这些选项  不适用于  外接式 ESP32 WiFi101 模块
  */
 #if ANY(WIFISUPPORT, ESP3D_WIFISUPPORT)
-  //#define WEBSUPPORT          // Start a webserver (which may include auto-discovery) using SPIFFS
-  //#define OTASUPPORT          // Support over-the-air firmware updates
-  //#define WIFI_CUSTOM_COMMAND // Accept feature config commands (e.g., WiFi ESP3D) from the host
+  //#define WEBSUPPORT          // Start a webserver (which may include auto-discovery) using SPIFFS  // 使用 SPIFFS 文件系统启动一个网页服务器（可能包含自动发现功能）
+  //#define OTASUPPORT          // Support over-the-air firmware updates                              // 支持无线（OTA）固件升级功能
+  //#define WIFI_CUSTOM_COMMAND // Accept feature config commands (e.g., WiFi ESP3D) from the host    // 允许接收来自主机/上位机的功能配置指令（例如 WiFi ESP3D 相关指令）
 
   /**
    * To set a default WiFi SSID / Password, create a file called Configuration_Secure.h with
@@ -5863,8 +5866,15 @@
    *
    *   #define WIFI_SSID "WiFi SSID"
    *   #define WIFI_PWD  "WiFi Password"
+   * 
+   * 如需设置默认 WiFi 名称（SSID）和密码，请创建一个名为 Configuration_Secure.h 的文件，
+   * 并在其中添加以下自定义网络的定义。该文件已通过 .gitignore 排除，
+   * 可防止密码意外泄露到公共代码仓库中。
+   *
+   *   #define WIFI_SSID "你的WiFi名称"
+   *   #define WIFI_PWD  "你的WiFi密码"
    */
-  //#include "Configuration_Secure.h" // External file with WiFi SSID / Password
+  //#include "Configuration_Secure.h" // External file with WiFi SSID / Password  // 存放 WiFi 名称(SSID) 和 密码的外部文件
 #endif
 
 // @section multi-material
