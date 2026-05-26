@@ -20,39 +20,58 @@
  *
  */
 #pragma once
+
 /*
+=============================================================================================================
+=============================================== 前言 ========================================================
+=============================================================================================================
+ * 中文翻译采用UTF-8格式编码
+ * The Chinese translation uses UTF-8 encoding.
 
-————————————————————————————————————————————————前言——————————————————————————————————————————————————————————
+ * 本工程为 Marlin 2.1.3-beta3的中文翻译版本，由 0xC0FFEE_ZY 翻译。原版工程来自https://github.com/MarlinFirmware/Marlin
+ * 本工程各项参数已配置完成，适用于本人自制的3D打印机（基于UM架构），
+ * 
+ * 该3D打印机设计图纸，硬件原理图，PCB已全部开源,未来预计更新制作教程至抖音/B站。
+ * 欢迎关注本人抖音：（抖音号:Technophilic)，昵称：0xC0FFEE_ZY，里面有一些电子科技创作相关的视频，欢迎大家点赞关注！谢谢！
+ * B站 UID:481302692，昵称：0xC0FFEE_ZY
+ * 
+ * 开源项目见本人Github主页：https://github.com/0xC0FFEE-ZY
+ * 仓库地址：https://github.com/0xC0FFEE-ZY/3D_Printer-Hardware-and-Firmware
+ * 
+ * 本工程保留了原版工程所有英文注释，并新增了中文注释及本人的注解，一些代码配置有改动，适用于本人的双X双Y双Z UM架构打印机。
+ * 本人的开源仓库同时提供了“仅翻译版本”，所有代码与配置均保持默认，仅新增了中文注释。
+ * 详见：
+ * 开源仓库同时还提供了纯中文版本（删去原有的英文注释，替换为中文注释。）
+ * 详见：
+ * 
 
-*本工程为Marlin 2.1.3-beta3的中文翻译版本，由0xC0FFEE_ZY翻译。原版工程来自https://github.com/MarlinFirmware/Marlin
-*本工程各项参数已配置完成，适用于本人自制的3D打印机（基于UM架构），
-*该3D打印机设计图纸，硬件原理图，PCB已全部开源,未来预计更新制作教程至抖音/B站。
-*开源项目见本人Github主页：https://github.com/0xC0FFEE-ZY
-*欢迎关注本人抖音：（抖音号:Technophilic)，昵称：0xC0FFEE_ZY，里面有一些电子科技创作相关的视频，欢迎大家点赞关注！谢谢！
-*B站UID:481302692，昵称：0xC0FFEE_ZY
-*up为2024级本科生，热爱电子科技，欢迎和我一起进行讨论和交流！
+ * up为2024级本科生，热爱电子科技，欢迎和我一起进行讨论和交流！
 
-*控制板芯片型号为STM32F407,
-*步进电机采用TMC2209驱动。
+ # Copyright (C) 2026 [0xC0FFEE_ZY]
+ # 本文件是Marlin 2.1.3固件的中文翻译版本
+ # 基于Marlin固件（Copyright (C)  Camiel Gubbels / Erik van der Zalm / MarlinFirmware ，GPLv3许可）
+ # 本翻译文件同样遵循GPLv3许可
+ # 如引用、转载或分发，必须保留本版权声明和署名
 
-    2026.5.13     By 0xC0FFEE_ZY
+                                                                      0xC0FFEE_ZY
+                                                                      2026.5.13     
 
-——————————————————————————————————————————————————————————————————————————————————————————————————————————————
+=============================================================================================================
 */
 
 /**
  * Configuration.h
  *
- * Basic settings such as:   本文件基础配置如下：
+ * Basic settings such as:                                 // 本文件基础配置如下：
  *
- * - Type of electronics   控制板型号
- * - Type of temperature sensor   温度传感器类型
- * - Printer geometry   打印机结构
- * - Endstop configuration   限位开关配置
- * - LCD controller   屏幕控制
- * - Extra features  其他功能
+ * - Type of electronics                                   // 控制板型号
+ * - Type of temperature sensor                            // 温度传感器类型
+ * - Printer geometry                                      // 打印机结构
+ * - Endstop configuration                                 // 限位开关配置
+ * - LCD controller                                        // 屏幕控制
+ * - Extra features                                        // 其他功能
  *
- * Advanced settings can be found in Configuration_adv.h   高级设置可以在 Configuration_adv.h 中找到
+ * Advanced settings can be found in Configuration_adv.h   // 高级设置可以在 Configuration_adv.h 中找到
  */
 #define CONFIGURATION_H_VERSION 02010300
 
@@ -60,37 +79,44 @@
 //============================= Getting Started =============================
 //===========================================================================
 
+//================================= 入门指引 =================================
+
 /**
  * Here are some useful links to help get your machine configured and calibrated:
  * 这里有一些有用的链接，可帮助您配置和校准您的机器
- * Example Configs:     https://github.com/MarlinFirmware/Configurations/branches/all
+ * Example Configs:     https://github.com/MarlinFirmware/Configurations/branches/all     // 官方示例配置文件说明
  *
- * Průša Calculator:    https://blog.prusa3d.com/calculator_3416/
+ * Průša Calculator:    https://blog.prusa3d.com/calculator_3416/                         // 网页版校准工具
  *
  * Calibration Guides:  https://reprap.org/wiki/Calibration
  *                      https://reprap.org/wiki/Triffid_Hunter%27s_Calibration_Guide
  *                      https://web.archive.org/web/20220907014303/sites.google.com/site/repraplogphase/calibration-of-your-reprap
  *                      https://youtu.be/wAL9d7FgInk
- *                      https://teachingtechyt.github.io/calibration.html
+ *                      https://teachingtechyt.github.io/calibration.html                 // 官方校准指南索引
  *
- * Calibration Objects: https://www.thingiverse.com/thing:5573
+ * Calibration Objects: https://www.thingiverse.com/thing:5573                            // 校准模型 / 测试件
  *                      https://www.thingiverse.com/thing:1278865
  */
 
 // @section info
 
 // Author info of this build printed to the host during boot and M115
-#define STRING_CONFIG_H_AUTHOR "(none, default config)" // Original author or contributor.
-//#define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
+// 此固件版本的作者信息，会在开机时显示，并可通过 M115 指令查看
+
+#define STRING_CONFIG_H_AUTHOR "(none, default config)" // Original author or contributor.    // 原始作者 / 贡献者
+//#define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)           // 从根目录开始的路径（不要加引号）
 //定义作者信息（默认无，为原版配置）
+
+//====================================== 机器硬件配置区 ====================================
 // @section machine
 
-// Choose the name from boards.h that matches your setup   从boards.h中选择与您的设备匹配的型号
+// Choose the name from boards.h that matches your setup   // 从boards.h中选择与您的设备匹配的型号
 
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_RAMPS_14_EFB
+  #define MOTHERBOARD BOARD_RAMPS_14_EFB  // 我的主板原理图设计中芯片引脚资源分配参考了MKS Monster8主板
 #endif
 
+//====================================== 串口 =============================================
 // @section serial
 
 /**
@@ -101,11 +127,19 @@
  *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
  * 
- * 
  * 选择主板上用于与上位机通信的串口。
-  此举可将无线适配器等设备连接到非默认端口引脚。
-  串口设为 -1 代表使用USB 虚拟串口（如硬件支持）。
-  注意：Arduino 引导程序将始终占用第一个串口（-1 或 0）。
+ * 此举可将无线适配器等设备连接到非默认端口引脚。
+ * 串口设为 -1 代表使用USB 虚拟串口（如硬件支持）。
+ * 注意：Arduino 引导程序将始终占用第一个串口（-1 或 0）。
+ * 
+ * （译者注）：
+ * 如果用 USB 虚拟串口（USB 直接连电脑）。
+ * 常见于：SKR 系列、LPC1768/1769、STM32 有 USB 直连的主板，值可以填-1
+ *
+ * 如果用 硬件串口 0（TX0/RX0），USB 转 TTL 芯片（CH340/CP2102）接电脑，值可以填0
+ * 绝大多数 8 位机（Uno+RAMPS、Ender‑3 原厂板）都填 0。
+ *
+ * 如果用其他硬件串口，一般接 蓝牙、WiFi、LCD、扩展板，值可以填 1、2、3…
  */
 #define SERIAL_PORT 0
 
@@ -121,17 +155,20 @@
  * :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000]
  * 
  * 
- * 串口波特率
-  此项为所有串口的默认通信速率。
-  下方可设置其他附加串口的默认波特率。
-  250000 波特在绝大多数场景下均可正常使用；
-  若在上位机打印过程中经常出现断连丢包，可尝试调低速率。
-  如需加快 SD 卡文件传输速度，最高可设至 1000000 波特。
-  可选波特率：[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000]
+ * - 串口波特率
+ * 
+ * 此项为所有串口的默认通信速率。
+ * 下方可设置其他附加串口的默认波特率。
+ * 250000 波特在绝大多数场景下均可正常使用；
+ * 若在上位机打印过程中经常出现断连丢包，可尝试调低速率。
+ * 如需加快 SD 卡文件传输速度，最高可设至 1000000 波特。
+ * 可选波特率：[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000]
+ * 
+ * （译者注）：对于大多数 3D 打印机，Marlin 固件官方推荐、最稳定的波特率填 250000
  */
 #define BAUDRATE 250000
 
-//#define BAUD_RATE_GCODE     // Enable G-code M575 to set the baud rate   启用 G 代码 M575 以设置波特率
+//#define BAUD_RATE_GCODE     // Enable G-code M575 to set the baud rate   // 启用 G 代码 M575 以设置波特率
 
 /**
  * Select a secondary serial port on the board to use for communication with the host.
@@ -139,11 +176,14 @@
  * :[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
  * 
  * 选择主板上用于与上位机通信的第二串口。
-  目前仅 Teensy 4.1 板支持以太网串口（-2）。
-  可选串口：[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+ * 目前仅 Teensy 4.1 板支持以太网串口（-2）。
+ * 可选串口：[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+ * 
+ * （译者注）：
+ * 如果你的打印机主板连接了串口屏，或者其他通过串口与主板通讯的外设，请开启第二串口
  */
 //#define SERIAL_PORT_2 -1
-//#define BAUDRATE_2 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE
+//#define BAUDRATE_2 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE  // 启用此项，用来覆盖（主串口）BAUDRATE
 
 
 /**
@@ -152,38 +192,44 @@
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
  * 
  * 选择主板上用于与上位机通信的第三串口。
-  目前支持 AVR、DUE、SAMD51、LPC1768/9、STM32/STM32F1/HC32 和 Teensy 4.x 板。
-  可选串口：[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+ * 目前支持 AVR、DUE、SAMD51、LPC1768/9、STM32/STM32F1/HC32 和 Teensy 4.x 板。
+ * 可选串口：[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
  */
 //#define SERIAL_PORT_3 1
-//#define BAUDRATE_3 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE
+//#define BAUDRATE_3 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE  // 启用此项，用来覆盖（主串口）BAUDRATE
+
 
 /**
  * Select a serial port to communicate with RS485 protocol
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
  * 
  * 选择一个串口用于 RS485 协议通信
-  可选串口：[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+ * 可选串口：[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
  */
 //#define RS485_SERIAL_PORT 1
 #ifdef RS485_SERIAL_PORT
-  //#define M485_PROTOCOL 1   // Check your host for protocol compatibility   检查你的上位机是否兼容当前通信协议
+  //#define M485_PROTOCOL 1   // Check your host for protocol compatibility   // 检查你的上位机是否兼容当前通信协议
   //#define RS485_BUS_BUFFER_SIZE 128
 #endif
 
-// Enable the Bluetooth serial interface on AT90USB devices   启用 AT90USB 设备上的蓝牙串口接口
+
+// Enable the Bluetooth serial interface on AT90USB devices         // 启用 AT90USB 设备上的蓝牙串口接口
 //#define BLUETOOTH
 
-// Name displayed in the LCD "Ready" message and Info menu   在液晶显示屏的就绪提示和信息菜单中显示的设备名称
+// Name displayed in the LCD "Ready" message and Info menu          // 在液晶显示屏的就绪提示和信息菜单中显示的设备名称
 
 //#define CUSTOM_MACHINE_NAME "3D Printer"
-//#define CONFIGURABLE_MACHINE_NAME // Add G-code M550 to set/report the machine name
+//#define CONFIGURABLE_MACHINE_NAME // Add G-code M550 to set/report the machine name   // 启用 M550 指令，用来设置 / 查看打印机名字
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like https://www.uuidgenerator.net/version4
+// 打印机唯一 ID，用于一些软件区分不同打印机。
+// 你可以自己随便写，也可以去https://www.uuidgenerator.net/version4 生成一串随机码。
 
 //#define MACHINE_UUID "00000000-0000-0000-0000-000000000000"
 
+
+//==================================== 电机驱动配置 ========================================
 // @section stepper drivers
 
 /**
@@ -203,28 +249,28 @@
  * 
  * 
  * 步进电机驱动器
-  这些设置允许 Marlin 调整步进电机驱动器的时序，并为支持的驱动器启用高级选项。
-  你也可以在 Configuration_adv.h 中覆盖时序选项。
-
-  对于 TMC2225 驱动器，使用 TMC2208/TMC2208_STANDALONE；对于 TMC2226 驱动器，使用 TMC2209/TMC2209_STANDALONE。
-
-  可选驱动器：A4988、A5984、DRV8825、LV8729、TB6560、TB6600、TMC2100、TMC2130、TMC2130_STANDALONE、TMC2160、
-  TMC2160_STANDALONE、TMC2208、TMC2208_STANDALONE、TMC2209、TMC2209_STANDALONE、TMC2240、TMC2660、
-  TMC2660_STANDALONE、TMC5130、TMC5130_STANDALONE、TMC5160、TMC5160_STANDALONE
-
-  可选列表：['A4988', 'A5984', 'DRV8825', 'LV8729', 'TB6560', 'TB6600', 'TMC2100', 
-  'TMC2130', 'TMC2130_STANDALONE', 'TMC2160', 'TMC2160_STANDALONE', 'TMC2208', 
-  'TMC2208_STANDALONE', 'TMC2209', 'TMC2209_STANDALONE', 'TMC2240', 'TMC2660', 
-  'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE', 'TMC5160', 'TMC5160_STANDALONE']
+ * 这些设置允许 Marlin 调整步进电机驱动器的时序，并为支持的驱动器启用高级选项。
+ * 你也可以在 Configuration_adv.h 中覆盖时序选项。
+ *
+ * 对于 TMC2225 驱动器，使用 TMC2208/TMC2208_STANDALONE；对于 TMC2226 驱动器，使用 TMC2209/TMC2209_STANDALONE。
+ *
+ * 可选驱动器：A4988、A5984、DRV8825、LV8729、TB6560、TB6600、TMC2100、TMC2130、TMC2130_STANDALONE、TMC2160、
+ * TMC2160_STANDALONE、TMC2208、TMC2208_STANDALONE、TMC2209、TMC2209_STANDALONE、TMC2240、TMC2660、
+ * TMC2660_STANDALONE、TMC5130、TMC5130_STANDALONE、TMC5160、TMC5160_STANDALONE
+ *
+ * 可选列表：['A4988', 'A5984', 'DRV8825', 'LV8729', 'TB6560', 'TB6600', 'TMC2100', 
+ * 'TMC2130', 'TMC2130_STANDALONE', 'TMC2160', 'TMC2160_STANDALONE', 'TMC2208', 
+ * 'TMC2208_STANDALONE', 'TMC2209', 'TMC2209_STANDALONE', 'TMC2240', 'TMC2660', 
+ * 'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE', 'TMC5160', 'TMC5160_STANDALONE']
  */
-#define X_DRIVER_TYPE  A4988
+#define X_DRIVER_TYPE  A4988           // （译者注）：请根据你电机驱动实际硬件型号，选择上面列表里的驱动型号。我用的是TMC2209。
 #define Y_DRIVER_TYPE  A4988
 #define Z_DRIVER_TYPE  A4988
-//#define X2_DRIVER_TYPE A4988
-//#define Y2_DRIVER_TYPE A4988
-//#define Z2_DRIVER_TYPE A4988
-//#define Z3_DRIVER_TYPE A4988
-//#define Z4_DRIVER_TYPE A4988
+//#define X2_DRIVER_TYPE A4988         // （译者注）：第二个X轴电机，如果你的打印机是双X电机，故应当取消注释此行，启用X2电机。
+//#define Y2_DRIVER_TYPE A4988         // （译者注）：第二个Y轴电机，如果你的打印机是双Y电机，故应当取消注释此行，启用Y2电机。
+//#define Z2_DRIVER_TYPE A4988         // （译者注）：第二个Z轴电机，如果你的打印机是双Z电机，故应当取消注释此行，启用Z2电机。
+//#define Z3_DRIVER_TYPE A4988         // （译者注）：第三个Z轴电机，如果你的打印机是三Z电机，故应当取消注释此行，启用Z3电机。
+//#define Z4_DRIVER_TYPE A4988         // （译者注）：第四个Z轴电机，如果你的打印机是四Z电机，故应当取消注释此行，启用Z4电机。
 //#define I_DRIVER_TYPE  A4988
 //#define J_DRIVER_TYPE  A4988
 //#define K_DRIVER_TYPE  A4988
@@ -240,6 +286,9 @@
 //#define E6_DRIVER_TYPE A4988
 //#define E7_DRIVER_TYPE A4988
 
+
+
+//================= （译者注）：下面是额外轴设置，不过大多普通3D打印机用不上（这个并不是双X,双Y，双Z轴配置区！） =====================
 /**
  * Additional Axis Settings
  *
@@ -258,19 +307,23 @@
  * Regardless of these settings the axes are internally named I, J, K, U, V, W.
  * 
  * 额外轴设置
-  定义 AXISn_ROTATES 用于所有旋转或枢轴轴。
-  旋转轴坐标以度为单位表示。
-
-  AXISn_NAME 定义了在（大多数）G 代码命令中用于引用轴的字母。
-  按惯例，名称和角色通常是：
-    'A' : 与 X 平行的旋转轴
-    'B' : 与 Y 平行的旋转轴
-    'C' : 与 Z 平行的旋转轴
-    'U' : 与 X 平行的第二线性轴
-    'V' : 与 Y 平行的第二线性轴
-    'W' : 与 Z 平行的第二线性轴
-
-  无论这些设置如何，轴在内部命名为 I、J、K、U、V、W。
+ * 定义 AXISn_ROTATES 用于所有旋转或枢轴轴。
+ * 旋转轴坐标以度为单位表示。
+ * 
+ *  AXISn_NAME 定义了在（大多数）G 代码命令中用于引用轴的字母。
+ *  按惯例，名称和角色通常是：
+ *   'A' : 与 X 平行的旋转轴
+ *   'B' : 与 Y 平行的旋转轴
+ *   'C' : 与 Z 平行的旋转轴
+ *   'U' : 与 X 平行的第二线性轴
+ *   'V' : 与 Y 平行的第二线性轴
+ *   'W' : 与 Z 平行的第二线性轴
+ *
+ * 无论这些设置如何，轴在内部命名为 I、J、K、U、V、W。
+ * 
+ *  （译者注）：
+ * 这是给多轴机器用的，比如：五轴雕刻机、带旋转轴的 3D 打印机（A/B/C 轴）、带副导轨的机器（U/V/W 轴）
+ * 普通 3D 打印机（只有 X Y Z E轴）用不上。
  */
 #ifdef I_DRIVER_TYPE
   #define AXIS4_NAME 'A' // :['A', 'B', 'C', 'U', 'V', 'W']
@@ -297,34 +350,35 @@
   //#define AXIS9_ROTATES
 #endif
 
+ //=================================== 挤出机 =======================================
 // @section extruder
 
-// This defines the number of extruders   此项用于定义挤出机数量
-// :[0, 1, 2, 3, 4, 5, 6, 7, 8]
-#define EXTRUDERS 1 //我的打印机只用了一个挤出机（远程挤出）
+// This defines the number of extruders       // 此项用于定义挤出机数量
+// :[0, 1, 2, 3, 4, 5, 6, 7, 8]               // （译者注）：最多支持8个挤出机电机（0代表无挤出机）
+#define EXTRUDERS 1                           // （译者注）：我的打印机只用了一个挤出机（远程挤出）
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
 //常规默认耗材直径（1.75、2.85、3.0 等）。用于体积挤出、耗材宽度传感器等功能。
-#define DEFAULT_NOMINAL_FILAMENT_DIA 1.75
+#define DEFAULT_NOMINAL_FILAMENT_DIA 1.75     // （译者注）：我的打印机耗材直径是1.75mm
 
-// For Cyclops or any "multi-extruder" that shares a single nozzle.
-//适用于Cyclops 挤出头或任何共用单个喷嘴的多挤出机结构。
+// For Cyclops or any "multi-extruder" that shares a single nozzle.    // 适用于Cyclops 挤出头或任何共用单个喷嘴的多挤出机结构。
+
 //#define SINGLENOZZLE
+// Save and restore temperature and fan speed on tool-change.          // 换喷头时保存并恢复温度与风扇转速。
+// Set standby for the unselected tool with M104/106/109 T...          // 使用 M104/106/109 T... 指令为未选中的喷头设置待机状态。
 
-// Save and restore temperature and fan speed on tool-change.
-// Set standby for the unselected tool with M104/106/109 T...
-// 换喷头时保存并恢复温度与风扇转速。
-// 使用 M104/106/109 T... 指令为未选中的喷头设置待机状态。
+
 #if ENABLED(SINGLENOZZLE)
   //#define SINGLENOZZLE_STANDBY_TEMP
   //#define SINGLENOZZLE_STANDBY_FAN
 #endif
 
-// A dual extruder that uses a single stepper motor   采用单个步进电机的双挤出机
+// A dual extruder that uses a single stepper motor                    // 采用单个步进电机的双挤出机
+//（译者注）：这是 “单电机 + 舵机切换耗材” 的打印配置
 //#define SWITCHING_EXTRUDER
 #if ENABLED(SWITCHING_EXTRUDER)
   #define SWITCHING_EXTRUDER_SERVO_NR 0
-  #define SWITCHING_EXTRUDER_SERVO_ANGLES { 0, 90 } // Angles for E0, E1[, E2, E3]
+  #define SWITCHING_EXTRUDER_SERVO_ANGLES { 0, 90 } // Angles for E0, E1[, E2, E3] //E0、E1（可选 E2、E3）对应的舵机角度。
   #if EXTRUDERS > 3
     #define SWITCHING_EXTRUDER_E23_SERVO_NR 1
   #endif
@@ -338,21 +392,20 @@
  * A dual-nozzle that uses a servomotor to raise/lower one (or both) of the nozzles.
  * Can be combined with SWITCHING_EXTRUDER.
  * 采用伺服电机升降单个或两个喷嘴的双喷嘴结构。
-   可与切换式挤出机（SWITCHING_EXTRUDER）组合使用。
- * 
+ * 可与切换式挤出机（SWITCHING_EXTRUDER）组合使用。
  */
 //#define SWITCHING_NOZZLE
 #if ENABLED(SWITCHING_NOZZLE)
   #define SWITCHING_NOZZLE_SERVO_NR 0
-  //#define SWITCHING_NOZZLE_E1_SERVO_NR 1          // If two servos are used, the index of the second
-  #define SWITCHING_NOZZLE_SERVO_ANGLES { 0, 90 }   // A pair of angles for { E0, E1 }.
-                                                    // For Dual Servo use two pairs: { { lower, raise }, { lower, raise } }
-  #define SWITCHING_NOZZLE_SERVO_DWELL 2500         // Dwell time to wait for servo to make physical move
-  #define SWITCHING_NOZZLE_LIFT_TO_PROBE            // Lift toolheads out of the way while probing
+  //#define SWITCHING_NOZZLE_E1_SERVO_NR 1          // If two servos are used, the index of the second                       // 如果使用两个舵机，这里填写第二个舵机的索引号
+  #define SWITCHING_NOZZLE_SERVO_ANGLES { 0, 90 }   // A pair of angles for { E0, E1 }.                                      // 对应 { 挤出机0, 挤出机1 } 的一组角度值。
+                                                    // For Dual Servo use two pairs: { { lower, raise }, { lower, raise } }  // 双舵机模式：填写两组角度 { {下降角度, 抬起角度}, {下降角度, 抬起角度} }
+  #define SWITCHING_NOZZLE_SERVO_DWELL 2500         // Dwell time to wait for servo to make physical move                    // 舵机动作完成后的等待时间（毫秒）
+  #define SWITCHING_NOZZLE_LIFT_TO_PROBE            // Lift toolheads out of the way while probing                           // 自动调平时，把其他喷头抬起来/移开，避免干扰
 #endif
 
 // Switch nozzles by bumping the toolhead. Requires EVENT_GCODE_TOOLCHANGE_#.
-//通过碰撞工具头完成喷嘴切换。需依赖 EVENT_GCODE_TOOLCHANGE_# 事件 G 代码。
+// 通过碰撞工具头完成喷嘴切换。需依赖 EVENT_GCODE_TOOLCHANGE_# 事件 G 代码。
 //#define MECHANICAL_SWITCHING_NOZZLE
 
 /**
@@ -381,22 +434,22 @@
 
 #if ANY(PARKING_EXTRUDER, MAGNETIC_PARKING_EXTRUDER)
 
-  #define PARKING_EXTRUDER_PARKING_X { -78, 184 }     // X positions for parking the extruders   //挤出机停放的 X 轴位置
+  #define PARKING_EXTRUDER_PARKING_X { -78, 184 }     // X positions for parking the extruders                                 // 挤出机停放的 X 轴位置
   #define PARKING_EXTRUDER_GRAB_DISTANCE 1            // (mm) Distance to move beyond the parking point to grab the extruder   //（毫米）在停放点之外移动以抓取挤出机的距离
 
   #if ENABLED(PARKING_EXTRUDER)
 
-    #define PARKING_EXTRUDER_SOLENOIDS_INVERT           // If enabled, the solenoid is NOT magnetized with applied voltage   //如果启用，电磁铁在施加电压时不会被磁化
-    #define PARKING_EXTRUDER_SOLENOIDS_PINS_ACTIVE LOW  // LOW or HIGH pin signal energizes the coil   // LOW 或 HIGH 引脚信号激励线圈
-    #define PARKING_EXTRUDER_SOLENOIDS_DELAY 250        // (ms) Delay for magnetic field. No delay if 0 or not defined.   //（毫秒）磁场延迟。设置为 0 或未定义则无延迟。
-    //#define MANUAL_SOLENOID_CONTROL                   // Manual control of docking solenoids with M380 S / M381   //使用 M380 S / M381 手动控制对接电磁铁
+    #define PARKING_EXTRUDER_SOLENOIDS_INVERT           // If enabled, the solenoid is NOT magnetized with applied voltage   // 如果启用，电磁铁在施加电压时不会被磁化
+    #define PARKING_EXTRUDER_SOLENOIDS_PINS_ACTIVE LOW  // LOW or HIGH pin signal energizes the coil                         // LOW 或 HIGH 引脚信号激励线圈
+    #define PARKING_EXTRUDER_SOLENOIDS_DELAY 250        // (ms) Delay for magnetic field. No delay if 0 or not defined.      //（毫秒）磁场延迟。设置为 0 或未定义则无延迟。
+    //#define MANUAL_SOLENOID_CONTROL                   // Manual control of docking solenoids with M380 S / M381            // 使用 M380 S / M381 手动控制对接电磁铁
 
   #elif ENABLED(MAGNETIC_PARKING_EXTRUDER)
 
-    #define MPE_FAST_SPEED      9000      // (mm/min) Speed for travel before last distance point   //（毫米/分钟）最后距离点之前的移动速度
-    #define MPE_SLOW_SPEED      4500      // (mm/min) Speed for last distance travel to park and couple   //（毫米/分钟）最后距离点的移动速度，用于停放和耦合
-    #define MPE_TRAVEL_DISTANCE   10      // (mm) Last distance point    //（毫米）最后距离点
-    #define MPE_COMPENSATION       0      // Offset Compensation -1 , 0 , 1 (multiplier) only for coupling   //补偿 -1、0、1（乘数），仅用于耦合
+    #define MPE_FAST_SPEED      9000      // (mm/min) Speed for travel before last distance point            //（毫米/分钟）最后距离点之前的移动速度
+    #define MPE_SLOW_SPEED      4500      // (mm/min) Speed for last distance travel to park and couple      //（毫米/分钟）最后距离点的移动速度，用于停放和耦合
+    #define MPE_TRAVEL_DISTANCE   10      // (mm) Last distance point                                        //（毫米）最后距离点
+    #define MPE_COMPENSATION       0      // Offset Compensation -1 , 0 , 1 (multiplier) only for coupling   // 补偿 -1、0、1（乘数），仅用于耦合
 
   #endif
 
@@ -434,21 +487,21 @@
 //#define ELECTROMAGNETIC_SWITCHING_TOOLHEAD
 
 #if ANY(SWITCHING_TOOLHEAD, MAGNETIC_SWITCHING_TOOLHEAD, ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
-  #define SWITCHING_TOOLHEAD_Y_POS          235         // (mm) Y position of the toolhead dock  //工具头停靠的 Y 轴位置
-  #define SWITCHING_TOOLHEAD_Y_SECURITY      10         // (mm) Security distance Y axis   // Y 轴安全距离
-  #define SWITCHING_TOOLHEAD_Y_CLEAR         60         // (mm) Minimum distance from dock for unobstructed X axis   //（毫米）停靠处无障碍 X 轴的最小距离
-  #define SWITCHING_TOOLHEAD_X_POS          { 215, 0 }  // (mm) X positions for parking the extruders   //挤出机停放的 X 轴位置
+  #define SWITCHING_TOOLHEAD_Y_POS          235         // (mm) Y position of the toolhead dock                     //工具头停靠的 Y 轴位置
+  #define SWITCHING_TOOLHEAD_Y_SECURITY      10         // (mm) Security distance Y axis                            // Y 轴安全距离
+  #define SWITCHING_TOOLHEAD_Y_CLEAR         60         // (mm) Minimum distance from dock for unobstructed X axis  //（毫米）停靠处无障碍 X 轴的最小距离
+  #define SWITCHING_TOOLHEAD_X_POS          { 215, 0 }  // (mm) X positions for parking the extruders               //挤出机停放的 X 轴位置
   #if ENABLED(SWITCHING_TOOLHEAD)
-    #define SWITCHING_TOOLHEAD_SERVO_NR       2         // Index of the servo connector   //伺服连接器的索引
+    #define SWITCHING_TOOLHEAD_SERVO_NR       2         // Index of the servo connector        // 伺服连接器的索引
     #define SWITCHING_TOOLHEAD_SERVO_ANGLES { 0, 180 }  // (degrees) Angles for Lock, Unlock   //（度）锁定、解锁的角度
   #elif ENABLED(MAGNETIC_SWITCHING_TOOLHEAD)
-    #define SWITCHING_TOOLHEAD_Y_RELEASE      5         // (mm) Security distance Y axis   // Y 轴安全距离
-    #define SWITCHING_TOOLHEAD_X_SECURITY   { 90, 150 } // (mm) Security distance X axis (T0,T1)   // X 轴安全距离（T0、T1）
-    //#define PRIME_BEFORE_REMOVE                       // Prime the nozzle before release from the dock   //在从停靠处释放之前为喷嘴预挤出
+    #define SWITCHING_TOOLHEAD_Y_RELEASE      5         // (mm) Security distance Y axis                  // Y 轴安全距离
+    #define SWITCHING_TOOLHEAD_X_SECURITY   { 90, 150 } // (mm) Security distance X axis (T0,T1)          // X 轴安全距离（T0、T1）
+    //#define PRIME_BEFORE_REMOVE                       // Prime the nozzle before release from the dock  //在从停靠处释放之前为喷嘴预挤出
     #if ENABLED(PRIME_BEFORE_REMOVE)
-      #define SWITCHING_TOOLHEAD_PRIME_MM           20  // (mm)   Extruder prime length     //挤出机预挤出长度
-      #define SWITCHING_TOOLHEAD_RETRACT_MM         10  // (mm)   Retract after priming length   //预挤出后回抽长度
-      #define SWITCHING_TOOLHEAD_PRIME_FEEDRATE    300  // (mm/min) Extruder prime feedrate   //挤出机预挤出进给速度
+      #define SWITCHING_TOOLHEAD_PRIME_MM           20  // (mm)   Extruder prime length         //挤出机预挤出长度
+      #define SWITCHING_TOOLHEAD_RETRACT_MM         10  // (mm)   Retract after priming length  //预挤出后回抽长度
+      #define SWITCHING_TOOLHEAD_PRIME_FEEDRATE    300  // (mm/min) Extruder prime feedrate     //挤出机预挤出进给速度
       #define SWITCHING_TOOLHEAD_RETRACT_FEEDRATE 2400  // (mm/min) Extruder retract feedrate   //挤出机回抽进给速度
     #endif
   #elif ENABLED(ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
@@ -471,13 +524,13 @@
  */
 //#define MIXING_EXTRUDER
 #if ENABLED(MIXING_EXTRUDER)
-  #define MIXING_STEPPERS 2        // Number of steppers in your mixing extruder  //混合挤出机中的步进电机数量
-  #define MIXING_VIRTUAL_TOOLS 16  // Use the Virtual Tool method with M163 and M164  //使用 M163 和 M164 的虚拟工具方法
-  //#define DIRECT_MIXING_IN_G1    // Allow ABCDHI mix factors in G1 movement commands  //允许在 G1 移动命令中使用 ABCDHI 混合因子
-  //#define GRADIENT_MIX           // Support for gradient mixing with M166 and LCD  //支持使用 M166 和 LCD 的渐变混合
+  #define MIXING_STEPPERS 2        // Number of steppers in your mixing extruder                  //混合挤出机中的步进电机数量
+  #define MIXING_VIRTUAL_TOOLS 16  // Use the Virtual Tool method with M163 and M164              //使用 M163 和 M164 的虚拟工具方法
+  //#define DIRECT_MIXING_IN_G1    // Allow ABCDHI mix factors in G1 movement commands            //允许在 G1 移动命令中使用 ABCDHI 混合因子
+  //#define GRADIENT_MIX           // Support for gradient mixing with M166 and LCD               //支持使用 M166 和 LCD 的渐变混合
   //#define MIXING_PRESETS         // Assign 8 default V-tool presets for 2 or 3 MIXING_STEPPERS  //为 2 或 3 个 MIXING_STEPPERS 分配 8 个默认 V 工具预设
   #if ENABLED(GRADIENT_MIX)
-    //#define GRADIENT_VTOOL       // Add M166 T to use a V-tool index as a Gradient alias  //添加 M166 T 以使用 V 工具索引作为渐变别名
+    //#define GRADIENT_VTOOL       // Add M166 T to use a V-tool index as a Gradient alias        //添加 M166 T 以使用 V 工具索引作为渐变别名
   #endif
 #endif
 
@@ -488,9 +541,9 @@
 // 挤出机 0（默认挤出机）的热端偏移量必须设置为 X=0、Y=0。
 // 其余热端的偏移量为其相对于挤出机 0 热端的距离。
 
-//#define HOTEND_OFFSET_X { 0.0, 20.00 } // (mm) relative X-offset for each nozzle  
-//#define HOTEND_OFFSET_Y { 0.0, 5.00 }  // (mm) relative Y-offset for each nozzle  
-//#define HOTEND_OFFSET_Z { 0.0, 0.00 }  // (mm) relative Z-offset for each nozzle  
+//#define HOTEND_OFFSET_X { 0.0, 20.00 } // (mm) relative X-offset for each nozzle    // 每个喷嘴相对于第一个喷头的 X 轴偏移量（单位：毫米）
+//#define HOTEND_OFFSET_Y { 0.0, 5.00 }  // (mm) relative Y-offset for each nozzle    // 每个喷嘴相对于第一个喷头的 Y 轴偏移量（单位：毫米）
+//#define HOTEND_OFFSET_Z { 0.0, 0.00 }  // (mm) relative Z-offset for each nozzle    // 每个喷嘴相对于第一个喷头的 Z 轴偏移量（单位：毫米）
 // @section multi-material
 
 /**
@@ -537,47 +590,53 @@
  */
 //#define PSU_CONTROL
 //#define PSU_NAME "Power Supply"
+// (译者注)：下面代码主要实现：
+// 自动开机 / 自动关机
+// 空闲一段时间自动断电
+// 断电续打模块（MKS PWC）
+// 关机前等待喷头冷却
+// ATX 电脑电源的控制信号
 
 #if ENABLED(PSU_CONTROL)
-  //#define MKS_PWC                 // Using the MKS PWC add-on  //使用 MKS PWC 附加模块
-  //#define PS_OFF_CONFIRM          // Confirm dialog when power off  //电源关闭时的确认对话框
-  //#define PS_OFF_SOUND            // Beep 1s when power off  //电源关闭时蜂鸣 1 秒
+  //#define MKS_PWC                 // Using the MKS PWC add-on             //使用 MKS PWC 附加模块
+  //#define PS_OFF_CONFIRM          // Confirm dialog when power off        //电源关闭时的确认对话框
+  //#define PS_OFF_SOUND            // Beep 1s when power off               //电源关闭时蜂鸣 1 秒
   #define PSU_ACTIVE_STATE LOW      // Set 'LOW' for ATX, 'HIGH' for X-Box  //ATX 电源设置为 'LOW'，X-Box 电源设置为 'HIGH'
 
-  //#define PSU_DEFAULT_OFF             // Keep power off until enabled directly with M80  //保持电源关闭，直到直接使用 M80 启用
-  //#define PSU_POWERUP_DELAY      250  // (ms) Delay for the PSU to warm up to full power  //（毫秒）PSU 加热到全功率的延迟
+  //#define PSU_DEFAULT_OFF             // Keep power off until enabled directly with M80                 // 保持电源关闭，直到直接使用 M80 启用
+  //#define PSU_POWERUP_DELAY      250  // (ms) Delay for the PSU to warm up to full power                //（毫秒）PSU 加热到全功率的延迟
   //#define LED_POWEROFF_TIMEOUT 10000  // (ms) Turn off LEDs after power-off, with this amount of delay  //（毫秒）电源关闭后关闭 LED 的延迟时间
 
-  //#define PSU_OFF_REDUNDANT           // Second pin for redundant power control  //冗余电源控制的第二个引脚
-  //#define PSU_OFF_REDUNDANT_INVERTED  // Redundant pin state is the inverse of PSU_ACTIVE_STATE  //冗余引脚状态与 PSU_ACTIVE_STATE 相反
+  //#define PSU_OFF_REDUNDANT           // Second pin for redundant power control                  // 冗余电源控制的第二个引脚
+  //#define PSU_OFF_REDUNDANT_INVERTED  // Redundant pin state is the inverse of PSU_ACTIVE_STATE  // 冗余引脚状态与 PSU_ACTIVE_STATE 相反
 
-  //#define PS_ON1_PIN               6  // Redundant pin required to enable power in combination with PS_ON_PIN  //与 PS_ON_PIN 组合使用时需要冗余引脚以启用电源
+  //#define PS_ON1_PIN               6  // Redundant pin required to enable power in combination with PS_ON_PIN  // 与 PS_ON_PIN 组合使用时需要冗余引脚以启用电源
 
   //#define PS_ON_EDM_PIN            8  // External Device Monitoring pins for external power control relay feedback. Fault on mismatch.  //外部设备监控引脚，用于外部电源控制继电器反馈。不匹配时发生故障。
   //#define PS_ON1_EDM_PIN           9
-  #define PS_EDM_RESPONSE          250  // (ms) Time to allow for relay action  //（毫秒）允许继电器动作的时间
+  #define PS_EDM_RESPONSE          250  // (ms) Time to allow for relay action                      //（毫秒）允许继电器动作的时间
 
-  //#define POWER_OFF_TIMER               // Enable M81 D<seconds> to power off after a delay  //启用 M81 D<seconds> 以在延迟后关闭电源
-  //#define POWER_OFF_WAIT_FOR_COOLDOWN   // Enable M81 S to power off only after cooldown   //启用 M81 S 以仅在冷却后关闭电源
+  //#define POWER_OFF_TIMER               // Enable M81 D<seconds> to power off after a delay       // 启用 M81 D<seconds> 以在延迟后关闭电源
+  //#define POWER_OFF_WAIT_FOR_COOLDOWN   // Enable M81 S to power off only after cooldown          // 启用 M81 S 以仅在冷却后关闭电源
 
-  //#define PSU_POWERUP_GCODE  "M355 S1"  // G-code to run after power-on (e.g., case light on)  //电源开启后要运行的 G 代码（例如，打开机箱灯）
-  //#define PSU_POWEROFF_GCODE "M355 S0"  // G-code to run before power-off (e.g., case light off)  //电源关闭前要运行的 G 代码（例如，关闭机箱灯）
+  //#define PSU_POWERUP_GCODE  "M355 S1"  // G-code to run after power-on (e.g., case light on)     // 电源开启后要运行的 G 代码（例如，打开机箱灯）
+  //#define PSU_POWEROFF_GCODE "M355 S0"  // G-code to run before power-off (e.g., case light off)  // 电源关闭前要运行的 G 代码（例如，关闭机箱灯）
 
-  //#define AUTO_POWER_CONTROL      // Enable automatic control of the PS_ON pin  //启用 PS_ON 引脚的自动控制
+  //#define AUTO_POWER_CONTROL      // Enable automatic control of the PS_ON pin                    // 启用 PS_ON 引脚的自动控制
   #if ENABLED(AUTO_POWER_CONTROL)
-    #define AUTO_POWER_FANS           // Turn on PSU for fans    // 开启电源模块为风扇供电
-    #define AUTO_POWER_E_FANS         // Turn on PSU for E Fans  //开启电源模块为挤出机风扇供电
-    #define AUTO_POWER_CONTROLLERFAN  // Turn on PSU for Controller Fan  //开启电源模块为控制器风扇供电
-    #define AUTO_POWER_CHAMBER_FAN    // Turn on PSU for Chamber Fan  //开启电源模块为机箱风扇供电
-    #define AUTO_POWER_COOLER_FAN     // Turn on PSU for Cooler Fan  //开启电源模块为冷却风扇供电
-    #define AUTO_POWER_SPINDLE_LASER  // Turn on PSU for Spindle/Laser  //开启电源模块为主轴/激光供电
-    #define POWER_TIMEOUT              30 // (s) Turn off power if the machine is idle for this duration  //（秒）如果机器空闲超过此时间则关闭电源
+    #define AUTO_POWER_FANS           // Turn on PSU for fans               // 开启电源模块为风扇供电
+    #define AUTO_POWER_E_FANS         // Turn on PSU for E Fans             // 开启电源模块为挤出机风扇供电
+    #define AUTO_POWER_CONTROLLERFAN  // Turn on PSU for Controller Fan     // 开启电源模块为控制器风扇供电
+    #define AUTO_POWER_CHAMBER_FAN    // Turn on PSU for Chamber Fan        // 开启电源模块为机箱风扇供电
+    #define AUTO_POWER_COOLER_FAN     // Turn on PSU for Cooler Fan         // 开启电源模块为冷却风扇供电
+    #define AUTO_POWER_SPINDLE_LASER  // Turn on PSU for Spindle/Laser      // 开启电源模块为主轴/激光供电
+    #define POWER_TIMEOUT              30 // (s) Turn off power if the machine is idle for this duration                      //（秒）如果机器空闲超过此时间则关闭电源
     //#define POWER_OFF_DELAY          60 // (s) Delay of poweroff after M81 command. Useful to let fans run for extra time.  //（秒）M81 命令后关闭电源的延迟。用于让风扇额外运行一段时间。
   #endif
   #if ANY(AUTO_POWER_CONTROL, POWER_OFF_WAIT_FOR_COOLDOWN)
     //#define AUTO_POWER_E_TEMP        50 // (°C) PSU on if any extruder is over this temperature  //（°C）如果任何挤出机超过此温度则开启电源模块
-    //#define AUTO_POWER_CHAMBER_TEMP  30 // (°C) PSU on if the chamber is over this temperature  //（°C）如果机箱超过此温度则开启电源模块
-    //#define AUTO_POWER_COOLER_TEMP   26 // (°C) PSU on if the cooler is over this temperature  //（°C）如果冷却器超过此温度则开启电源模块
+    //#define AUTO_POWER_CHAMBER_TEMP  30 // (°C) PSU on if the chamber is over this temperature   //（°C）如果机箱超过此温度则开启电源模块
+    //#define AUTO_POWER_COOLER_TEMP   26 // (°C) PSU on if the cooler is over this temperature    //（°C）如果冷却器超过此温度则开启电源模块
   #endif
 #endif
 
@@ -585,6 +644,7 @@
 //============================= Thermal Settings ============================
 //===========================================================================
 // @section temperature
+// 温度设置
 
 /**
  * Temperature Sensors:
@@ -685,18 +745,14 @@
    非标准配置，需将 4.7kΩ 上拉电阻更换为 1kΩ。
    但能提升测温精度并让PID调节更稳定）
  * ================================================================
- *    51 : 100kΩ EPCOS (1kΩ pullup)
- *    52 : 200kΩ ATC Semitec 204GT-2 (1kΩ pullup)
- *    55 : 100kΩ ATC Semitec 104GT-2 - Used in ParCan & J-Head (1kΩ pullup)
+ *    51 : 100kΩ EPCOS (1kΩ pullup)                                             // 51 : 100kΩ EPCOS 热敏电阻（1kΩ 上拉电阻）
+ *    52 : 200kΩ ATC Semitec 204GT-2 (1kΩ pullup)                               // 52 : 200kΩ ATC Semitec 204GT-2 热敏电阻（1kΩ 上拉电阻）
+ *    55 : 100kΩ ATC Semitec 104GT-2 - Used in ParCan & J-Head (1kΩ pullup)     // 55 : 100kΩ ATC Semitec 104GT-2 热敏电阻 - 用于 ParCan 和 J-Head 热端（1kΩ 上拉电阻）
  *
- *    51 : 100kΩ EPCOS 热敏电阻（1kΩ 上拉电阻）
-      52 : 200kΩ ATC Semitec 204GT-2 热敏电阻（1kΩ 上拉电阻）
-      55 : 100kΩ ATC Semitec 104GT-2 热敏电阻 - 用于 ParCan 和 J-Head 热端（1kΩ 上拉电阻）
  * ================================================================
- *  Analog Thermistors - 10kΩ pullup - Atypical    模拟热敏电阻 - 10kΩ 上拉电阻 - 非标准配置
+ *  Analog Thermistors - 10kΩ pullup - Atypical                                 // 模拟热敏电阻 - 10kΩ 上拉电阻 - 非标准配置
  * ================================================================
- *    99 : 100kΩ Found on some Wanhao i3 machines with a 10kΩ pull-up resistor
- *    99 : 100kΩ  见于部分万好i3机型，搭配10kΩ上拉电阻
+ *    99 : 100kΩ Found on some Wanhao i3 machines with a 10kΩ pull-up resistor  // 99 : 100kΩ  见于部分万好i3机型，搭配10kΩ上拉电阻
  * ================================================================
  *  Analog RTDs (Pt100/Pt1000)
  * ================================================================
@@ -725,13 +781,10 @@
  *        Configuration_adv.h file. At this time, separate Hardware SPI buses for sensors are not supported.
  *
  * ================================================================
- *  Analog Thermocouple Boards   模拟热电偶转接板
+ *  Analog Thermocouple Boards                // 模拟热电偶转接板
  * ================================================================
- *    -4 : AD8495 with Thermocouple
- *    -1 : AD595  with Thermocouple
- * 
- *    -4 : AD8495 热电偶转接板
-      -1 : AD595  热电偶转接板
+ *    -4 : AD8495 with Thermocouple           // -4 : AD8495 热电偶转接板
+ *    -1 : AD595  with Thermocouple           //  -1 : AD595  热电偶转接板
  *
  * ================================================================
  *  SoC internal sensor   SoC 内部传感器
@@ -744,14 +797,12 @@
  *     0 : not used
  *  1000 : Custom - Specify parameters in Configuration_adv.h
  *
- *   !!! Use these for Testing or Development purposes. NEVER for production machine. !!!
- *   998 : Dummy Table that ALWAYS reads 25°C or the temperature defined below.
- *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
- *  !!! 仅用于测试或开发目的。切勿用于生产机器！！！
-    998 : 始终读取 25°C 或下方定义的温度的虚拟表。
-    999 : 始终读取 100°C 或下方定义的温度的虚拟表。
+ *   !!! Use these for Testing or Development purposes. NEVER for production machine. !!! // 仅用于测试或开发目的。切勿用于生产机器！！！
+ *   998 : Dummy Table that ALWAYS reads 25°C or the temperature defined below.           // 998 : 始终读取 25°C 或下方定义的温度的虚拟表。
+ *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.          // 999 : 始终读取 100°C 或下方定义的温度的虚拟表。
  */
-#define TEMP_SENSOR_0 1
+// 下面的配置，请根据上方列出的多种型号的热敏电阻，然后选择与你的硬件相匹配的型号，将对应的数值填进去。
+#define TEMP_SENSOR_0 1      // （译者注：这一行是挤出机的热敏电阻配置）
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
@@ -774,7 +825,7 @@
 // Resistor values when using MAX31865 sensors (-5) on TEMP_SENSOR_0 / 1 / 2 / BED
 // 在 TEMP_SENSOR_0 / 1 / 2 / BED 上使用 MAX31865 传感器（型号-5）时的电阻值配置
 #if TEMP_SENSOR_IS_MAX_TC(0)
-  #define MAX31865_SENSOR_OHMS_0      100 // (Ω) Typically 100 or 1000 (PT100 or PT1000)  // (Ω) 通常为 100 或 1000（对应 PT100 或 PT1000 传感器）
+  #define MAX31865_SENSOR_OHMS_0      100 // (Ω) Typically 100 or 1000 (PT100 or PT1000)                     // (Ω) 通常为 100 或 1000（对应 PT100 或 PT1000 传感器）
   #define MAX31865_CALIBRATION_OHMS_0 430 // (Ω) Typically 430 for Adafruit PT100; 4300 for Adafruit PT1000  // (Ω) Adafruit PT100 通常为 430；Adafruit PT1000 通常为 4300
 #endif
 #if TEMP_SENSOR_IS_MAX_TC(1)
@@ -791,20 +842,20 @@
 #endif
 
 #if HAS_E_TEMP_SENSOR
-  #define TEMP_RESIDENCY_TIME         10  // (seconds) Time to wait for hotend to "settle" in M109  // (秒) M109 指令中等待热端温度稳定的延时时间
-  #define TEMP_WINDOW                  1  // (°C) Temperature proximity for the "temperature reached" timer  // (°C) “温度达到”计时器的温度接近度
+  #define TEMP_RESIDENCY_TIME         10  // (seconds) Time to wait for hotend to "settle" in M109               // (秒) M109 指令中等待热端温度稳定的延时时间
+  #define TEMP_WINDOW                  1  // (°C) Temperature proximity for the "temperature reached" timer      // (°C) “温度达到”计时器的温度接近度
   #define TEMP_HYSTERESIS              3  // (°C) Temperature proximity considered "close enough" to the target  // (°C) 被认为“足够接近”目标的温度接近度
 #endif
 
 #if TEMP_SENSOR_BED
-  #define TEMP_BED_RESIDENCY_TIME     10  // (seconds) Time to wait for bed to "settle" in M190  // (秒) M190 指令中等待热床温度稳定的延时时间
-  #define TEMP_BED_WINDOW              1  // (°C) Temperature proximity for the "temperature reached" timer  // (°C) “温度达到”计时器的温度接近度
+  #define TEMP_BED_RESIDENCY_TIME     10  // (seconds) Time to wait for bed to "settle" in M190                  // (秒) M190 指令中等待热床温度稳定的延时时间
+  #define TEMP_BED_WINDOW              1  // (°C) Temperature proximity for the "temperature reached" timer      // (°C) “温度达到”计时器的温度接近度
   #define TEMP_BED_HYSTERESIS          3  // (°C) Temperature proximity considered "close enough" to the target  // (°C) 被认为“足够接近”目标的温度接近度
 #endif
 
 #if TEMP_SENSOR_CHAMBER
-  #define TEMP_CHAMBER_RESIDENCY_TIME 10  // (seconds) Time to wait for chamber to "settle" in M191  // (秒) M191 指令中等待机箱温度稳定的延时时间
-  #define TEMP_CHAMBER_WINDOW          1  // (°C) Temperature proximity for the "temperature reached" timer  // (°C) “温度达到”计时器的温度接近度
+  #define TEMP_CHAMBER_RESIDENCY_TIME 10  // (seconds) Time to wait for chamber to "settle" in M191              // (秒) M191 指令中等待机箱温度稳定的延时时间
+  #define TEMP_CHAMBER_WINDOW          1  // (°C) Temperature proximity for the "temperature reached" timer      // (°C) “温度达到”计时器的温度接近度
   #define TEMP_CHAMBER_HYSTERESIS      3  // (°C) Temperature proximity considered "close enough" to the target  // (°C) 被认为“足够接近”目标的温度接近度
 #endif
 
@@ -819,20 +870,18 @@
  * For selecting source/target use: COOLER, PROBE, BOARD, CHAMBER, BED, E0, E1, E2, E3, E4, E5, E6, E7
  * 
  * 冗余温度传感器（TEMP_SENSOR_REDUNDANT）
-  使用一个温度传感器作为另一个读数的冗余传感器。选择一个未使用的温度传感器，以及另一个你希望它冗余的传感器。
-  如果两个热敏电阻的温度差异超过 TEMP_SENSOR_REDUNDANT_MAX_DIFF（°C），打印将被中止。
-  无论选择哪个传感器，都将禁用其正常功能；例如，选择床传感器（-1）将禁用床加热/监测。
+ * 使用一个温度传感器作为另一个读数的冗余传感器。选择一个未使用的温度传感器，以及另一个你希望它冗余的传感器。
+ * 如果两个热敏电阻的温度差异超过 TEMP_SENSOR_REDUNDANT_MAX_DIFF（°C），打印将被中止。
+ * 无论选择哪个传感器，都将禁用其正常功能；例如，选择床传感器（-1）将禁用床加热/监测。
  */
 #if TEMP_SENSOR_REDUNDANT
-  #define TEMP_SENSOR_REDUNDANT_SOURCE    E1  // The sensor that will provide the redundant reading.  // 将提供冗余读数的传感器。
-  #define TEMP_SENSOR_REDUNDANT_TARGET    E0  // The sensor that we are providing a redundant reading for.  // 我们正在为其提供冗余读数的传感器。
+  #define TEMP_SENSOR_REDUNDANT_SOURCE    E1  // The sensor that will provide the redundant reading.           // 将提供冗余读数的传感器。
+  #define TEMP_SENSOR_REDUNDANT_TARGET    E0  // The sensor that we are providing a redundant reading for.     // 我们正在为其提供冗余读数的传感器。
   #define TEMP_SENSOR_REDUNDANT_MAX_DIFF  10  // (°C) Temperature difference that will trigger a print abort.  //（°C）将触发打印中止的温度差异。
 #endif
 
-// Below this temperature the heater will be switched off
-// because it probably indicates a broken thermistor wire.
-// 低于该温度时，加热器将自动关闭
-// 因为这种情况通常表明热敏电阻线路断路。
+// Below this temperature the heater will be switched off     // 低于该温度时，加热器将自动关闭
+// because it probably indicates a broken thermistor wire.    // 因为这种情况通常表明热敏电阻线路断路。
 #define HEATER_0_MINTEMP   5
 #define HEATER_1_MINTEMP   5
 #define HEATER_2_MINTEMP   5
@@ -844,12 +893,10 @@
 #define BED_MINTEMP        5
 #define CHAMBER_MINTEMP    5
 
-// Above this temperature the heater will be switched off.
-// This can protect components from overheating, but NOT from shorts and failures.
-// (Use MINTEMP for thermistor short/failure protection.)
-// 高于该温度时，加热器将自动关闭。
-// 可保护元件免受过热损坏，但无法防护短路与故障。
-// （使用 MINTEMP 实现热敏电阻短路/故障保护。）
+// Above this temperature the heater will be switched off.                          // 高于该温度时，加热器将自动关闭。
+// This can protect components from overheating, but NOT from shorts and failures.  // 可保护元件免受过热损坏，但无法防护短路与故障。
+// (Use MINTEMP for thermistor short/failure protection.)                           // （使用 MINTEMP 实现热敏电阻短路/故障保护。）
+// （译者注）：下面是0-7号喷头（HEATER）温度上限设置，热床温度上限（BED_MAXTEMP ）设置，以及机箱温度（CHAMBER_MAXTEMP）上限设置。
 #define HEATER_0_MAXTEMP 275
 #define HEATER_1_MAXTEMP 275
 #define HEATER_2_MAXTEMP 275
@@ -868,12 +915,12 @@
  * a MAXTEMP shutdown! Use these values to forbid temperatures being set too close to MAXTEMP.
  * 
  * 热过冲
-  在加热（和打印）过程中，温度通常会超过目标温度很多度（尤其是在 PID 调整之前）。
-  将目标温度设置得太接近 MAXTEMP 会导致 MAXTEMP 关机！使用这些值禁止将温度设置得过于接近 MAXTEMP。
+ * 在加热（和打印）过程中，温度通常会超过目标温度很多度（尤其是在 PID 调整之前）。
+ * 将目标温度设置得太接近 MAXTEMP 会导致 MAXTEMP 关机！使用这些值禁止将温度设置得过于接近 MAXTEMP。
  */
 #define HOTEND_OVERSHOOT 15   // (°C) Forbid temperatures over MAXTEMP - OVERSHOOT  //（°C）禁止设置超过 MAXTEMP - OVERSHOOT 的温度
 #define BED_OVERSHOOT    10   // (°C) Forbid temperatures over MAXTEMP - OVERSHOOT  //（°C）禁止设置超过 MAXTEMP - OVERSHOOT 的温度
-#define COOLER_OVERSHOOT  2   // (°C) Forbid temperatures closer than OVERSHOOT  //（°C）禁止设置接近 OVERSHOOT 的温度
+#define COOLER_OVERSHOOT  2   // (°C) Forbid temperatures closer than OVERSHOOT     //（°C）禁止设置接近 OVERSHOOT 的温度
 
 //===========================================================================
 //============================= PID Settings ================================
@@ -894,21 +941,21 @@
   PIDTEMP : PID 温度控制（约占用4.1K字节）
   MPCTEMP : 预测模型温度控制（无自动调节时约占用1.8K字节）
  */
-#define PIDTEMP           // See the PID Tuning Guide at https://reprap.org/wiki/PID_Tuning  // 参阅PID调参指南，网址：https://reprap.org/wiki/PID_Tuning
+#define PIDTEMP           // See the PID Tuning Guide at https://reprap.org/wiki/PID_Tuning        // 参阅PID调参指南，网址：https://reprap.org/wiki/PID_Tuning
 //#define MPCTEMP         // See https://marlinfw.org/docs/features/model_predictive_control.html  // 参阅：https://marlinfw.org/docs/features/model_predictive_control.html
 
 #define PID_MAX  255      // Limit hotend current while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current  // PID激活时限制热端电流（见下文PID_FUNCTIONAL_RANGE）；255=全电流
 #define PID_K1     0.95   // Smoothing factor within any PID loop  // PID循环内的平滑因子
 
 #if ENABLED(PIDTEMP)
-  //#define MIN_POWER 0           // Min power to improve PID stability (0..PID_MAX).  // 提升PID稳定性的最小功率输出（取值范围：0 到 PID_MAX）
+  //#define MIN_POWER 0           // Min power to improve PID stability (0..PID_MAX).                                       // 提升PID稳定性的最小功率输出（取值范围：0 到 PID_MAX）
                                   // Get the power from the temperature report ('M105' => @:nnn) and try P*2-20 to P*2-10.  // 从温度反馈指令中获取功率值（'M105' => @:nnn），尝试将P值设为 当前功率值×2-20 至 当前功率值×2-10 区间。
-  //#define PID_DEBUG             // Print PID debug data to the serial port. Use 'M303 D' to enable/disable.  // 将PID调试数据打印到串口。使用 'M303 D' 命令启用/禁用。
-  //#define PID_PARAMS_PER_HOTEND // Use separate PID parameters for each extruder (useful for mismatched extruders)  // 为每个挤出机使用单独的PID参数（适用于不匹配的挤出机）
-                                  // Set/get with G-code: M301 E[extruder number, 0-2]  // 使用G-code设置/获取：M301 E[挤出机编号，0-2] P[KP] I[KI] D[KD]
+  //#define PID_DEBUG             // Print PID debug data to the serial port. Use 'M303 D' to enable/disable.               // 将PID调试数据打印到串口。使用 'M303 D' 命令启用/禁用。
+  //#define PID_PARAMS_PER_HOTEND // Use separate PID parameters for each extruder (useful for mismatched extruders)        // 为每个挤出机使用单独的PID参数（适用于不匹配的挤出机）
+                                  // Set/get with G-code: M301 E[extruder number, 0-2]                                      // 使用G-code设置/获取：M301 E[挤出机编号，0-2] P[KP] I[KI] D[KD]
 
   #if ENABLED(PID_PARAMS_PER_HOTEND)
-    // Specify up to one value per hotend here, according to your setup.  // 根据你的设备配置，在此为每个热端分别指定一个参数值。
+    // Specify up to one value per hotend here, according to your setup.          // 根据你的设备配置，在此为每个热端分别指定一个参数值。
     // If there are fewer values, the last one applies to the remaining hotends.  // 如果值的数量较少，则最后一个值将适用于剩余的热端。
     #define DEFAULT_Kp_LIST {  22.20,  22.20 }
     #define DEFAULT_Ki_LIST {   1.08,   1.08 }
@@ -936,27 +983,27 @@
   @section mpc temp
  */
 #if ENABLED(MPCTEMP)
-  #define MPC_AUTOTUNE                                // Include a method to do MPC auto-tuning (~6.3K bytes of flash)  // 启用MPC自动调参功能（约占用6.3KB闪存空间）
+  #define MPC_AUTOTUNE                                // Include a method to do MPC auto-tuning (~6.3K bytes of flash)                // 启用MPC自动调参功能（约占用6.3KB闪存空间）
   #if ENABLED(MPC_AUTOTUNE)
-    //#define MPC_AUTOTUNE_DEBUG                      // Enable MPC debug logging (~870 bytes of flash)  // 启用MPC调试日志记录（约占用870字节的闪存空间）
+    //#define MPC_AUTOTUNE_DEBUG                      // Enable MPC debug logging (~870 bytes of flash)                               // 启用MPC调试日志记录（约占用870字节的闪存空间）
   #endif
-  //#define MPC_EDIT_MENU                             // Add MPC editing to the "Advanced Settings" menu. (~1.3K bytes of flash)  // 在“高级设置”菜单中添加MPC编辑功能（约占用1.3KB的闪存空间）
-  //#define MPC_AUTOTUNE_MENU                         // Add MPC auto-tuning to the "Advanced Settings" menu. (~350 bytes of flash)  // 在“高级设置”菜单中添加MPC自动调节功能（约占用350字节的闪存空间）
+  //#define MPC_EDIT_MENU                             // Add MPC editing to the "Advanced Settings" menu. (~1.3K bytes of flash)      // 在“高级设置”菜单中添加MPC编辑功能（约占用1.3KB的闪存空间）
+  //#define MPC_AUTOTUNE_MENU                         // Add MPC auto-tuning to the "Advanced Settings" menu. (~350 bytes of flash)   // 在“高级设置”菜单中添加MPC自动调节功能（约占用350字节的闪存空间）
 
-  #define MPC_MAX 255                                 // (0..255) Current to nozzle while MPC is active.  255=full current.  // MPC激活时喷嘴的电流（取值范围：0 到 255，255=全电流）
-  #define MPC_HEATER_POWER { 40.0f }                  // (W) Nominal heat cartridge powers.    //（W）名义热卡功率。用于自动调节和作为模型的基础。
-  //#define MPC_PTC                                   // Hotend power changes with temperature (e.g., PTC heat cartridges).  // 热端功率随温度变化（例如，PTC热卡）。启用后需要定义MPC_HEATER_ALPHA和MPC_HEATER_REFTEMP。
+  #define MPC_MAX 255                                 // (0..255) Current to nozzle while MPC is active.  255=full current.           // MPC激活时喷嘴的电流（取值范围：0 到 255，255=全电流）
+  #define MPC_HEATER_POWER { 40.0f }                  // (W) Nominal heat cartridge powers.                                           //（W）名义热卡功率。用于自动调节和作为模型的基础。
+  //#define MPC_PTC                                   // Hotend power changes with temperature (e.g., PTC heat cartridges).           // 热端功率随温度变化（例如，PTC热卡）。启用后需要定义MPC_HEATER_ALPHA和MPC_HEATER_REFTEMP。
   #if ENABLED(MPC_PTC)
-    #define MPC_HEATER_ALPHA { 0.0028f }              // Temperature coefficient of resistance of the heat cartridges.  // 热卡的电阻温度系数。用于自动调节和作为模型的基础。
-    #define MPC_HEATER_REFTEMP { 20 }                 // (°C) Reference temperature for MPC_HEATER_POWER and MPC_HEATER_ALPHA.  // MPC_HEATER_POWER和MPC_HEATER_ALPHA的参考温度（°C）。通常为室温。
+    #define MPC_HEATER_ALPHA { 0.0028f }              // Temperature coefficient of resistance of the heat cartridges.                // 热卡的电阻温度系数。用于自动调节和作为模型的基础。
+    #define MPC_HEATER_REFTEMP { 20 }                 // (°C) Reference temperature for MPC_HEATER_POWER and MPC_HEATER_ALPHA.        // MPC_HEATER_POWER和MPC_HEATER_ALPHA的参考温度（°C）。通常为室温。
   #endif
 
   #define MPC_INCLUDE_FAN                             // Model the fan speed?  // 启用风扇速度建模？
 
   // Measured physical constants from M306
   #define MPC_BLOCK_HEAT_CAPACITY { 16.7f }           // (J/K) Heat block heat capacities.   //（J/K）热块热容量。
-  #define MPC_SENSOR_RESPONSIVENESS { 0.22f }         // (K/s per ∆K) Rate of change of sensor temperature from heat block.  //（K/s per ∆K）热块温度变化引起的传感器温度变化率。用于自动调节和作为模型的基础。
-  #define MPC_AMBIENT_XFER_COEFF { 0.068f }           // (W/K) Heat transfer coefficients from heat block to room air with fan off.  //（W/K）热块到室内空气的热传递系数，风扇关闭时。用于自动调节和作为模型的基础。
+  #define MPC_SENSOR_RESPONSIVENESS { 0.22f }         // (K/s per ∆K) Rate of change of sensor temperature from heat block.              //（K/s per ∆K）热块温度变化引起的传感器温度变化率。用于自动调节和作为模型的基础。
+  #define MPC_AMBIENT_XFER_COEFF { 0.068f }           // (W/K) Heat transfer coefficients from heat block to room air with fan off.      //（W/K）热块到室内空气的热传递系数，风扇关闭时。用于自动调节和作为模型的基础。
   #if ENABLED(MPC_INCLUDE_FAN)
     #define MPC_AMBIENT_XFER_COEFF_FAN255 { 0.097f }  // (W/K) Heat transfer coefficients from heat block to room air with fan on full.  //（W/K）热块到室内空气的热传递系数，风扇全速时。用于自动调节和作为模型的基础。
   #endif
@@ -970,19 +1017,19 @@
 
   // Filament Heat Capacity (joules/kelvin/mm)
   // Set at runtime with M306 H<value>
-  #define FILAMENT_HEAT_CAPACITY_PERMM { 5.6e-3f }    // 0.0056 J/K/mm for 1.75mm PLA (0.0149 J/K/mm for 2.85mm PLA).  // 1.75mm PLA 耗材热容参数：0.0056 J/K/mm（2.85mm PLA 耗材热容参数：0.0149 J/K/mm）
-                                                      // 0.0036 J/K/mm for 1.75mm PETG (0.0094 J/K/mm for 2.85mm PETG).  // 1.75mm PETG 耗材热容参数：0.0036 J/K/mm（2.85mm PETG 耗材热容参数：0.0094 J/K/mm）  
-                                                      // 0.00515 J/K/mm for 1.75mm ABS (0.0137 J/K/mm for 2.85mm ABS).  // 1.75mm ABS 耗材热容参数：0.00515 J/K/mm（2.85mm ABS 耗材热容参数：0.0137 J/K/mm）
+  #define FILAMENT_HEAT_CAPACITY_PERMM { 5.6e-3f }    // 0.0056 J/K/mm for 1.75mm PLA (0.0149 J/K/mm for 2.85mm PLA).       // 1.75mm PLA 耗材热容参数：0.0056 J/K/mm（2.85mm PLA 耗材热容参数：0.0149 J/K/mm）
+                                                      // 0.0036 J/K/mm for 1.75mm PETG (0.0094 J/K/mm for 2.85mm PETG).     // 1.75mm PETG 耗材热容参数：0.0036 J/K/mm（2.85mm PETG 耗材热容参数：0.0094 J/K/mm）  
+                                                      // 0.00515 J/K/mm for 1.75mm ABS (0.0137 J/K/mm for 2.85mm ABS).      // 1.75mm ABS 耗材热容参数：0.00515 J/K/mm（2.85mm ABS 耗材热容参数：0.0137 J/K/mm）
                                                       // 0.00522 J/K/mm for 1.75mm Nylon (0.0138 J/K/mm for 2.85mm Nylon).  // 1.75mm 尼龙 耗材热容参数：0.00522 J/K/mm（2.85mm 尼龙 耗材热容参数：0.0138 J/K/mm）
 
   // Advanced options  高级选项
   #define MPC_SMOOTHING_FACTOR 0.5f                   // (0.0...1.0) Noisy temperature sensors may need a lower value for stabilization.  //（0.0...1.0）// 温度传感器信号噪声较大时，可能需要降低该参数值以实现稳定。
-  #define MPC_MIN_AMBIENT_CHANGE 1.0f                 // (K/s) Modeled ambient temperature rate of change, when correcting model inaccuracies.  //(开尔文/秒) 用于修正模型误差时，模拟环境温度的变化速率
-  #define MPC_STEADYSTATE 0.5f                        // (K/s) Temperature change rate for steady state logic to be enforced.  // (开尔文/秒) 稳态逻辑生效所需的温度变化速率
+  #define MPC_MIN_AMBIENT_CHANGE 1.0f                 // (K/s) Modeled ambient temperature rate of change, when correcting model inaccuracies.           // (开尔文/秒) 用于修正模型误差时，模拟环境温度的变化速率
+  #define MPC_STEADYSTATE 0.5f                        // (K/s) Temperature change rate for steady state logic to be enforced.                            // (开尔文/秒) 稳态逻辑生效所需的温度变化速率
 
-  #define MPC_TUNING_POS { X_CENTER, Y_CENTER, 1.0f } // (mm) M306 Autotuning position, ideally bed center at first layer height.  // (毫米) M306 自动调参坐标，理想位置为第一层高度时的热床中心
-  #define MPC_TUNING_END_Z 10.0f                      // (mm) M306 Autotuning final Z position.  // (毫米) M306 自动调参结束时的Z坐标位置
-  //#define EVENT_GCODE_AFTER_MPC_TUNE "M84"          // G-code to execute after MPC tune finished and Z raised.  // M306自动调节完成并提升Z轴后执行的G-code
+  #define MPC_TUNING_POS { X_CENTER, Y_CENTER, 1.0f } // (mm) M306 Autotuning position, ideally bed center at first layer height. // (毫米) M306 自动调参坐标，理想位置为第一层高度时的热床中心
+  #define MPC_TUNING_END_Z 10.0f                      // (mm) M306 Autotuning final Z position.                                   // (毫米) M306 自动调参结束时的Z坐标位置
+  //#define EVENT_GCODE_AFTER_MPC_TUNE "M84"          // G-code to execute after MPC tune finished and Z raised.                  // M306自动调节完成并提升Z轴后执行的G-code
 #endif
 
 //===========================================================================
@@ -1033,17 +1080,17 @@
 //#define PIDTEMPBED
 
 #if ENABLED(PIDTEMPBED)
-  //#define MIN_BED_POWER 0   // Min power to improve PID stability (0..MAX_BED_POWER).  // 提升热床PID稳定性的最小输出功率（取值范围：0 到 MAX_BED_POWER）
+  //#define MIN_BED_POWER 0   // Min power to improve PID stability (0..MAX_BED_POWER).                                  // 提升热床PID稳定性的最小输出功率（取值范围：0 到 MAX_BED_POWER）
                               // Get the power from the temperature report ('M105' => B@:nnn) and try P*2-20 to P*2-10.  // 从温度反馈指令中获取功率值（'M105' => B@:nnn），尝试将P值设为 当前功率值×2-20 至 当前功率值×2-10 区间。
-  //#define PID_BED_DEBUG     // Print Bed PID debug data to the serial port. Use 'M303 D' to enable/disable.  // 将热床PID调试数据打印到串口。使用 'M303 D' 命令启用/禁用。
+  //#define PID_BED_DEBUG     // Print Bed PID debug data to the serial port. Use 'M303 D' to enable/disable.            // 将热床PID调试数据打印到串口。使用 'M303 D' 命令启用/禁用。
 
-  // 120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)  // 适配 120V 250W 硅胶加热板 + 4mm 硼硅玻璃热床（MendelMax 1.5+ 机型）
+  // 120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)                                    // 适配 120V 250W 硅胶加热板 + 4mm 硼硅玻璃热床（MendelMax 1.5+ 机型）
   // from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)  // 来自 FOPDT 模型 - kp=.39 Tp=405 Tdead=66，Tc 设置为 79.2，激进因子为 .15（相对于 .1、1、10）
   #define DEFAULT_bedKp  10.00
   #define DEFAULT_bedKi   0.023
   #define DEFAULT_bedKd 305.4
 
-  // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.  // 运行自动调节命令 "M303 E-1 C8 S90"，在热床上以 90°C 进行 8 个周期的自动调节，来获取适合你设备的 PID 参数。
+  // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.      // 运行自动调节命令 "M303 E-1 C8 S90"，在热床上以 90°C 进行 8 个周期的自动调节，来获取适合你设备的 PID 参数。
 #else
   //#define BED_LIMIT_SWITCHING   // Keep the bed temperature within BED_HYSTERESIS of the target  // 将热床温度保持在目标温度的 BED_HYSTERESIS 范围内
 #endif
@@ -1105,7 +1152,7 @@
  */
 //#define PELTIER_BED
 #if ENABLED(PELTIER_BED)
-  #define PELTIER_DIR_PIN           -1  // Relay control pin for Peltier  // 半导体制冷片的继电器控制引脚
+  #define PELTIER_DIR_PIN           -1  // Relay control pin for Peltier                        // 半导体制冷片的继电器控制引脚
   #define PELTIER_DIR_HEAT_STATE   LOW  // The relay pin state that causes the Peltier to heat  // 导致半导体制冷片加热的继电器引脚状态
 #endif
 
@@ -1166,9 +1213,9 @@
 #define MAX_CHAMBER_POWER 255 // limits duty cycle to chamber heater; 255=full current  // 限制腔体加热器的工作占空比；255 = 满电流/满功率
 
 #if ENABLED(PIDTEMPCHAMBER)
-  //#define MIN_CHAMBER_POWER 0 // Min power to improve PID stability. (0..MAX_CHAMBER_POWER)  // 提升腔体 PID 稳定性的最小输出功率（取值范围：0 到 MAX_CHAMBER_POWER）
+  //#define MIN_CHAMBER_POWER 0 // Min power to improve PID stability. (0..MAX_CHAMBER_POWER)                              // 提升腔体 PID 稳定性的最小输出功率（取值范围：0 到 MAX_CHAMBER_POWER）
                                 // Get the power from the temperature report ('M105' => C@:nnn) and try P*2-20 to P*2-10.  // 从温度反馈指令中获取功率值（'M105' => C@:nnn），尝试将P值设为 当前功率值×2-20 至 当前功率值×2-10 区间。
-  //#define PID_CHAMBER_DEBUG   // Print Chamber PID debug data to the serial port. Use 'M303 D' to enable/disable.  // 将腔体 PID 调试数据打印到串口。使用 'M303 D' 命令启用/禁用。
+  //#define PID_CHAMBER_DEBUG   // Print Chamber PID debug data to the serial port. Use 'M303 D' to enable/disable.        // 将腔体 PID 调试数据打印到串口。使用 'M303 D' 命令启用/禁用。
 
   // Lasko "MyHeat Personal Heater" (200w) modified with a Fotek SSR-10DA to control only the heating element
   // and placed inside the small Creality printer enclosure tent.
@@ -1187,13 +1234,13 @@
 // @section pid temp
 
 #if ANY(PIDTEMP, PIDTEMPBED, PIDTEMPCHAMBER)
-  //#define PID_OPENLOOP          // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX  // 将 PID 设置为开环模式。M104/M140 指令将输出功率设置为 0 到 PID_MAX 之间的值
+  //#define PID_OPENLOOP          // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX                                                          // 将 PID 设置为开环模式。M104/M140 指令将输出功率设置为 0 到 PID_MAX 之间的值
   //#define SLOW_PWM_HEATERS      // PWM with very low frequency (roughly 0.125Hz=8s) and minimum state time of approximately 1s useful for heaters driven by a relay  // 通过继电器驱动的加热器适用的非常低频率（大约0.125Hz=8秒）和最小状态时间约为1秒的PWM
   #define PID_FUNCTIONAL_RANGE 20 // If the temperature difference between the target temperature and the actual temperature
                                   // is more than PID_FUNCTIONAL_RANGE then the PID will be shut off and the heater will be set to min/max.
                                   //当目标温度与实际温度之差超过 PID_FUNCTIONAL_RANGE 时，将关闭 PID 控制，并将加热器设置为最大/最小功率。
 
-  //#define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of flash)  // 在“高级设置”菜单中添加 PID 编辑功能（约占用700字节的闪存空间）
+  //#define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of flash)      // 在“高级设置”菜单中添加 PID 编辑功能（约占用700字节的闪存空间）
   //#define PID_AUTOTUNE_MENU     // Add PID auto-tuning to the "Advanced Settings" menu. (~250 bytes of flash)  // 在“高级设置”菜单中添加 PID 自动调节功能（约占用250字节的闪存空间）
 #endif
 
@@ -1226,7 +1273,7 @@
  *
  */
 #define PREVENT_LENGTHY_EXTRUDE
-#define EXTRUDE_MAXLENGTH 200
+#define EXTRUDE_MAXLENGTH 200    //（译者注）：每次手动挤出，最长只能出 200mm
 
 //===========================================================================
 //======================== Thermal Runaway Protection =======================
@@ -1259,10 +1306,10 @@
  *
  */
 
-#define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders  // 为所有挤出机启用热保护功能
-#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed  // 为热床启用热保护功能
+#define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders       // 为所有挤出机启用热保护功能
+#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed      // 为热床启用热保护功能
 #define THERMAL_PROTECTION_CHAMBER // Enable thermal protection for the heated chamber  // 为加热腔体启用热保护功能
-#define THERMAL_PROTECTION_COOLER  // Enable thermal protection for the laser cooling  // 为激光冷却系统启用热保护功能
+#define THERMAL_PROTECTION_COOLER  // Enable thermal protection for the laser cooling   // 为激光冷却系统启用热保护功能
 
 //===========================================================================
 //============================= Mechanical Settings =========================
@@ -1277,6 +1324,7 @@
 
 // 启用以下选项之一，以支持 CoreXY、CoreXZ 或 CoreYZ 运动学架构
 // 支持标准布局或反向布局
+//（译者注）：如果你是UM架构的打印机，下面全部保持注释。UM 是普通笛卡尔机，不是 Core 系列，所以这些 Core 全部注释掉，不用开。
 //#define COREXY
 //#define COREXZ
 //#define COREYZ
