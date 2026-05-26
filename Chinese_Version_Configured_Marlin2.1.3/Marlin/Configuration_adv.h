@@ -5702,20 +5702,22 @@
 /**
  * Analog Joystick(s)
  * @section joystick
+ * 模拟量摇杆（一个或多个）
+ * （配置区域：摇杆）
  */
 //#define JOYSTICK
 #if ENABLED(JOYSTICK)
-  #define JOY_X_PIN    5  // RAMPS: Suggested pin A5  on AUX2
-  #define JOY_Y_PIN   10  // RAMPS: Suggested pin A10 on AUX2
-  #define JOY_Z_PIN   12  // RAMPS: Suggested pin A12 on AUX2
-  #define JOY_EN_PIN  44  // RAMPS: Suggested pin D44 on AUX2
+  #define JOY_X_PIN    5  // RAMPS: Suggested pin A5  on AUX2   // RAMPS 主板：推荐使用 AUX2 接口上的 A5 引脚
+  #define JOY_Y_PIN   10  // RAMPS: Suggested pin A10 on AUX2   // RAMPS 主板：推荐使用 AUX2 接口上的 A10 引脚
+  #define JOY_Z_PIN   12  // RAMPS: Suggested pin A12 on AUX2   // RAMPS 主板：推荐使用 AUX2 接口上的 A12 引脚
+  #define JOY_EN_PIN  44  // RAMPS: Suggested pin D44 on AUX2   // RAMPS 主板：推荐使用 AUX2 接口上的 D44 引脚
 
-  //#define INVERT_JOY_X  // Enable if X direction is reversed
-  //#define INVERT_JOY_Y  // Enable if Y direction is reversed
-  //#define INVERT_JOY_Z  // Enable if Z direction is reversed
+  //#define INVERT_JOY_X  // Enable if X direction is reversed  // 如果 X 轴方向是反的，就启用这个选项
+  //#define INVERT_JOY_Y  // Enable if Y direction is reversed  // 如果 Y 轴方向是反的，就启用这个选项
+  //#define INVERT_JOY_Z  // Enable if Z direction is reversed  // 如果 Z 轴方向是反的，就启用这个选项
 
-  // Use M119 with JOYSTICK_DEBUG to find reasonable values after connecting:
-  #define JOY_X_LIMITS { 5600, 8190-100, 8190+100, 10800 } // min, deadzone start, deadzone end, max
+  // Use M119 with JOYSTICK_DEBUG to find reasonable values after connecting:                         // 连接好硬件后，可使用 M119 指令（配合 JOYSTICK_DEBUG 功能）来获取合理的校准值
+  #define JOY_X_LIMITS { 5600, 8190-100, 8190+100, 10800 } // min, deadzone start, deadzone end, max  // 最小值、死区起始值、死区结束值、最大值
   #define JOY_Y_LIMITS { 5600, 8250-100, 8250+100, 11000 }
   #define JOY_Z_LIMITS { 4800, 8080-100, 8080+100, 11550 }
   //#define JOYSTICK_DEBUG
@@ -5727,18 +5729,23 @@
  * Adds capability to work with any adjustable current drivers.
  * Implemented as G34 because M915 is deprecated.
  * @section calibrate
+ * 机械龙门架校准
+ * 作为 Průša 机型 TMC_Z_CALIBRATION 功能的新版替代方案
+ * 支持搭配各类可调节电流的驱动芯片使用
+ * 该功能通过 G34 指令实现（M915 指令已废弃）
+ * （配置区域：校准功能）
  */
 //#define MECHANICAL_GANTRY_CALIBRATION
 #if ENABLED(MECHANICAL_GANTRY_CALIBRATION)
-  #define GANTRY_CALIBRATION_CURRENT          600     // Default calibration current in ma
-  #define GANTRY_CALIBRATION_EXTRA_HEIGHT      15     // Extra distance in mm past Z_###_POS to move
-  #define GANTRY_CALIBRATION_FEEDRATE         500     // Feedrate for correction move
-  //#define GANTRY_CALIBRATION_TO_MIN                 // Enable to calibrate Z in the MIN direction
+  #define GANTRY_CALIBRATION_CURRENT          600     // Default calibration current in ma            // 默认校准电流（单位：毫安 ma）
+  #define GANTRY_CALIBRATION_EXTRA_HEIGHT      15     // Extra distance in mm past Z_###_POS to move  // 超出 Z_###_POS 位置后，额外继续移动的距离（单位：毫米）
+  #define GANTRY_CALIBRATION_FEEDRATE         500     // Feedrate for correction move                 // 校正移动时的进给速率（速度）
+  //#define GANTRY_CALIBRATION_TO_MIN                 // Enable to calibrate Z in the MIN direction   // 启用后，将向Z轴负方向执行校准
 
-  //#define GANTRY_CALIBRATION_SAFE_POSITION XY_CENTER // Safe position for nozzle
-  //#define GANTRY_CALIBRATION_XY_PARK_FEEDRATE 3000  // XY Park Feedrate - MMM
+  //#define GANTRY_CALIBRATION_SAFE_POSITION XY_CENTER // Safe position for nozzle                    // 喷嘴的安全停留位置
+  //#define GANTRY_CALIBRATION_XY_PARK_FEEDRATE 3000  // XY Park Feedrate - MMM                       // XY 轴移动到安全位置时的进给速度（单位：毫米/分钟）
   //#define GANTRY_CALIBRATION_COMMANDS_PRE   ""
-  #define GANTRY_CALIBRATION_COMMANDS_POST  "G28"     // G28 highly recommended to ensure an accurate position
+  #define GANTRY_CALIBRATION_COMMANDS_POST  "G28"     // G28 highly recommended to ensure an accurate position  // 强烈建议先执行 G28 归位操作，以确保位置精准
 #endif
 
 /**
@@ -5746,11 +5753,16 @@
  * Potentially useful for rapid stop that allows being resumed. Halts stepper movement.
  * Note this does NOT pause spindles, lasers, fans, heaters or any other auxiliary device.
  * @section interface
+ * 
+ * 即时冻结 / 解除冻结功能
+ * 适用于需要快速停止但后续可恢复的场景，会暂停步进电机运动
+ * 注意：此功能不会暂停主轴、激光、风扇、加热头或其他辅助设备
+ * （配置区域：界面/交互功能）
  */
 //#define FREEZE_FEATURE
 #if ENABLED(FREEZE_FEATURE)
-  //#define FREEZE_PIN 41   // Override the default (KILL) pin here
-  #define FREEZE_STATE LOW  // State of pin indicating freeze
+  //#define FREEZE_PIN 41   // Override the default (KILL) pin here   // 在此处覆盖默认的 KILL 引脚定义(KILL 引脚 = 打印机的紧急停止引脚（触发后立刻停机）)
+  #define FREEZE_STATE LOW  // State of pin indicating freeze         // 用于触发冻结功能的引脚状态（高电平 / 低电平）
 #endif
 
 /**
@@ -5759,6 +5771,12 @@
  * Add support for a low-cost 8x8 LED Matrix based on the Max7219 chip as a realtime status display.
  * Requires 3 signal wires. Some useful debug options are included to demonstrate its usage.
  * @section debug matrix
+ * MAX7219 调试LED矩阵屏
+ *
+ * 添加对低成本 MAX7219 芯片 8x8 LED 点阵屏的支持，用作实时状态显示屏
+ * 需要连接 3 根信号线
+ * 内置了一些实用的调试选项，用于演示如何使用该模块
+ * @section debug matrix （配置区域：调试矩阵屏）
  */
 //#define MAX7219_DEBUG
 #if ENABLED(MAX7219_DEBUG)
@@ -5766,32 +5784,34 @@
   #define MAX7219_DIN_PIN   57
   #define MAX7219_LOAD_PIN  44
 
-  //#define MAX7219_GCODE          // Add the M7219 G-code to control the LED matrix
-  #define MAX7219_INIT_TEST    2   // Test pattern at startup: 0=none, 1=sweep, 2=spiral
-  #define MAX7219_NUMBER_UNITS 1   // Number of Max7219 units in chain.
-  #define MAX7219_ROTATE       0   // Rotate the display clockwise (in multiples of +/- 90°)
-                                   // connector at:  right=0   bottom=-90  top=90  left=180
-  //#define MAX7219_REVERSE_ORDER  // The order of the LED matrix units may be reversed
-  //#define MAX7219_REVERSE_EACH   // The LEDs in each matrix unit row may be reversed
-  //#define MAX7219_SIDE_BY_SIDE   // Big chip+matrix boards can be chained side-by-side
+  //#define MAX7219_GCODE          // Add the M7219 G-code to control the LED matrix         // 添加 M7219 G-code 指令，用于控制 LED 矩阵屏
+  #define MAX7219_INIT_TEST    2   // Test pattern at startup: 0=none, 1=sweep, 2=spiral     // 开机自检显示图案：0=无，1=扫掠，2=螺旋
+  #define MAX7219_NUMBER_UNITS 1   // Number of Max7219 units in chain.                      // 级联的 Max7219 模块数量
+  #define MAX7219_ROTATE       0   // Rotate the display clockwise (in multiples of +/- 90°) // 将显示屏顺时针旋转（以 ±90° 为单位进行旋转）
+                                   // connector at:  right=0   bottom=-90  top=90  left=180  // 接口位置对应旋转值：右侧=0   底部=-90  顶部=90  左侧=180
+  //#define MAX7219_REVERSE_ORDER  // The order of the LED matrix units may be reversed      // LED 矩阵模块的显示顺序可以设置为反转
+  //#define MAX7219_REVERSE_EACH   // The LEDs in each matrix unit row may be reversed       // 可以反转单个矩阵模块中每行LED的显示顺序
+  //#define MAX7219_SIDE_BY_SIDE   // Big chip+matrix boards can be chained side-by-side     // 大型芯片+矩阵集成板可并排级联使用
 
   /**
    * Sample debug features
    * If you add more debug displays, be careful to avoid conflicts!
+   * 调试功能示例
+   * 如果你添加更多的调试显示内容，务必注意避免冲突！
    */
-  #define MAX7219_DEBUG_PRINTER_ALIVE     // Blink corner LED of 8x8 matrix to show that the firmware is functioning
-  #define MAX7219_DEBUG_PLANNER_HEAD  2   // Show the planner queue head position on this and the next LED matrix row
-  #define MAX7219_DEBUG_PLANNER_TAIL  4   // Show the planner queue tail position on this and the next LED matrix row
+  #define MAX7219_DEBUG_PRINTER_ALIVE     // Blink corner LED of 8x8 matrix to show that the firmware is functioning       // 闪烁 8x8 矩阵的角落 LED，用于表明固件正在正常运行
+  #define MAX7219_DEBUG_PLANNER_HEAD  2   // Show the planner queue head position on this and the next LED matrix row      // 在当前LED矩阵行和下一行显示规划队列的头部位置
+  #define MAX7219_DEBUG_PLANNER_TAIL  4   // Show the planner queue tail position on this and the next LED matrix row      // 在当前LED矩阵行和下一行显示规划队列的尾部位置
 
   #define MAX7219_DEBUG_PLANNER_QUEUE 0   // Show the current planner queue depth on this and the next LED matrix row
-                                          // If you experience stuttering, reboots, etc. this option can reveal how
-                                          // tweaks made to the configuration are affecting the printer in real-time.
-  #define MAX7219_DEBUG_PROFILE       6   // Display the fraction of CPU time spent in profiled code on this LED matrix
-                                          // row. By default idle() is profiled so this shows how "idle" the processor is.
-                                          // See class CodeProfiler.
-  //#define MAX7219_DEBUG_MULTISTEPPING 6 // Show multi-stepping 1 to 128 on this LED matrix row.
-  //#define MAX7219_DEBUG_SLOWDOWN      6 // Count (mod 16) how many times SLOWDOWN has reduced print speed.
-  //#define MAX7219_REINIT_ON_POWERUP     // Re-initialize MAX7129 when power supply turns on
+                                          // If you experience stuttering, reboots, etc. this option can reveal how        // 在当前LED矩阵行和下一行显示当前规划队列的深度
+                                          // tweaks made to the configuration are affecting the printer in real-time.      // 如果你遇到打印卡顿、重启等问题，此选项可以实时显示配置调整对打印机的实际影响。
+  #define MAX7219_DEBUG_PROFILE       6   // Display the fraction of CPU time spent in profiled code on this LED matrix    // 在该LED矩阵行上显示CPU用于分析代码的时间占比
+                                          // row. By default idle() is profiled so this shows how "idle" the processor is. // 默认监控的是 idle() 函数，因此该数值表示处理器的“空闲率”
+                                          // See class CodeProfiler.                                                       // 详见 CodeProfiler 类。
+  //#define MAX7219_DEBUG_MULTISTEPPING 6 // Show multi-stepping 1 to 128 on this LED matrix row.                          // 在该LED矩阵行上显示 1 到 128 的多步细分（multi-stepping）状态
+  //#define MAX7219_DEBUG_SLOWDOWN      6 // Count (mod 16) how many times SLOWDOWN has reduced print speed.               // 对 SLOWDOWN 减速触发次数进行计数（模 16 显示）
+  //#define MAX7219_REINIT_ON_POWERUP     // Re-initialize MAX7129 when power supply turns on                              // 电源开启时重新初始化 MAX7219 芯片
 #endif
 
 /**
@@ -5801,10 +5821,16 @@
  * output a "Z_move_comp" string to enable synchronization with DLP projector exposure.
  * This feature allows you to use [[WaitForDoneMessage]] instead of M400 commands.
  * @section nanodlp
+ * NanoDLP 同步功能支持
+ *
+ * 用于与 NanoDLP 配合使用时，支持 Z 轴同步移动。G0/G1 轴移动指令会
+ * 输出一个 "Z_move_comp" 字符串，以实现与 DLP 投影仪曝光的同步。
+ * 该功能允许你使用 [[WaitForDoneMessage]] 代替 M400 指令。
+ * (译者注：这是光固化 3D 打印机（DLP/SLA）专用功能，FDM 熔融打印机用不到)
  */
 //#define NANODLP_Z_SYNC
 #if ENABLED(NANODLP_Z_SYNC)
-  //#define NANODLP_ALL_AXIS  // Send a "Z_move_comp" report for any axis move (not just Z).
+  //#define NANODLP_ALL_AXIS  // Send a "Z_move_comp" report for any axis move (not just Z).  // 对任意轴的移动都发送 "Z_move_comp" 同步报告（不只是Z轴）
 #endif
 
 /**
