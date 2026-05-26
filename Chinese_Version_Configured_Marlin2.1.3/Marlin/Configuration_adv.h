@@ -5588,15 +5588,19 @@
 #endif
 
 // @section extras
+// 额外配置
 
 /**
  * Cancel Objects
  *
  * Implement M486 to allow Marlin to skip objects
+ * 取消打印对象
+ *
+ * 实现 M486 指令，允许固件跳过指定物体的打印
  */
 //#define CANCEL_OBJECTS
 #if ENABLED(CANCEL_OBJECTS)
-  #define CANCEL_OBJECTS_REPORTING // Emit the current object as a status message
+  #define CANCEL_OBJECTS_REPORTING // Emit the current object as a status message  // 将当前正在打印的对象作为状态消息发送（给主机/上位机）
 #endif
 
 /**
@@ -5611,31 +5615,43 @@
  *
  * Reliabuild encoders have been modified to improve reliability.
  * @section i2c encoders
+ * 
+ * 用于闭环控制的 I2C 通信位置编码器
+ * 由 Aus3D 的 Chris Barr 研发
+ *
+ * 维基文档：https://wiki.aus3d.com.au/Magnetic_Encoder
+ * Github 地址：https://github.com/Aus3D/MagneticEncoder
+ *
+ * 销售商：https://aus3d.com.au/products/magnetic-encoder-module
+ * 替代销售商：https://reliabuild3d.com/
+ *
+ * Reliabuild 编码器做了可靠性优化改进
+ * @section i2c encoders
  */
 
 //#define I2C_POSITION_ENCODERS
 #if ENABLED(I2C_POSITION_ENCODERS)
 
-  #define I2CPE_ENCODER_CNT         1                       // The number of encoders installed; max of 5
-                                                            // encoders supported currently.
+  #define I2CPE_ENCODER_CNT         1                       // The number of encoders installed; max of 5                    // 已安装的编码器数量；最大值为 5
+                                                            // encoders supported currently.                                 // 当前支持的编码器类型
 
-  #define I2CPE_ENC_1_ADDR          I2CPE_PRESET_ADDR_X     // I2C address of the encoder. 30-200.
-  #define I2CPE_ENC_1_AXIS          X_AXIS                  // Axis the encoder module is installed on.  <X|Y|Z|E>_AXIS.
-  #define I2CPE_ENC_1_TYPE          I2CPE_ENC_TYPE_LINEAR   // Type of encoder:  I2CPE_ENC_TYPE_LINEAR -or-
-                                                            // I2CPE_ENC_TYPE_ROTARY.
-  #define I2CPE_ENC_1_TICKS_UNIT    2048                    // 1024 for magnetic strips with 2mm poles; 2048 for
-                                                            // 1mm poles. For linear encoders this is ticks / mm,
-                                                            // for rotary encoders this is ticks / revolution.
-  //#define I2CPE_ENC_1_TICKS_REV     (16 * 200)            // Only needed for rotary encoders; number of stepper
-                                                            // steps per full revolution (motor steps/rev * microstepping)
-  //#define I2CPE_ENC_1_INVERT                              // Invert the direction of axis travel.
-  #define I2CPE_ENC_1_EC_METHOD     I2CPE_ECM_MICROSTEP     // Type of error error correction.
-  #define I2CPE_ENC_1_EC_THRESH     0.10                    // Threshold size for error (in mm) above which the
-                                                            // printer will attempt to correct the error; errors
-                                                            // smaller than this are ignored to minimize effects of
+  #define I2CPE_ENC_1_ADDR          I2CPE_PRESET_ADDR_X     // I2C address of the encoder. 30-200.                           // 编码器的 I2C 地址。取值范围：30–200。
+  #define I2CPE_ENC_1_AXIS          X_AXIS                  // Axis the encoder module is installed on.  <X|Y|Z|E>_AXIS.     // 编码器模块安装的轴。可选值：<X|Y|Z|E>_AXIS。
+  #define I2CPE_ENC_1_TYPE          I2CPE_ENC_TYPE_LINEAR   // Type of encoder:  I2CPE_ENC_TYPE_LINEAR -or-               
+                                                            // I2CPE_ENC_TYPE_ROTARY.                                        // 编码器类型：I2CPE_ENC_TYPE_LINEAR（线性编码器） 或 I2CPE_ENC_TYPE_ROTARY（旋转编码器）
+  #define I2CPE_ENC_1_TICKS_UNIT    2048                    // 1024 for magnetic strips with 2mm poles; 2048 for             // 磁极间距2mm的磁条用1024；1mm磁极用2048。
+                                                            // 1mm poles. For linear encoders this is ticks / mm,            // 线性编码器：单位是 脉冲/毫米
+                                                            // for rotary encoders this is ticks / revolution.               // 旋转编码器：单位是 脉冲/圈
+  //#define I2CPE_ENC_1_TICKS_REV     (16 * 200)            // Only needed for rotary encoders; number of stepper            // 仅旋转编码器需要设置；步进电机每转总步数
+                                                            // steps per full revolution (motor steps/rev * microstepping)   // (电机基本步数 * 细分)
+  //#define I2CPE_ENC_1_INVERT                              // Invert the direction of axis travel.                          // 反转轴的运动方向
+  #define I2CPE_ENC_1_EC_METHOD     I2CPE_ECM_MICROSTEP     // Type of error error correction.                               // 误差校正类型
+  #define I2CPE_ENC_1_EC_THRESH     0.10                    // Threshold size for error (in mm) above which the              // 误差阈值（单位：毫米）
+                                                            // printer will attempt to correct the error; errors             // 超过此值的误差，打印机才会尝试校正
+                                                            // smaller than this are ignored to minimize effects of          // 小于此值的误差直接忽略，用于过滤测量噪声和延迟带来的微小抖动
                                                             // measurement noise / latency (filter).
 
-  #define I2CPE_ENC_2_ADDR          I2CPE_PRESET_ADDR_Y     // Same as above, but for encoder 2.
+  #define I2CPE_ENC_2_ADDR          I2CPE_PRESET_ADDR_Y     // Same as above, but for encoder 2.                             // 与上述参数相同，但这是用于 2 号编码器的设置。
   #define I2CPE_ENC_2_AXIS          Y_AXIS
   #define I2CPE_ENC_2_TYPE          I2CPE_ENC_TYPE_LINEAR
   #define I2CPE_ENC_2_TICKS_UNIT    2048
@@ -5644,8 +5660,8 @@
   #define I2CPE_ENC_2_EC_METHOD     I2CPE_ECM_MICROSTEP
   #define I2CPE_ENC_2_EC_THRESH     0.10
 
-  #define I2CPE_ENC_3_ADDR          I2CPE_PRESET_ADDR_Z     // Encoder 3.  Add additional configuration options
-  #define I2CPE_ENC_3_AXIS          Z_AXIS                  // as above, or use defaults below.
+  #define I2CPE_ENC_3_ADDR          I2CPE_PRESET_ADDR_Z     // Encoder 3.  Add additional configuration options              // 3号编码器。添加额外的配置选项
+  #define I2CPE_ENC_3_AXIS          Z_AXIS                  // as above, or use defaults below.                              // 与上述配置相同，或者直接使用下方的默认值。
 
   #define I2CPE_ENC_4_ADDR          I2CPE_PRESET_ADDR_E     // Encoder 4.
   #define I2CPE_ENC_4_AXIS          E_AXIS
@@ -5653,7 +5669,7 @@
   #define I2CPE_ENC_5_ADDR          34                      // Encoder 5.
   #define I2CPE_ENC_5_AXIS          E_AXIS
 
-  // Default settings for encoders which are enabled, but without settings configured above.
+  // Default settings for encoders which are enabled, but without settings configured above.    // 对于已启用、但上方未单独配置的编码器，使用此默认设置。
   #define I2CPE_DEF_TYPE            I2CPE_ENC_TYPE_LINEAR
   #define I2CPE_DEF_ENC_TICKS_UNIT  2048
   #define I2CPE_DEF_TICKS_REV       (16 * 200)
@@ -5662,20 +5678,23 @@
 
   //#define I2CPE_ERR_THRESH_ABORT  100.0                   // Threshold size for error (in mm) error on any given
                                                             // axis after which the printer will abort. Comment out to
-                                                            // disable abort behavior.
+                                                            // disable abort behavior.               // 任意轴的误差阈值（单位：毫米），超过此值打印机会立即中止打印。注释掉此行即可禁用中止功能。
 
   #define I2CPE_TIME_TRUSTED        10000                   // After an encoder fault, there must be no further fault
                                                             // for this amount of time (in ms) before the encoder
-                                                            // is trusted again.
+                                                            // is trusted again.                     // 编码器故障后，必须在该时长（单位：毫秒）内未再次发生故障,才能重新恢复编码器的信任状态
 
   /**
    * Position is checked every time a new command is executed from the buffer but during long moves,
    * this setting determines the minimum update time between checks. A value of 100 works well with
    * error rolling average when attempting to correct only for skips and not for vibration.
+   * 每次从缓冲区执行新指令时都会检测位置，但在长距离移动过程中，
+   * 本设置决定了检测之间的最小更新时间。
+   * 设置为 100 时，配合误差滚动平均算法，可只校正丢步，不校正振动。
    */
-  #define I2CPE_MIN_UPD_TIME_MS     4                       // (ms) Minimum time between encoder checks.
+  #define I2CPE_MIN_UPD_TIME_MS     4                       // (ms) Minimum time between encoder checks.          // 编码器位置检测的最小时间间隔（单位：毫秒）
 
-  // Use a rolling average to identify persistent errors that indicate skips, as opposed to vibration and noise.
+  // Use a rolling average to identify persistent errors that indicate skips, as opposed to vibration and noise.  // 使用滚动平均值算法，识别代表丢步的持续性误差，而非振动和噪声。
   #define I2CPE_ERR_ROLLING_AVERAGE
 
 #endif // I2C_POSITION_ENCODERS
