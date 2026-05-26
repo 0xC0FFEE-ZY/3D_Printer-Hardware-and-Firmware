@@ -6150,45 +6150,50 @@
 /**
  * Advanced Print Counter settings
  * @section stats
+ * 高级打印计数设置
+ * 统计（stats）
  */
 #if ENABLED(PRINTCOUNTER)
   #define SERVICE_WARNING_BUZZES  3
-  // Activate up to 3 service interval watchdogs
-  //#define SERVICE_NAME_1      "Service S"
-  //#define SERVICE_INTERVAL_1  100 // print hours
-  //#define SERVICE_NAME_2      "Service L"
-  //#define SERVICE_INTERVAL_2  200 // print hours
+  // Activate up to 3 service interval watchdogs    // 启用最多 3 个维护间隔监控计时器
+  //#define SERVICE_NAME_1      "Service S"         // 维护提醒 S（第1组维护项）
+  //#define SERVICE_INTERVAL_1  100 // print hours  // 打印时间
+  //#define SERVICE_NAME_2      "Service L"         // 长期维护提醒 L
+  //#define SERVICE_INTERVAL_2  200 // print hours  // 打印时间
   //#define SERVICE_NAME_3      "Service 3"
-  //#define SERVICE_INTERVAL_3    1 // print hours
+  //#define SERVICE_INTERVAL_3    1 // print hours  // 打印时间
 #endif
 
 // @section develop
+//【开发者 / 高级调试】配置分区标记
 
 //
-// M100 Free Memory Watcher to debug memory usage
+// M100 Free Memory Watcher to debug memory usage   // M100 空闲内存监视器 —— 用于调试内存使用情况
 //
 //#define M100_FREE_MEMORY_WATCHER
 
 //
-// M42 - Set pin states
+// M42 - Set pin states   // M42 - 设置引脚状态
 //
 //#define DIRECT_PIN_CONTROL
 
 //
-// M43 - display pin status, toggle pins, watch pins, watch endstops & toggle LED, test servo probe
+// M43 - display pin status, toggle pins, watch pins, watch endstops & toggle LED, test servo probe  // M43 - 显示引脚状态、切换引脚电平、监控引脚、监控限位开关 & 切换LED、测试伺服探针
 //
 //#define PINS_DEBUGGING
 
-// Enable Tests that will run at startup and produce a report
+// Enable Tests that will run at startup and produce a report  // 启用开机自动运行的测试项，并生成测试报告
 //#define MARLIN_TEST_BUILD
 
-// Enable Marlin dev mode which adds some special commands
+// Enable Marlin dev mode which adds some special commands     // 启用 Marlin 开发者模式，会添加一些专用的特殊指令
 //#define MARLIN_DEV_MODE
 
 #if ENABLED(MARLIN_DEV_MODE)
   /**
    * D576 - Buffer Monitoring
    * To help diagnose print quality issues stemming from empty command buffers.
+   * D576 - 缓冲区监控
+   * 用于诊断因指令缓冲区为空导致的打印质量问题。
    */
   //#define BUFFER_MONITORING
 #endif
@@ -6197,17 +6202,22 @@
  * Postmortem Debugging captures misbehavior and outputs the CPU status and backtrace to serial.
  * When running in the debugger it will break for debugging. This is useful to help understand
  * a crash from a remote location. Requires ~400 bytes of SRAM and 5Kb of flash.
+ * 崩溃调试（Postmortem Debugging）
+ * 捕获系统异常行为，并将 CPU 状态、调用栈回溯通过串口输出。
+ * 在调试器中运行时会暂停以便调试。
+ * 用于远程分析打印机崩溃原因。
+ * 占用约 400 字节 SRAM + 5KB 闪存空间。
  */
 //#define POSTMORTEM_DEBUGGING
 
 /**
- * Software Reset options
+ * Software Reset options   // 软件复位选项
  */
-//#define SOFT_RESET_VIA_SERIAL         // 'KILL' and '^X' commands will soft-reset the controller
-//#define SOFT_RESET_ON_KILL            // Use a digital button to soft-reset the controller after KILL
+//#define SOFT_RESET_VIA_SERIAL         // 'KILL' and '^X' commands will soft-reset the controller      // 命令 'KILL' 和 '^X' 将执行控制器的软重启
+//#define SOFT_RESET_ON_KILL            // Use a digital button to soft-reset the controller after KILL // 使用一个数字按键，在系统 KILL 停机后执行控制器软重启
 
-// Report uncleaned reset reason from register r2 instead of MCUSR. Supported by Optiboot on AVR.
+// Report uncleaned reset reason from register r2 instead of MCUSR. Supported by Optiboot on AVR.       // 从寄存器 r2 中读取未清除的复位原因，而非从 MCUSR 读取。仅支持 AVR 芯片上的 Optiboot 引导程序。
 //#define OPTIBOOT_RESET_REASON
 
-// Shrink the build for smaller boards by sacrificing some serial feedback
+// Shrink the build for smaller boards by sacrificing some serial feedback                              // 为小容量主板精简编译体积，牺牲部分串口反馈信息
 //#define MARLIN_SMALL_BUILD
