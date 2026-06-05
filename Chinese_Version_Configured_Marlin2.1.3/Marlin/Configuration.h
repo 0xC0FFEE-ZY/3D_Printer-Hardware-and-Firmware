@@ -32,7 +32,7 @@
  * 本工程各项参数已配置完成，适用于本人自制的3D打印机（基于UM架构），
  * 
  * 该3D打印机设计图纸，硬件原理图，PCB已全部开源,未来预计更新制作教程至抖音/B站。
- * 欢迎关注本人抖音：（抖音号:Technophilic)，昵称：0xC0FFEE_ZY，里面有一些电子科技创作相关的视频，欢迎大家点赞关注！谢谢！
+ * 欢迎关注本人抖音：(抖音号:Technophilic)，昵称：0xC0FFEE_ZY，里面有一些电子科技创作相关的视频，欢迎大家点赞关注！谢谢！
  * B站 UID:481302692，昵称：0xC0FFEE_ZY
  * 
  * 开源项目见本人Github主页：https://github.com/0xC0FFEE-ZY
@@ -41,9 +41,6 @@
  * 本工程保留了原版工程所有英文注释，并新增了中文注释及本人的注解，一些代码配置有改动，适用于本人的双X双Y双Z UM架构打印机。
  * 本人的开源仓库同时提供了“仅翻译版本”，所有代码与配置均保持默认，仅新增了中文注释。
  * 详见：
- * 开源仓库同时还提供了纯中文版本（删去原有的英文注释，替换为中文注释。）
- * 详见：
- * 
 
  * up为2024级本科生，热爱电子科技，欢迎和我一起进行讨论和交流！
 
@@ -695,7 +692,7 @@
  *   666 : 200kΩ Einstart S custom thermistor with 10k pullup.
  *  2000 : 100kΩ Ultimachine Rambo TDK NTCG104LH104KT1 NTC100K motherboard Thermistor  
  * 
- * *     1 : 100kΩ EPCOS - EPCOS热敏电阻的最佳选型
+ *    1 : 100kΩ EPCOS - EPCOS热敏电阻的最佳选型
 *   331 : 100kΩ 与1号参数相同，适配MEGA主板3.3V分压
 *   332 : 100kΩ 与1号参数相同，适配DUE主板3.3V分压
 *     2 : 200kΩ ATC Semitec 204GT-2
@@ -810,7 +807,7 @@
 #define TEMP_SENSOR_5 0
 #define TEMP_SENSOR_6 0
 #define TEMP_SENSOR_7 0
-#define TEMP_SENSOR_BED 1
+#define TEMP_SENSOR_BED 1    // （译者注：这一行是热床的热敏电阻配置）
 #define TEMP_SENSOR_PROBE 0
 #define TEMP_SENSOR_CHAMBER 0
 #define TEMP_SENSOR_COOLER 0
@@ -882,7 +879,7 @@
 
 // Below this temperature the heater will be switched off     // 低于该温度时，加热器将自动关闭
 // because it probably indicates a broken thermistor wire.    // 因为这种情况通常表明热敏电阻线路断路。
-#define HEATER_0_MINTEMP   5
+#define HEATER_0_MINTEMP   5                                  // （译者注：0号加热器的最低温度限制:5℃）
 #define HEATER_1_MINTEMP   5
 #define HEATER_2_MINTEMP   5
 #define HEATER_3_MINTEMP   5
@@ -897,7 +894,7 @@
 // This can protect components from overheating, but NOT from shorts and failures.  // 可保护元件免受过热损坏，但无法防护短路与故障。
 // (Use MINTEMP for thermistor short/failure protection.)                           // （使用 MINTEMP 实现热敏电阻短路/故障保护。）
 // （译者注）：下面是0-7号喷头（HEATER）温度上限设置，热床温度上限（BED_MAXTEMP ）设置，以及机箱温度（CHAMBER_MAXTEMP）上限设置。
-#define HEATER_0_MAXTEMP 275
+#define HEATER_0_MAXTEMP 275                                                        // （译者注：0号加热器的最高温度限制:275℃）
 #define HEATER_1_MAXTEMP 275
 #define HEATER_2_MAXTEMP 275
 #define HEATER_3_MAXTEMP 275
@@ -968,6 +965,7 @@
 #else
   #define BANG_MAX 255    // Limit hotend current while in bang-bang mode; 255=full current  // 在开/关模式下限制热端电流；255=全电流
 #endif
+//(译者注：Bang-Bang控制：低于目标温度 → 加热器 100% 满功率全开；高于目标温度 → 加热器彻底断电全关，只有全开 / 全关两档，)
 
 /**
  * Model Predictive Control for hotend
@@ -980,6 +978,7 @@
  * 热端的模型预测控制
   使用热端的物理模型来控制温度。当正确配置时，这比PID具有更好的响应性和稳定性，并且不需要PID_EXTRUSION_SCALING和PID_FAN_SCALING。
   启用MPC_AUTOTUNE并使用M306 T进行自动调节模型。
+  （译者注：MPC（提前预判）：内置热块热容、加热功率、散热损耗、耗材吸热的物理模型，在开始挤料、开风扇前就提前预补热量，抵消温度跌落，因此不用 PID 的两项补偿参数。)
   @section mpc temp
  */
 #if ENABLED(MPCTEMP)
@@ -998,10 +997,10 @@
     #define MPC_HEATER_REFTEMP { 20 }                 // (°C) Reference temperature for MPC_HEATER_POWER and MPC_HEATER_ALPHA.        // MPC_HEATER_POWER和MPC_HEATER_ALPHA的参考温度（°C）。通常为室温。
   #endif
 
-  #define MPC_INCLUDE_FAN                             // Model the fan speed?  // 启用风扇速度建模？
+  #define MPC_INCLUDE_FAN                             // Model the fan speed?                                                            // 启用风扇速度建模？
 
   // Measured physical constants from M306
-  #define MPC_BLOCK_HEAT_CAPACITY { 16.7f }           // (J/K) Heat block heat capacities.   //（J/K）热块热容量。
+  #define MPC_BLOCK_HEAT_CAPACITY { 16.7f }           // (J/K) Heat block heat capacities.                                               //（J/K）热块热容量。
   #define MPC_SENSOR_RESPONSIVENESS { 0.22f }         // (K/s per ∆K) Rate of change of sensor temperature from heat block.              //（K/s per ∆K）热块温度变化引起的传感器温度变化率。用于自动调节和作为模型的基础。
   #define MPC_AMBIENT_XFER_COEFF { 0.068f }           // (W/K) Heat transfer coefficients from heat block to room air with fan off.      //（W/K）热块到室内空气的热传递系数，风扇关闭时。用于自动调节和作为模型的基础。
   #if ENABLED(MPC_INCLUDE_FAN)
@@ -1345,7 +1344,7 @@
 // Enable for a belt style printer with endless "Z" motion // 启用此选项：适用于采用皮带传动、可实现无限Z轴运动的打印机
 //#define BELTPRINTER
 
-// Articulated robot (arm). Joints are directly mapped to axes with no kinematics.  适用于机械臂式打印机，关节直接映射到轴，无运动学计算。
+// Articulated robot (arm). Joints are directly mapped to axes with no kinematics.  // 适用于机械臂式打印机，关节直接映射到轴，无运动学计算。
 //#define ARTICULATED_ROBOT_ARM
 
 // For a hot wire cutter with parallel horizontal axes (X, I) where the heights of the two wire
@@ -1671,7 +1670,7 @@
  * Set to the state (HIGH or LOW) that applies to each endstop.
  * 
  * 限位开关触发状态
- * 设置每个限位开关被触发时的信号状态（HIGH 高电平 或 LOW 低电平）。
+ * 设置每个限位开关被触发时的信号状态（HIGH 高电平触发 或 LOW 低电平触发）。
  *
  */
 #define X_MIN_ENDSTOP_HIT_STATE HIGH
@@ -1776,7 +1775,7 @@
  *                                    X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  *
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 500 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 500 }    //（译者注：大括号里的参数依次为：X 轴，Y 轴，Z 轴，挤出机 E0 的步数/毫米。根据你的机器实际情况修改这些数值，确保打印机运动的准确性。）
 
 /**
  * Enable support for M92. Disable to save at least ~530 bytes of flash.
