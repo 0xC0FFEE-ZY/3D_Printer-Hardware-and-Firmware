@@ -1775,7 +1775,7 @@
  *                                    X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  *
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 500 }    //（译者注：大括号里的参数依次为：X 轴，Y 轴，Z 轴，挤出机 E0 的步数/毫米。根据你的机器实际情况修改这些数值，确保打印机运动的准确性。）
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 500 }    //（译者注：大括号里四个参数依次为：X 轴，Y 轴，Z 轴，挤出机 E0 的步数/毫米。根据你的机器实际情况修改这些数值，确保打印机运动的准确性。）
 
 /**
  * Enable support for M92. Disable to save at least ~530 bytes of flash.
@@ -1794,7 +1794,7 @@
  *                                    X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  *
  */
-#define DEFAULT_MAX_FEEDRATE          { 300, 300, 5, 25 }
+#define DEFAULT_MAX_FEEDRATE          { 300, 300, 5, 25 }   //（译者注：四个参数依次为X、Y、Z、挤出机的最大运动速度，单位：mm/s。）
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2// 限制通过 M203 指令或 LCD 屏幕修改的速度上限为 DEFAULT_MAX_FEEDRATE 的 2 倍
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -1814,7 +1814,7 @@
  *                                    X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  *
  */
-#define DEFAULT_MAX_ACCELERATION      { 3000, 3000, 100, 10000 }
+#define DEFAULT_MAX_ACCELERATION      { 3000, 3000, 100, 10000 }  //（译者注：四个参数依次为X、Y、Z、挤出机的最大加速度，单位：mm/s²。）
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2  // 限制通过 M201 指令或 LCD 屏幕修改的加速度上限为 DEFAULT_MAX_ACCELERATION 的 2 倍
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
@@ -1839,8 +1839,8 @@
  *   M204 T    空移加速度
  *
  */
-#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves// 打印移动时 X、Y、Z、E 轴的加速度
-#define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts  // 回抽时 E 轴（挤出机）的加速度
+#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves         // 打印移动时 X、Y、Z、E 轴的加速度
+#define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts                           // 回抽时 E 轴（挤出机）的加速度
 #define DEFAULT_TRAVEL_ACCELERATION   3000    // X, Y, Z acceleration for travel (non printing) moves  // 空移（非打印移动）时 X、Y、Z 轴的加速度
 
 /**
@@ -1860,7 +1860,6 @@
  * 电机将瞬间完成速度/方向切换，不做平滑加减速。
  * 
  *  附（译者注）：
- *
  *  Jerk是什么？
  * Jerk = 瞬间启停的 “爆发力”，它决定了：机器能不能瞬间启动、瞬间转向、瞬间停，而不用慢慢加速减速。
     数值越大：转向越干脆、打印越快，但震动大、抖边、丢步、撞头
@@ -1879,11 +1878,11 @@
   //#define DEFAULT_VJERK  0.3
   //#define DEFAULT_WJERK  0.3
 
-  //#define TRAVEL_EXTRA_XYJERK 0.0     // Additional jerk allowance for all travel moves  // 所有空移（非打印移动）的额外 XY 轴瞬时速度允许值
+  //#define TRAVEL_EXTRA_XYJERK 0.0     // Additional jerk allowance for all travel moves    // 所有空移（非打印移动）的额外 XY 轴瞬时速度允许值
 
-  //#define LIMITED_JERK_EDITING        // Limit edit via M205 or LCD to DEFAULT_aJERK * 2  // 限制通过 M205 指令或 LCD 屏幕修改的瞬时速度上限为 DEFAULT_aJERK 的 2 倍
+  //#define LIMITED_JERK_EDITING        // Limit edit via M205 or LCD to DEFAULT_aJERK * 2   // 限制通过 M205 指令或 LCD 屏幕修改的瞬时速度上限为 DEFAULT_aJERK 的 2 倍
   #if ENABLED(LIMITED_JERK_EDITING)
-    #define MAX_JERK_EDIT_VALUES { 20, 20, 0.6, 10 } // ...or, set your own edit limits  // ...或者，设置你自定义的修改上限
+    #define MAX_JERK_EDIT_VALUES { 20, 20, 0.6, 10 } // ...or, set your own edit limits      // ...或者，设置你自定义的修改上限
   #endif
 #endif
 
@@ -2051,10 +2050,10 @@
  */
 //#define Z_PROBE_SERVO_NR 0
 #ifdef Z_PROBE_SERVO_NR
-  //#define Z_SERVO_ANGLES { 70, 0 }      // Z Servo Deploy and Stow angles  // Z 轴舵机的伸出和收回角度
+  //#define Z_SERVO_ANGLES { 70, 0 }      // Z Servo Deploy and Stow angles                                              // Z 轴舵机的伸出和收回角度
   //#define Z_SERVO_MEASURE_ANGLE 45      // Use if the servo must move to a "free" position for measuring after deploy  // 如果舵机必须在伸出后移动到一个“空闲”位置进行测量，请设置这个角度
-  //#define Z_SERVO_INTERMEDIATE_STOW     // Stow the probe between points  // 在测量点之间收回探头
-  //#define Z_SERVO_DEACTIVATE_AFTER_STOW // Deactivate the servo when probe is stowed  // 探头收回后停用舵机
+  //#define Z_SERVO_INTERMEDIATE_STOW     // Stow the probe between points                                               // 在测量点之间收回探头
+  //#define Z_SERVO_DEACTIVATE_AFTER_STOW // Deactivate the servo when probe is stowed                                   // 探头收回后停用舵机
 #endif
 
 /**
@@ -2454,10 +2453,10 @@
  */
 //#define PROBE_TARE
 #if ENABLED(PROBE_TARE)
-  #define PROBE_TARE_TIME  200    // (ms) Time to hold tare pin  // 保持置零引脚状态的时间（毫秒）
-  #define PROBE_TARE_DELAY 200    // (ms) Delay after tare before  // 置零后到开始探测的延迟（毫秒）
-  #define PROBE_TARE_STATE HIGH   // State to write pin for tare  // 置零时引脚的信号状态
-  //#define PROBE_TARE_PIN PA5    // Override default pin  // 覆盖默认引脚
+  #define PROBE_TARE_TIME  200    // (ms) Time to hold tare pin             // 保持置零引脚状态的时间（毫秒）
+  #define PROBE_TARE_DELAY 200    // (ms) Delay after tare before           // 置零后到开始探测的延迟（毫秒）
+  #define PROBE_TARE_STATE HIGH   // State to write pin for tare            // 置零时引脚的信号状态
+  //#define PROBE_TARE_PIN PA5    // Override default pin                   // 覆盖默认引脚
   //#define PROBE_TARE_MENU       // Display a menu item to tare the probe  // 显示一个菜单项来执行探头置零
   #if ENABLED(PROBE_ACTIVATION_SWITCH)
     //#define PROBE_TARE_ONLY_WHILE_INACTIVE  // Fail to tare/probe if PROBE_ACTIVATION_SWITCH is active  // 仅在探头未激活时执行置零/探测，如果 PROBE_ACTIVATION_SWITCH 处于激活状态则失败
@@ -2534,11 +2533,11 @@
  * 探测完一个点后Z轴抬升到安全高度，再飞到下一个点，这个设置就是控制抬多高
  *
  */
-#define Z_CLEARANCE_DEPLOY_PROBE   10 // (mm) Z Clearance for Deploy/Stow  //探头展开 / 收回时的 Z 轴安全间隙（毫米）
-#define Z_CLEARANCE_BETWEEN_PROBES  5 // (mm) Z Clearance between probe points  // 探测点之间的 Z 轴安全间隙（毫米）
+#define Z_CLEARANCE_DEPLOY_PROBE   10 // (mm) Z Clearance for Deploy/Stow                                                       //探头展开 / 收回时的 Z 轴安全间隙（毫米）
+#define Z_CLEARANCE_BETWEEN_PROBES  5 // (mm) Z Clearance between probe points                                                  // 探测点之间的 Z 轴安全间隙（毫米）
 #define Z_CLEARANCE_MULTI_PROBE     5 // (mm) Z Clearance between multiple probes  // (mm) Z Clearance between multiple probes  // 多次探测之间的 Z 轴安全间隙（毫米）
-#define Z_PROBE_ERROR_TOLERANCE     3 // (mm) Tolerance for early trigger (<= -probe.offset.z + ZPET)  // 过早触发的容差范围（毫米）。探头触发时，如果 Z 轴位置低于 -probe.offset.z + Z_PROBE_ERROR_TOLERANCE，则认为是过早触发。
-//#define Z_AFTER_PROBING           5 // (mm) Z position after probing is done  // 探测完成后的 Z 轴位置（毫米）
+#define Z_PROBE_ERROR_TOLERANCE     3 // (mm) Tolerance for early trigger (<= -probe.offset.z + ZPET)                           // 过早触发的容差范围（毫米）。探头触发时，如果 Z 轴位置低于 -probe.offset.z + Z_PROBE_ERROR_TOLERANCE，则认为是过早触发。
+//#define Z_AFTER_PROBING           5 // (mm) Z position after probing is done                                                  // 探测完成后的 Z 轴位置（毫米）
 
 #define Z_PROBE_LOW_POINT          -2 // (mm) Farthest distance below the trigger-point to go before stopping  // 探测时，探头触发点以下的最远距离（毫米）。如果探头在触发点以下继续下降超过这个距离，则停止探测并报告错误。
 
@@ -2600,6 +2599,7 @@
 // For Inverting Stepper Enable Pins (Active Low) use 0, Non Inverting (Active High) use 1
 // 对于【低电平有效】的步进电机使能引脚，使用 0
 // 对于【高电平有效】的步进电机使能引脚，使用 1
+// （译者注：这和你的步进电机驱动的硬件设计有关。）
 // :['LOW', 'HIGH']
 #define X_ENABLE_ON LOW
 #define Y_ENABLE_ON LOW
@@ -2631,8 +2631,8 @@
 
 // @section extruder
 
-//#define DISABLE_E               // Disable the extruder when not stepping  //挤出机电机不转动时，关闭电机电源
-#define DISABLE_OTHER_EXTRUDERS   // Keep only the active extruder enabled  //仅保持当前活动挤出机启用，其他挤出机关闭
+//#define DISABLE_E               // Disable the extruder when not stepping  // 挤出机电机不转动时，关闭电机电源
+#define DISABLE_OTHER_EXTRUDERS   // Keep only the active extruder enabled   // 仅保持当前活动挤出机启用，其他挤出机关闭
 
 // @section motion
 
@@ -2653,6 +2653,7 @@
 
 // For direct drive extruder v9 set to true, for geared extruder set to false.
 // 直驱挤出机 v9 版本设置为 true，齿轮减速挤出机设置为 false。
+// （译者注：这和你选择的挤出机型号有关。）
 #define INVERT_E0_DIR false
 #define INVERT_E1_DIR false
 #define INVERT_E2_DIR false
@@ -2664,8 +2665,8 @@
 
 // @section homing
 
-//#define NO_MOTION_BEFORE_HOMING // Inhibit movement until all axes have been homed. Also enable HOME_AFTER_DEACTIVATE for extra safety.  在所有轴完成归位（回零）之前，禁止任何移动。同时建议启用 HOME_AFTER_DEACTIVATE 以获得额外的安全性。
-//#define HOME_AFTER_DEACTIVATE   // Require rehoming after steppers are deactivated. Also enable NO_MOTION_BEFORE_HOMING for extra safety.  在步进电机断电后需要重新归位（回零）。同时建议启用 NO_MOTION_BEFORE_HOMING 以获得额外的安全性。
+//#define NO_MOTION_BEFORE_HOMING // Inhibit movement until all axes have been homed. Also enable HOME_AFTER_DEACTIVATE for extra safety.    // 在所有轴完成归位（回零）之前，禁止任何移动。同时建议启用 HOME_AFTER_DEACTIVATE 以获得额外的安全性。
+//#define HOME_AFTER_DEACTIVATE   // Require rehoming after steppers are deactivated. Also enable NO_MOTION_BEFORE_HOMING for extra safety.  // 在步进电机断电后需要重新归位（回零）。同时建议启用 NO_MOTION_BEFORE_HOMING 以获得额外的安全性。
 
 /**
  * Set Z_IDLE_HEIGHT if the Z-Axis moves on its own when steppers are disabled.
@@ -2676,7 +2677,7 @@
  *  - 如果喷嘴会自己掉落到热床上，使用较小的值（例如 Z_MIN_POS）。
  *  - 如果热床会自己向下远离喷嘴，使用较大的值（例如 Z_MAX_POS）。
  * 注（译者注）：
- * 如果你的打印机电机断电后热床自己往下掉，或者喷头自己往下压，请进行这些设置。
+ * 如果你的打印机电机断电后热床自己往下掉（受重力或其他因素），或者喷头自己往下压，请进行这些设置。
  *
  */
 //#define Z_IDLE_HEIGHT Z_HOME_POS
@@ -2684,10 +2685,10 @@
 //#define Z_CLEARANCE_FOR_HOMING  4   // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
                                       // You'll need this much clearance above Z_MAX_POS to avoid grinding.
                                       // (mm) 归位 (G28) 前的最小 Z 高度
-                                     // 确保喷嘴高于热床、夹子、支架等障碍物
-                                     // 必须高于 Z_MAX_POS 这个距离，避免齿轮摩擦、撞机
+                                      // 确保喷嘴高于热床、夹子、支架等障碍物
+                                      // 必须高于 Z_MAX_POS 这个距离，避免齿轮摩擦、撞机
 
-//#define Z_AFTER_HOMING         10   // (mm) Height to move to after homing (if Z was homed)  // 归位后（如果 Z 轴完成归位）移动到的高度（毫米）
+//#define Z_AFTER_HOMING         10   // (mm) Height to move to after homing (if Z was homed)      // 归位后（如果 Z 轴完成归位）移动到的高度（毫米）
 //#define XY_AFTER_HOMING { 10, 10 }  // (mm) Move to an XY position after homing (and raising Z)  // 归位后（并抬高 Z 轴）移动到的 XY 坐标（毫米）
 
 //#define EVENT_GCODE_AFTER_HOMING "M300 P440 S200"  // Commands to run after G28 (and move to XY_AFTER_HOMING)  // G28 后（并移动到 XY_AFTER_HOMING）执行的指令
@@ -2731,20 +2732,23 @@
 // @section geometry
 
 // The size of the printable area  // 可打印区域的尺寸
+// （译者注：这是打印机的最大工作范围，通常也是热床的尺寸，由你的打印机硬件结构决定。单位是毫米。）
 #define X_BED_SIZE 200
 #define Y_BED_SIZE 200
 
 // Travel limits (linear=mm, rotational=°) after homing, corresponding to endstop positions.
 // 回零后的运动限制（直线单位：mm，旋转单位：°），对应限位开关的位置。
-// 注（译者注）：
-// 它的意思是：
-// 下面的 X、Y、Z 坐标限制，是打印机回零后能移动到的 最远/最高/最低位置
-// 决定了喷头不能超出的安全范围，防止撞机、掉轴
+
+/* 注（译者注）：
+ * 这是X、Y、Z 坐标限制，是打印机回零后能移动到的X、Y、Z轴极限位置。
+ * 限定了喷头运动的安全范围，防止撞机、刮床、飞出热床等。
+ * 该限制区域无法代替限位开关或者DIAG无传感器归零。因为打印机刚上电不知道喷头在哪里，所以必须通过限位开关或DIAG模式先回零，才能知道喷头位置，才能启用这个限制区域。
+ */
 #define X_MIN_POS 0
 #define Y_MIN_POS 0
 #define Z_MIN_POS 0
-#define X_MAX_POS X_BED_SIZE
-#define Y_MAX_POS Y_BED_SIZE
+#define X_MAX_POS X_BED_SIZE   // （译者注：X_BED_SIZE在上面定义了，这里直接引用，保持一致）
+#define Y_MAX_POS Y_BED_SIZE   // （译者注：Y_BED_SIZE在上面定义了，这里直接引用，保持一致）
 #define Z_MAX_POS 200
 //#define I_MIN_POS 0
 //#define I_MAX_POS 50
@@ -2845,12 +2849,12 @@
  */
 //#define FILAMENT_RUNOUT_SENSOR
 #if ENABLED(FILAMENT_RUNOUT_SENSOR)
-  #define FIL_RUNOUT_ENABLED_DEFAULT true // Enable the sensor on startup. Override with M412 followed by M500.  // 启动时启用传感器。可以通过 M412 指令（之后跟 M500 保存）来覆盖默认设置。
+  #define FIL_RUNOUT_ENABLED_DEFAULT true // Enable the sensor on startup. Override with M412 followed by M500.             // 启动时启用传感器。可以通过 M412 指令（之后跟 M500 保存）来覆盖默认设置。
   #define NUM_RUNOUT_SENSORS   1          // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.  // 传感器数量，每个挤出机最多一个。为每个传感器定义一个 FIL_RUNOUT#_PIN。
 
   #define FIL_RUNOUT_STATE     LOW        // Pin state indicating that filament is NOT present.  // 传感器引脚状态，表示没有耗材时的信号状态
-  #define FIL_RUNOUT_PULLUP               // Use internal pullup for filament runout pins.  // 使用内部上拉电阻连接断料传感器引脚
-  //#define FIL_RUNOUT_PULLDOWN           // Use internal pulldown for filament runout pins.  // 使用内部下拉电阻连接断料传感器引脚
+  #define FIL_RUNOUT_PULLUP               // Use internal pullup for filament runout pins.       // 使用内部上拉电阻连接断料传感器引脚
+  //#define FIL_RUNOUT_PULLDOWN           // Use internal pulldown for filament runout pins.     // 使用内部下拉电阻连接断料传感器引脚
   //#define WATCH_ALL_RUNOUT_SENSORS      // Execute runout script on any triggering sensor, not only for the active extruder.
                                           // This is automatically enabled for MIXING_EXTRUDERs.
                                           // 任意一个断料传感器触发时，都执行断料处理程序，而不仅仅是当前工作的挤出机。
@@ -3346,8 +3350,8 @@
   //#define Z_SAFE_HOMING_POINT_ABSOLUTE  // Ignore home offsets (M206) for Z homing position // Z 轴回零位置不受 M206 设置的原点偏移影响，始终使用绝对坐标
 #endif
 
-// Homing speeds (linear=mm/min, rotational=°/min)  //回零速度（直线轴单位：毫米/分钟，旋转轴单位：度/分钟）
-#define HOMING_FEEDRATE_MM_M { (50*60), (50*60), (4*60) }
+// Homing speeds (linear=mm/min, rotational=°/min)         // 回零速度（直线轴单位：毫米/分钟，旋转轴单位：度/分钟）
+#define HOMING_FEEDRATE_MM_M { (50*60), (50*60), (4*60) }  // X、Y 回零速度：3000 mm/min（ 50 mm/s）；Z 回零速度：240 mm/min
 
 // Edit homing feedrates with M210 and MarlinUI menu items  // 通过 M210 指令和 MarlinUI 屏幕菜单 编辑回零速度
 //#define EDITABLE_HOMING_FEEDRATE
@@ -3455,12 +3459,12 @@
  *   M502 - 恢复设置为固件默认值（之后用 M500 初始化）
  *
  */
-//#define EEPROM_SETTINGS     // Persistent storage with M500 and M501  //通过 M500 / M501 实现参数持久化存储（断电不丢设置）
-//#define DISABLE_M503        // Saves ~2700 bytes of flash. Disable for release! //节省大约 2700 字节的闪存空间。正式发布固件时建议关闭！
+//#define EEPROM_SETTINGS     // Persistent storage with M500 and M501                     //通过 M500 / M501 实现参数持久化存储（断电不丢设置）
+//#define DISABLE_M503        // Saves ~2700 bytes of flash. Disable for release!          //节省大约 2700 字节的闪存空间。正式发布固件时建议关闭！
 #define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save flash.  //执行 EEPROM 指令（M500/M501/M502）时，给出提示信息。关闭它可以节省一点点闪存空间。
-#define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load  //让 M503 指令输出保持静默，只在首次加载时显示错误信息。
+#define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load    //让 M503 指令输出保持静默，只在首次加载时显示错误信息。
 #if ENABLED(EEPROM_SETTINGS)
-  //#define EEPROM_AUTO_INIT  // Init EEPROM automatically on any errors.  //在发生任何错误时自动初始化 EEPROM。
+  //#define EEPROM_AUTO_INIT  // Init EEPROM automatically on any errors.      //在发生任何错误时自动初始化 EEPROM。
   //#define EEPROM_INIT_NOW   // Init EEPROM on first boot after a new build.  //在新固件构建后第一次启动时初始化 EEPROM。
 #endif
 
@@ -3475,9 +3479,9 @@
 // 启用后，当打印机无法接收指令时
 // 会每隔几秒向主机（电脑/上位机）发送忙碌状态消息
 //
-#define HOST_KEEPALIVE_FEATURE        // Disable this if your host doesn't like keepalive messages  //如果你的主机不喜欢接收 keepalive 消息，请禁用此功能
+#define HOST_KEEPALIVE_FEATURE        // Disable this if your host doesn't like keepalive messages  // 如果你的主机不喜欢接收 keepalive 消息，请禁用此功能
 #define DEFAULT_KEEPALIVE_INTERVAL 2  // Number of seconds between "busy" messages. Set with M113.  // "busy" 消息之间的秒数。可以通过 M113 指令设置。
-#define BUSY_WHILE_HEATING            // Some hosts require "busy" messages even during heating  // 一些主机要求在加热过程中也发送 "busy" 消息
+#define BUSY_WHILE_HEATING            // Some hosts require "busy" messages even during heating     // 一些主机要求在加热过程中也发送 "busy" 消息
 
 // @section units
 
@@ -3496,17 +3500,17 @@
 //
 // Preheat Constants - Up to 10 are supported without changes  //预热参数配置区 —— 最多可直接设置 10 种预热模式，无需修改代码。
 //
-#define PREHEAT_1_LABEL       "PLA"
-#define PREHEAT_1_TEMP_HOTEND 180
-#define PREHEAT_1_TEMP_BED     70
-#define PREHEAT_1_TEMP_CHAMBER 35
-#define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255  // 风扇速度，范围从 0 到 255
+#define PREHEAT_1_LABEL       "PLA"  // PLA耗材预热模式标签
+#define PREHEAT_1_TEMP_HOTEND 180    //（摄氏度）预热模式 1 的默认喷嘴温度。
+#define PREHEAT_1_TEMP_BED     70    //（摄氏度）预热模式 1 的默认热床温度。
+#define PREHEAT_1_TEMP_CHAMBER 35    //（摄氏度）预热模式 1 的默认打印环境温度（如果有封闭打印舱的话）。设置为 0 则不加热打印环境。
+#define PREHEAT_1_FAN_SPEED     0    // Value from 0 to 255  // 风扇速度，范围从 0 到 255
 
 #define PREHEAT_2_LABEL       "ABS"
 #define PREHEAT_2_TEMP_HOTEND 240
 #define PREHEAT_2_TEMP_BED    110
 #define PREHEAT_2_TEMP_CHAMBER 35
-#define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255  // 风扇速度，范围从 0 到 255
+#define PREHEAT_2_FAN_SPEED     0    // Value from 0 to 255  // 风扇速度，范围从 0 到 255
 
 /**
  * @section nozzle park
@@ -3639,9 +3643,9 @@
   #define NOZZLE_CLEAN_END_POINT   { { 100, 60, (Z_MIN_POS + 1) } }
 
   #if ENABLED(NOZZLE_CLEAN_PATTERN_CIRCLE)
-    #define NOZZLE_CLEAN_CIRCLE_RADIUS 6.5                      // (mm) Circular pattern radius  //（毫米）圆形清洁模式的半径
+    #define NOZZLE_CLEAN_CIRCLE_RADIUS 6.5                      // (mm) Circular pattern radius                //（毫米）圆形清洁模式的半径
     #define NOZZLE_CLEAN_CIRCLE_FN 10                           // Circular pattern circle number of segments  // 圆形清洁模式的圆周分段数量
-    #define NOZZLE_CLEAN_CIRCLE_MIDDLE NOZZLE_CLEAN_START_POINT // Middle point of circle  // 圆形清洁模式的圆心位置
+    #define NOZZLE_CLEAN_CIRCLE_MIDDLE NOZZLE_CLEAN_START_POINT // Middle point of circle                      // 圆形清洁模式的圆心位置
   #endif
 
   // Move the nozzle to the initial position after cleaning  // 清洁完成后将喷头移回初始位置
@@ -3794,11 +3798,11 @@
  */
 //#define PASSWORD_FEATURE
 #if ENABLED(PASSWORD_FEATURE)
-  #define PASSWORD_LENGTH 4                 // (#) Number of digits (1-9). 3 or 4 is recommended  //（数字）密码位数，范围 1-9。建议使用 3 位或 4 位密码。
+  #define PASSWORD_LENGTH 4                 // (#) Number of digits (1-9). 3 or 4 is recommended                                 //（数字）密码位数，范围 1-9。建议使用 3 位或 4 位密码。
   #define PASSWORD_ON_STARTUP
-  #define PASSWORD_UNLOCK_GCODE             // Unlock with the M511 P<password> command. Disable to prevent brute-force attack.  //通过 M511 P<password> 指令解锁。禁用此功能可防止暴力破解攻击。
-  #define PASSWORD_CHANGE_GCODE             // Change the password with M512 P<old> S<new>.  //通过 M512 P<old> S<new> 指令修改密码。
-  //#define PASSWORD_ON_SD_PRINT_MENU       // This does not prevent G-codes from running  //该功能无法阻止 G 代码指令运行
+  #define PASSWORD_UNLOCK_GCODE             // Unlock with the M511 P<password> command. Disable to prevent brute-force attack.  // 通过 M511 P<password> 指令解锁。禁用此功能可防止暴力破解攻击。
+  #define PASSWORD_CHANGE_GCODE             // Change the password with M512 P<old> S<new>.                                      // 通过 M512 P<old> S<new> 指令修改密码。
+  //#define PASSWORD_ON_SD_PRINT_MENU       // This does not prevent G-codes from running                                        // 该功能无法阻止 G 代码指令运行
   //#define PASSWORD_AFTER_SD_PRINT_END
   //#define PASSWORD_AFTER_SD_PRINT_ABORT
   //#include "Configuration_Secure.h"       // External file with PASSWORD_DEFAULT_VALUE  // 外部文件，包含默认密码值
@@ -3831,7 +3835,7 @@
 /**
  * SD CARD: ENABLE CRC
  *
- * Use CRC checks and retries on the SD communication. //SD 卡通信启用 CRC 校验与重连重试机制
+ * Use CRC checks and retries on the SD communication. // SD 卡通信启用 CRC 校验与重连重试机制
  * 注（译者注）：启用后，SD 卡通信会使用 CRC 校验来验证数据完整性，并在通信失败时自动重试。这可以提高 SD 卡读取的可靠性，尤其是在电磁干扰较大的环境中。
  * 不过启用此功能可能会略微降低 SD 卡的读写速度，因为每次通信都需要进行 CRC 计算和验证。
  */
@@ -4929,10 +4933,9 @@
  * 
  * 注（译者注）：
  * SOFT_PWM_SCALE = 软件 PWM 频率档位
- * 数字越大 → 风扇 / 加热控制频率越高 → 不抖、不嗡嗡响
- * 数字越大 → 控制精度越低（比如调风速没那么细腻）
- * 默认 0 → 精度最高，但频率最低
- * 
+ * 数字越小，精度越高，频率越低
+ * 数字越大，精度越低，频率越高
+ * 默认 0 ，精度最高，但频率最低
  */
 #define SOFT_PWM_SCALE 0
 
