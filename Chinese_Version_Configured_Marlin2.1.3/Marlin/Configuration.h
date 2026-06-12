@@ -484,7 +484,7 @@
 //#define ELECTROMAGNETIC_SWITCHING_TOOLHEAD
 
 #if ANY(SWITCHING_TOOLHEAD, MAGNETIC_SWITCHING_TOOLHEAD, ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
-  #define SWITCHING_TOOLHEAD_Y_POS          235         // (mm) Y position of the toolhead dock                     //工具头停靠的 Y 轴位置
+  #define SWITCHING_TOOLHEAD_Y_POS          235         // (mm) Y position of the toolhead dock                     // 工具头停靠的 Y 轴位置
   #define SWITCHING_TOOLHEAD_Y_SECURITY      10         // (mm) Security distance Y axis                            // Y 轴安全距离
   #define SWITCHING_TOOLHEAD_Y_CLEAR         60         // (mm) Minimum distance from dock for unobstructed X axis  //（毫米）停靠处无障碍 X 轴的最小距离
   #define SWITCHING_TOOLHEAD_X_POS          { 215, 0 }  // (mm) X positions for parking the extruders               //挤出机停放的 X 轴位置
@@ -494,12 +494,12 @@
   #elif ENABLED(MAGNETIC_SWITCHING_TOOLHEAD)
     #define SWITCHING_TOOLHEAD_Y_RELEASE      5         // (mm) Security distance Y axis                  // Y 轴安全距离
     #define SWITCHING_TOOLHEAD_X_SECURITY   { 90, 150 } // (mm) Security distance X axis (T0,T1)          // X 轴安全距离（T0、T1）
-    //#define PRIME_BEFORE_REMOVE                       // Prime the nozzle before release from the dock  //在从停靠处释放之前为喷嘴预挤出
+    //#define PRIME_BEFORE_REMOVE                       // Prime the nozzle before release from the dock  // 在从停靠处释放之前为喷嘴预挤出
     #if ENABLED(PRIME_BEFORE_REMOVE)
-      #define SWITCHING_TOOLHEAD_PRIME_MM           20  // (mm)   Extruder prime length         //挤出机预挤出长度
-      #define SWITCHING_TOOLHEAD_RETRACT_MM         10  // (mm)   Retract after priming length  //预挤出后回抽长度
-      #define SWITCHING_TOOLHEAD_PRIME_FEEDRATE    300  // (mm/min) Extruder prime feedrate     //挤出机预挤出进给速度
-      #define SWITCHING_TOOLHEAD_RETRACT_FEEDRATE 2400  // (mm/min) Extruder retract feedrate   //挤出机回抽进给速度
+      #define SWITCHING_TOOLHEAD_PRIME_MM           20  // (mm)   Extruder prime length         // 挤出机预挤出长度
+      #define SWITCHING_TOOLHEAD_RETRACT_MM         10  // (mm)   Retract after priming length  // 预挤出后回抽长度
+      #define SWITCHING_TOOLHEAD_PRIME_FEEDRATE    300  // (mm/min) Extruder prime feedrate     // 挤出机预挤出进给速度
+      #define SWITCHING_TOOLHEAD_RETRACT_FEEDRATE 2400  // (mm/min) Extruder retract feedrate   // 挤出机回抽进给速度
     #endif
   #elif ENABLED(ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
     #define SWITCHING_TOOLHEAD_Z_HOP          2         // (mm) Z raise for switching   //（毫米）切换时 Z 轴提升高度
@@ -521,13 +521,13 @@
  */
 //#define MIXING_EXTRUDER
 #if ENABLED(MIXING_EXTRUDER)
-  #define MIXING_STEPPERS 2        // Number of steppers in your mixing extruder                  //混合挤出机中的步进电机数量
-  #define MIXING_VIRTUAL_TOOLS 16  // Use the Virtual Tool method with M163 and M164              //使用 M163 和 M164 的虚拟工具方法
-  //#define DIRECT_MIXING_IN_G1    // Allow ABCDHI mix factors in G1 movement commands            //允许在 G1 移动命令中使用 ABCDHI 混合因子
-  //#define GRADIENT_MIX           // Support for gradient mixing with M166 and LCD               //支持使用 M166 和 LCD 的渐变混合
+  #define MIXING_STEPPERS 2        // Number of steppers in your mixing extruder                  // 混合挤出机中的步进电机数量
+  #define MIXING_VIRTUAL_TOOLS 16  // Use the Virtual Tool method with M163 and M164              // 使用 M163 和 M164 的虚拟工具方法
+  //#define DIRECT_MIXING_IN_G1    // Allow ABCDHI mix factors in G1 movement commands            // 允许在 G1 移动命令中使用 ABCDHI 混合因子
+  //#define GRADIENT_MIX           // Support for gradient mixing with M166 and LCD               // 支持使用 M166 和 LCD 的渐变混合
   //#define MIXING_PRESETS         // Assign 8 default V-tool presets for 2 or 3 MIXING_STEPPERS  //为 2 或 3 个 MIXING_STEPPERS 分配 8 个默认 V 工具预设
   #if ENABLED(GRADIENT_MIX)
-    //#define GRADIENT_VTOOL       // Add M166 T to use a V-tool index as a Gradient alias        //添加 M166 T 以使用 V 工具索引作为渐变别名
+    //#define GRADIENT_VTOOL       // Add M166 T to use a V-tool index as a Gradient alias        // 添加 M166 T 以使用 V 工具索引作为渐变别名
   #endif
 #endif
 
@@ -595,10 +595,10 @@
 // ATX 电脑电源的控制信号
 
 #if ENABLED(PSU_CONTROL)
-  //#define MKS_PWC                 // Using the MKS PWC add-on             //使用 MKS PWC 附加模块
-  //#define PS_OFF_CONFIRM          // Confirm dialog when power off        //电源关闭时的确认对话框
-  //#define PS_OFF_SOUND            // Beep 1s when power off               //电源关闭时蜂鸣 1 秒
-  #define PSU_ACTIVE_STATE LOW      // Set 'LOW' for ATX, 'HIGH' for X-Box  //ATX 电源设置为 'LOW'，X-Box 电源设置为 'HIGH'
+  //#define MKS_PWC                 // Using the MKS PWC add-on             //  使用 MKS PWC 附加模块
+  //#define PS_OFF_CONFIRM          // Confirm dialog when power off        // 电源关闭时的确认对话框
+  //#define PS_OFF_SOUND            // Beep 1s when power off               // 电源关闭时蜂鸣 1 秒
+  #define PSU_ACTIVE_STATE LOW      // Set 'LOW' for ATX, 'HIGH' for X-Box  // ATX 电源设置为 'LOW'，X-Box 电源设置为 'HIGH'
 
   //#define PSU_DEFAULT_OFF             // Keep power off until enabled directly with M80                 // 保持电源关闭，直到直接使用 M80 启用
   //#define PSU_POWERUP_DELAY      250  // (ms) Delay for the PSU to warm up to full power                //（毫秒）PSU 加热到全功率的延迟
@@ -2520,7 +2520,7 @@
  *
  * 使用这些设置来指定抬高探头（或降低热床）的距离（毫米）。
  * 这里设置的值，是在通过 NOZZLE_TO_PROBE_OFFSET、M851 或 LCD 设置的
- * （负）探头Z偏移量基础上**额外增加**的高度。
+ *（负）探头Z偏移量基础上**额外增加**的高度。
  * 此处仅支持 >= 1 的整数值。
  *
  * 示例：
@@ -2531,9 +2531,8 @@
  * 注（译者注）：
  * 这一段设置的是探头移动时的安全高度，防止探头在换点移动时撞坏热床
  * 探测完一个点后Z轴抬升到安全高度，再飞到下一个点，这个设置就是控制抬多高
- *
  */
-#define Z_CLEARANCE_DEPLOY_PROBE   10 // (mm) Z Clearance for Deploy/Stow                                                       //探头展开 / 收回时的 Z 轴安全间隙（毫米）
+#define Z_CLEARANCE_DEPLOY_PROBE   10 // (mm) Z Clearance for Deploy/Stow                                                       // s探头展开 / 收回时的 Z 轴安全间隙（毫米）
 #define Z_CLEARANCE_BETWEEN_PROBES  5 // (mm) Z Clearance between probe points                                                  // 探测点之间的 Z 轴安全间隙（毫米）
 #define Z_CLEARANCE_MULTI_PROBE     5 // (mm) Z Clearance between multiple probes  // (mm) Z Clearance between multiple probes  // 多次探测之间的 Z 轴安全间隙（毫米）
 #define Z_PROBE_ERROR_TOLERANCE     3 // (mm) Tolerance for early trigger (<= -probe.offset.z + ZPET)                           // 过早触发的容差范围（毫米）。探头触发时，如果 Z 轴位置低于 -probe.offset.z + Z_PROBE_ERROR_TOLERANCE，则认为是过早触发。
