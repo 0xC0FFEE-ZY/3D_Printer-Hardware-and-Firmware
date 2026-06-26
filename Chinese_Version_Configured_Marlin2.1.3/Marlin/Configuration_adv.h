@@ -1328,7 +1328,7 @@
   //         Minimum command delay (ms). Enable and increase if needed.
   // 安全项：探头需要时间来识别指令
   // 最小指令延迟时间（毫秒）。如出现异常可启用并增大该值。
-  //#define BLTOUCH_DELAY 500
+  //#define BLTOUCH_DELAY 500  //（译者注）：3D Touch 不稳定时才开启此项。
 
   /**
    * Settings for BLTOUCH Classic 1.2, 1.3 or BLTouch Smart 1.0, 2.0, 2.2, 3.0, 3.1, and most clones:
@@ -1943,6 +1943,10 @@
  * 在最低步进频率下提供最佳的步进平滑效果。
  */
 //#define ADAPTIVE_STEP_SMOOTHING
+//（译者注）：
+// 上方功能： 当多条轴同时运动时，每条轴的步进脉冲频率不同，互相之间会产生"拍频"效应————就像两个频率接近的音叉同时响，你会听到嗡嗡的拍音。
+// 在打印上，这表现为表面波纹（Salmon Skin / Moiré）
+// 这个算法动态调整脉冲时序，把这种干涉消除掉。
 
 /**
  * Custom Microstepping
@@ -1960,8 +1964,10 @@
 // Microstep settings (Requires a board with pins named X_MS1, X_MS2, etc.)
 // 电机细分设置 (需要主板带有 X_MS1, X_MS2 等专用引脚)
 #define MICROSTEP_MODES { 16, 16, 16, 16, 16, 16 } // [1,2,4,8,16]
-// 上面宏定义里面的 6 个数字，依次对应：X、Y、Z、E0、E1、E2 电机
-// 16 代表 16 细分（最常用、最平衡的设置）
+//（译者注）：
+// 上面宏定义里面的 6 个数字，依次对应：X、Y、Z、E0、E1、E2 电机，16 代表 16 细分
+// 但是这部分配置是针对电机驱动独立模式（Standalone）的，如果你的驱动（例如TMC2209）采用UART模式，这部分配置就不需要了，请直接跳转到4100行进行配置。
+
 
 
 //======================================= 步进电机电流参数区 =========================================
@@ -4630,7 +4636,7 @@
 
   #if ANY(SENSORLESS_HOMING, SENSORLESS_PROBING)
     // TMC2209: 0...255. TMC2130: -64...63
-    #define X_STALL_SENSITIVITY  8
+    #define X_STALL_SENSITIVITY  8  //（译者注）：堵转灵敏度（越小越灵敏）
     #define X2_STALL_SENSITIVITY X_STALL_SENSITIVITY
     #define Y_STALL_SENSITIVITY  8
     #define Y2_STALL_SENSITIVITY Y_STALL_SENSITIVITY

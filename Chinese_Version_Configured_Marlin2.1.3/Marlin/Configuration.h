@@ -25,18 +25,31 @@
 =============================================================================================================
 =============================================== 前言 ========================================================
 =============================================================================================================
+ *
  * 中文翻译采用UTF-8格式编码
  * The Chinese translation uses UTF-8 encoding.
-
- * 本工程为 Marlin 2.1.3-beta3的中文翻译版本，由 0xC0FFEE_ZY 翻译。原版工程来自https://github.com/MarlinFirmware/Marlin
- * 本工程各项参数已配置完成，适用于本人自制的3D打印机（基于UM架构），
  * 
- * 该3D打印机设计图纸，硬件原理图，PCB已全部开源,未来预计更新制作教程至抖音/B站。
+ # Copyright (C) 2026 [0xC0FFEE_ZY]
+ # 本文件是Marlin 2.1.3固件的中文翻译版本
+ # 基于Marlin固件（Copyright (C)  Camiel Gubbels / Erik van der Zalm / MarlinFirmware ，GPLv3许可）
+ # 本翻译文件同样遵循GPLv3许可
+ # 如引用、转载或分发，必须保留本版权声明和署名 
+ * 
+ *
+ *
+ *
+ * 本工程为 Marlin 2.1.3-beta3的中文翻译版本，由 0xC0FFEE_ZY 翻译。原版工程来自https://github.com/MarlinFirmware/Marlin
+ * 
+ * 本工程各项参数已配置完成，适用于本人自制的3D打印机（基于UM架构）
+ * 该3D打印机设计图纸，硬件原理图，PCB已全部开源
+ * 开源项目见本人Github主页：https://github.com/0xC0FFEE-ZY
+ * 仓库地址：https://github.com/0xC0FFEE-ZY/3D_Printer-Hardware-and-Firmware
+ * 
+ * 未来预计更新制作教程至抖音/B站。
  * 欢迎关注本人抖音：(抖音号:Technophilic)，昵称：0xC0FFEE_ZY，里面有一些电子科技创作相关的视频，欢迎大家点赞关注！谢谢！
  * B站 UID:481302692，昵称：0xC0FFEE_ZY
  * 
- * 开源项目见本人Github主页：https://github.com/0xC0FFEE-ZY
- * 仓库地址：https://github.com/0xC0FFEE-ZY/3D_Printer-Hardware-and-Firmware
+ *
  * 
  * 本工程保留了原版工程所有英文注释，并新增了中文注释及本人的注解，一些代码配置有改动，适用于本人的双X双Y双Z UM架构打印机。
  * 本人的开源仓库同时提供了“仅翻译版本”，所有代码与配置均保持默认，仅新增了中文注释。
@@ -44,11 +57,7 @@
 
  * up为2024级本科生，热爱电子科技，欢迎和我一起进行讨论和交流！
 
- # Copyright (C) 2026 [0xC0FFEE_ZY]
- # 本文件是Marlin 2.1.3固件的中文翻译版本
- # 基于Marlin固件（Copyright (C)  Camiel Gubbels / Erik van der Zalm / MarlinFirmware ，GPLv3许可）
- # 本翻译文件同样遵循GPLv3许可
- # 如引用、转载或分发，必须保留本版权声明和署名
+
 
                                                                       0xC0FFEE_ZY
                                                                       2026.5.13     
@@ -110,8 +119,14 @@
 // Choose the name from boards.h that matches your setup   // 从boards.h中选择与您的设备匹配的型号
 
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_RAMPS_14_EFB  // 我的主板原理图设计中芯片引脚资源分配参考了MKS Monster8主板
+  #define MOTHERBOARD BOARD_RAMPS_14_EFB  // （译者注）：我的打印机主板为自制主板，主板芯片硬件引脚资源映射均为自定义，我在Marlin\src\pins\stm32f4目录下新建的头文件(pins_0xC0FFEE_ZY.h)里的宏定义映射了芯片硬件引脚功能
 #endif
+//（译者注）：
+// 如果你使用的是市面上的商品3D打印机主板，请输入对应的型号即可。
+// “ BOARD_0xC0FFEE_ZY ” 是我自定义的主板型号，适用于我的自制打印机主板，其他用户请勿使用这个型号，否则会导致代码编译错误。
+// 如果你的打印机用的是我设计的主板，那么可以把 MOTHERBOARD 定义为 BOARD_0xC0FFEE_ZY
+
+
 
 //====================================== 串口 =============================================
 // @section serial
@@ -274,7 +289,7 @@
 //#define U_DRIVER_TYPE  A4988
 //#define V_DRIVER_TYPE  A4988
 //#define W_DRIVER_TYPE  A4988
-#define E0_DRIVER_TYPE A4988
+#define E0_DRIVER_TYPE A4988           // （译者注）：挤出机电机
 //#define E1_DRIVER_TYPE A4988
 //#define E2_DRIVER_TYPE A4988
 //#define E3_DRIVER_TYPE A4988
@@ -283,6 +298,23 @@
 //#define E6_DRIVER_TYPE A4988
 //#define E7_DRIVER_TYPE A4988
 
+//（译者注）：
+// 如果你想让你的电机驱动工作在UART模式下（前提是你的电机驱动硬件支持UART模式），代码配置格式应该如下：
+// #define X_DRIVER_TYPE  TMC2209
+// 此时 Marlin 对驱动的配置和状态读取（电流、细分、堵转检测等）通过 UART 在线完成
+//
+// 若不使用 UART（驱动仅连接 STEP/DIR/ENABLE 引脚），需要加上_STANDALONE后缀，代码配置格式应该如下：
+// #define X_DRIVER_TYPE  TMC2209_STANDALONE
+// 此时 Marlin 只发 STEP/DIR 脉冲，所有驱动参数（电流、细分等）靠硬件决定。因此更推荐使用 UART 模式，尤其是对于 TMC2209 这类支持 UART 的驱动器。
+//
+//（译者注）：
+// 下方这六行注释看不懂可忽略：
+// 注：关于硬件设计中的一些tips:
+// 当你自己设计打印机主板原理图时，你需要决定你的电机驱动采用硬件串口还是软件串口进行通讯。不过主流商品主板基本都采用软件串口。
+// 当步进电机驱动配置为 UART 模式时，通信通道由主板引脚文件(Marlin\src\pins\芯片型号\主板型号\)中的宏定义决定。若定义了 X_HARDWARE_SERIAL，则使用主控芯片
+// 硬件USART外设 进行通信；若未定义该宏而定义了X_SERIAL_TX_PIN 和 X_SERIAL_RX_PIN，则使用软件串口（基于定时器中断的 GPIO 位翻转）进行通信。
+// 切换方式只需在引脚文件中增删 X_HARDWARE_SERIAL 宏，无需修改HAL层代码。
+// 无论选择哪种方式，请确保你的主板硬件原理图上 MCU 到驱动的物理连线都与代码相匹配.
 
 
 //================= （译者注）：下面是额外轴设置，不过大多普通3D打印机用不上（这个并不是双X,双Y，双Z轴配置区！） =====================
@@ -1989,7 +2021,7 @@
  * 启用其中一种，才能使用下方的自动调平功能。
  * 
  * 附（译者注）：
- * BLTouch、3D Touch、电感探头，选FIX_MOUNTED_PROBE
+ * BLTouch、3D Touch、电感探头，选BLTOUCH
  * 小舵机、会伸缩 / 翻出的机械探头,选SERVO_PROBE(老机器用，现在很少见)
  *
  */
@@ -2063,6 +2095,8 @@
  *
  */
 //#define BLTOUCH
+// （译者注）：我的打印机使用3D-Touch（BLTouch平替），所以启用上方代码。
+
 
 /**
  * MagLev V4 probe by MDD
@@ -2388,6 +2422,7 @@
  * Z 偏移：探头比喷嘴高还是低，差多少
  */
 #define NOZZLE_TO_PROBE_OFFSET { 10, 10, 0 }
+// 注（译者注）：这是我打印机的实际参数，这三个偏移量的数值取决于你的调平探头的安装位置。具体可以看本人抖音/B站教程视频-
 
 // Enable and set to use a specific tool for probing. Disable to allow any tool.
 // 启用并设置【指定工具号】进行探测调平。
@@ -2495,7 +2530,7 @@
  * 总共探测 3 次及以上：增加更多慢速精探，然后取平均值。
  *
  */
-//#define MULTIPLE_PROBING 2
+//#define MULTIPLE_PROBING 2   //（译者注）：每个点测 2 次（快 + 慢），提高精度。
 //#define EXTRA_PROBING    1
 
 /**
@@ -3028,7 +3063,7 @@
  */
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
-//#define AUTO_BED_LEVELING_BILINEAR
+//#define AUTO_BED_LEVELING_BILINEAR   //（译者注）：这是我选择的调平方式。
 //#define AUTO_BED_LEVELING_UBL
 //#define MESH_BED_LEVELING
 
@@ -3057,7 +3092,7 @@
  * 或者始终在回零后立即启用调平。
  *
  */
-//#define RESTORE_LEVELING_AFTER_G28
+//#define RESTORE_LEVELING_AFTER_G28  //（译者注）XYZ回零后自动用上次存的调平网格，节省时间不用反复调平。前提是网格已通过 M500 保存，且热床状态没变。
 //#define ENABLE_LEVELING_AFTER_G28
 
 /**
@@ -3234,7 +3269,7 @@
   // 热床调平网格相关配置
 
   #define MESH_INSET 10          // Set Mesh bounds as an inset region of the bed  // 设置网格边界为热床内缩区域
-  #define GRID_MAX_POINTS_X 3
+  #define GRID_MAX_POINTS_X 3    //（译者注）：网格点数越多，调平越精细，但调平时间也会增加。启用 BILINEAR 之后生效。
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   //#define MESH_G28_REST_ORIGIN // After homing all axes ('G28' or 'G28 XYZ') rest Z at Z_MIN_POS 
@@ -3342,6 +3377,8 @@
  *
  */
 //#define Z_SAFE_HOMING
+//（译者注）：上方功能作用是：先把喷头移到热床中心，防止探头悬在热床外面。只要你的探头偏移量不超过床尺寸的一半，喷嘴移到中心后，探头就一定在床内。
+// 如果探头不在热床上方那么在Z轴回零的时候就触发不了信号，热床一直往上升，直到撞到喷头。
 
 #if ENABLED(Z_SAFE_HOMING)
   #define Z_SAFE_HOMING_X_POINT X_CENTER  // (mm) X point for Z homing //Z 轴回零所用的 X 轴坐标点
