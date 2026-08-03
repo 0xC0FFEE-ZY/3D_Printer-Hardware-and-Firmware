@@ -22,9 +22,9 @@
 #pragma once
 
 /*
-=============================================================================================================
-=============================================== 前言 ========================================================
-=============================================================================================================
+* =============================================================================================================
+*  ============================================== 前言 ========================================================
+* =============================================================================================================
  *
  * 中文翻译采用UTF-8格式编码
  * The Chinese translation uses UTF-8 encoding.
@@ -51,7 +51,7 @@
  * 
  *
  * 
- * 本工程保留了原版工程所有英文注释，并新增了中文注释及本人的注解，一些代码配置有改动，适用于本人的双X双Y双Z UM架构打印机。
+ * 本工程保留了原版工程所有英文注释，并新增了中文注释及本人的注解（译者注），一些代码配置有改动，适用于本人的双X双Y双Z UM架构打印机。
  * 本人的开源仓库同时提供了“仅翻译版本”，所有代码与配置均保持默认，仅新增了中文注释。
  * 详见：
 
@@ -123,7 +123,7 @@
 #endif
 //（译者注）：
 // 如果你使用的是市面上的商品3D打印机主板，请输入对应的型号即可。
-// “ BOARD_0xC0FFEE_ZY ” 是我自定义的主板型号，适用于我的自制打印机主板，其他用户请勿使用这个型号，否则会导致代码编译错误。
+// “ BOARD_0xC0FFEE_ZY ” 是我自定义的主板型号，适用于我的自制打印机主板。
 // 如果你的打印机用的是我设计的主板，那么可以把 MOTHERBOARD 定义为 BOARD_0xC0FFEE_ZY
 
 
@@ -148,10 +148,10 @@
  * 如果用 USB 虚拟串口（USB 直接连电脑）。
  * 常见于：SKR 系列、LPC1768/1769、STM32 有 USB 直连的主板，值可以填-1
  * 如果用 硬件串口 0（TX0/RX0），USB 转 TTL 芯片（CH340/CP2102）接电脑，值可以填0
- * 绝大多数 8 位机（Uno+RAMPS、Ender‑3 原厂板）都填 0。
  * 如果用其他硬件串口，一般接 蓝牙、WiFi、LCD、扩展板，值可以填 1、2、3…
  */
 #define SERIAL_PORT 0
+// （译者注）：这里我的自制主板使用硬件串口（PD9-RX,PD8-TX）通过 CH340 与电脑 USB 通讯，PD9 和 PD8 对应 USART3，所以上方我配置值为 3
 
 /**
  * Serial Port Baud Rate
@@ -174,7 +174,7 @@
  * 如需加快 SD 卡文件传输速度，最高可设至 1000000 波特。
  * 可选波特率：[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000]
  * 
- * （译者注）：对于大多数 3D 打印机，Marlin 固件官方推荐、最稳定的波特率填 250000
+ * （译者注）：对于大多数 3D 打印机，Marlin 固件官方推荐的波特率填 250000
  */
 #define BAUDRATE 250000
 
@@ -194,7 +194,7 @@
  */
 //#define SERIAL_PORT_2 -1
 //#define BAUDRATE_2 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE  // 启用此项，用来覆盖（主串口）BAUDRATE
-
+// 由于我的串口屏与主板之间的距离较远，连接线很长，所以降低频率提高稳定性。
 
 /**
  * Select a third serial port on the board to use for communication with the host.
@@ -276,11 +276,11 @@
 #define X_DRIVER_TYPE  A4988           // （译者注）：请根据你电机驱动实际硬件型号，选择上面列表里的驱动型号。我用的是TMC2209。
 #define Y_DRIVER_TYPE  A4988
 #define Z_DRIVER_TYPE  A4988
-//#define X2_DRIVER_TYPE A4988         // （译者注）：第二个X轴电机，如果你的打印机是双X电机，故应当取消注释此行，启用X2电机。
-//#define Y2_DRIVER_TYPE A4988         // （译者注）：第二个Y轴电机，如果你的打印机是双Y电机，故应当取消注释此行，启用Y2电机。
-//#define Z2_DRIVER_TYPE A4988         // （译者注）：第二个Z轴电机，如果你的打印机是双Z电机，故应当取消注释此行，启用Z2电机。
-//#define Z3_DRIVER_TYPE A4988         // （译者注）：第三个Z轴电机，如果你的打印机是三Z电机，故应当取消注释此行，启用Z3电机。
-//#define Z4_DRIVER_TYPE A4988         // （译者注）：第四个Z轴电机，如果你的打印机是四Z电机，故应当取消注释此行，启用Z4电机。
+//#define X2_DRIVER_TYPE A4988         // （译者注）：第二个X轴电机，如果你的打印机是双X电机，应当取消注释此行，启用X2电机。
+//#define Y2_DRIVER_TYPE A4988         // （译者注）：第二个Y轴电机，如果你的打印机是双Y电机，应当取消注释此行，启用Y2电机。
+//#define Z2_DRIVER_TYPE A4988         // （译者注）：第二个Z轴电机，如果你的打印机是双Z电机，应当取消注释此行，启用Z2电机。
+//#define Z3_DRIVER_TYPE A4988         // （译者注）：第三个Z轴电机，如果你的打印机是三Z电机，应当取消注释此行，启用Z3电机。
+//#define Z4_DRIVER_TYPE A4988         // （译者注）：第四个Z轴电机，如果你的打印机是四Z电机，应当取消注释此行，启用Z4电机。
 //#define I_DRIVER_TYPE  A4988
 //#define J_DRIVER_TYPE  A4988
 //#define K_DRIVER_TYPE  A4988
@@ -306,12 +306,12 @@
 // 此时 Marlin 只发 STEP/DIR 脉冲，所有驱动参数（电流、细分等）靠硬件决定。因此更推荐使用 UART 模式，尤其是对于 TMC2209 这类支持 UART 的驱动器。
 //
 //（译者注）：
-// 下方这六行注释看不懂可忽略：
-// 注：关于硬件设计中的一些tips:
+// 下方几段注释是硬件设计上的一些考虑，如果你只是快速上手打印，可以不用深入研究.
 // 当你自己设计打印机主板原理图时，你需要决定你的电机驱动采用硬件串口还是软件串口进行通讯。不过主流商品主板基本都采用软件串口。
-// 当步进电机驱动配置为 UART 模式时，通信通道由主板引脚文件(Marlin\src\pins\芯片型号\主板型号\)中的宏定义决定。若定义了 X_HARDWARE_SERIAL，则使用主控芯片
-// 硬件USART外设 进行通信；若未定义该宏而定义了X_SERIAL_TX_PIN 和 X_SERIAL_RX_PIN，则使用软件串口（基于定时器中断的 GPIO 位翻转）进行通信。
+// 当步进电机驱动配置为 UART 模式时，通信通道由主板引脚文件 (Marlin\src\pins\芯片型号\主板型号\) 中的宏定义决定。若定义了 X_HARDWARE_SERIAL，则使用主控芯片
+// 硬件USART外设 进行通信；若未定义该宏而定义了 X_SERIAL_TX_PIN 和 X_SERIAL_RX_PIN，则使用软件串口（基于定时器中断的 GPIO 位翻转）进行通信。
 // 切换方式只需在引脚文件中增删 X_HARDWARE_SERIAL 宏，无需修改HAL层代码。
+// 使用硬件串口时请注意将 TX 和 RX 通过 1K 电阻串联后再接到驱动的 PDN_UART （TMC2209的第14号引脚）上。
 // 无论选择哪种方式，请确保你的主板硬件原理图上 MCU 到驱动的物理连线都与代码相匹配.
 
 
@@ -627,7 +627,7 @@
 // ATX 电脑电源的控制信号
 
 #if ENABLED(PSU_CONTROL)
-  //#define MKS_PWC                 // Using the MKS PWC add-on             //  使用 MKS PWC 附加模块
+  //#define MKS_PWC                 // Using the MKS PWC add-on             // 使用 MKS PWC 附加模块
   //#define PS_OFF_CONFIRM          // Confirm dialog when power off        // 电源关闭时的确认对话框
   //#define PS_OFF_SOUND            // Beep 1s when power off               // 电源关闭时蜂鸣 1 秒
   #define PSU_ACTIVE_STATE LOW      // Set 'LOW' for ATX, 'HIGH' for X-Box  // ATX 电源设置为 'LOW'，X-Box 电源设置为 'HIGH'
@@ -1743,7 +1743,7 @@
 #define V_MAX_ENDSTOP_HIT_STATE HIGH
 #define W_MIN_ENDSTOP_HIT_STATE HIGH
 #define W_MAX_ENDSTOP_HIT_STATE HIGH
-#define Z_MIN_PROBE_ENDSTOP_HIT_STATE HIGH
+#define Z_MIN_PROBE_ENDSTOP_HIT_STATE HIGH       //（译者注）：根据你的探针实际情况进行配置。
 
 // Enable this feature if all enabled endstop pins are interrupt-capable.
 // This will remove the need to poll the interrupt pins, saving many CPU cycles.
@@ -1828,6 +1828,26 @@
  *
  */
 #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 500 }    //（译者注：大括号里四个参数依次为：X 轴，Y 轴，Z 轴，挤出机 E0 的步数/毫米。根据你的机器实际情况修改这些数值，确保打印机运动的准确性。）
+/* (译者注)：
+ * ----------->> 如果你的打印机运动轴是同步轮+皮带驱动（例如XY轴），则:
+ * steps/mm = (电机每转步数 × 细分数) ÷ (皮带轮齿数 × 皮带节距)
+ * 我的 XY 轴电机的步距角是0.9°，则一步转动0.9°，转动一圈（360°）需要 360/0.9 = 400 步；
+ * 驱动器细分数是 16（UART模式下细分的配置在Marlin/Configuration_adv.h第4098行左右）；
+ * 我的打印机用的同步轮是20齿，使用GT2皮带（皮带节距是 2mm），
+ * 则每毫米步数 =（400 × 16）/ (20 × 2) = 160 步/mm.
+ *
+ * ----------->> 如果你的打印机运动轴是丝杆+丝杆螺母驱动（例如Z轴），则:
+ * steps/mm = (电机每转步数 × 细分数) ÷ 导程
+ * 我的 Z 轴电机步距角是0.9°，则一步转动0.9°，转动一圈（360°）需要 360/0.9 = 400 步；
+ * 驱动器细分数是 16
+ * 我的打印机用的丝杆是 T12 螺纹，导程是 2mm（每转动一圈，丝杆螺母移动 2mm），
+ * 则每毫米步数 =（400 × 16）/ 2 = 3200 步/mm.
+ * 
+ * ----------->> 关于挤出机步数计算公式：
+ * steps/mm = (电机每转步数 × 细分数) ÷ (挤出轮有效直径 × π × 减速比)
+ * 具体数值找商家提供的挤出机参数，或者自己测量挤出机的挤出轮直径和减速比。
+ */
+ 
 
 /**
  * Enable support for M92. Disable to save at least ~530 bytes of flash.
@@ -1991,13 +2011,12 @@
  * 如果你的探头连接到 Z-MIN 引脚，请启用此选项。
  * 该探头将替代 Z-MIN 限位开关，用于 Z 轴归位。
  * （启用后会自动开启 USE_PROBE_FOR_Z_HOMING 功能。）
- *
  */
-#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
+#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN   //（译者注）：我的 3DTouch 探针的信号引脚与 Z 轴限位开关独立，因此本段注释掉。
 
 // Force the use of the probe for Z-axis homing
 // 强制使用探头进行 Z 轴归位
-//#define USE_PROBE_FOR_Z_HOMING
+//#define USE_PROBE_FOR_Z_HOMING             // 强制使用 Z 探针（3DTouch)进行归位，不开启则默认使用Z_MIN_PIN进行归位！（如果你的Z探针引脚和Z_MIN_PIN是独立的两个引脚，请务必开启此！
 
 /**
  * Z_MIN_PROBE_PIN
@@ -2948,9 +2967,9 @@
   //#define FIL_RUNOUT8_PULLUP
   //#define FIL_RUNOUT8_PULLDOWN
 
-  // Commands to execute on filament runout.  //耗材断料时要执行的指令
-  // With multiple runout sensors use the %c placeholder for the current tool in commands (e.g., "M600 T%c")//当使用多个断料传感器时，可在指令中使用 %c 占位符表示当前触发断料的喷头/工具。示例："M600 T%c"
-  // NOTE: After 'M412 H1' the host handles filament runout and this script does not apply.  //注意：执行 'M412 H1' 后，主机将处理断料事件，此时此脚本不再适用。
+  // Commands to execute on filament runout.  // 耗材断料时要执行的指令
+  // With multiple runout sensors use the %c placeholder for the current tool in commands (e.g., "M600 T%c") // 当使用多个断料传感器时，可在指令中使用 %c 占位符表示当前触发断料的喷头/工具。示例："M600 T%c"
+  // NOTE: After 'M412 H1' the host handles filament runout and this script does not apply.                  // 注意：执行 'M412 H1' 后，主机将处理断料事件，此时此脚本不再适用。
   #define FILAMENT_RUNOUT_SCRIPT "M600"
 
   // After a runout is detected, continue printing this length of filament  
@@ -3087,6 +3106,7 @@
 //#define AUTO_BED_LEVELING_BILINEAR   //（译者注）：这是我选择的调平方式。
 //#define AUTO_BED_LEVELING_UBL
 //#define MESH_BED_LEVELING
+// (译者注)：如果你开启了 #define AUTO_BED_LEVELING_BILINEAR ，需要同时开启 #define Z_SAFE_HOMING 和#define BLTOUCH，否则编译报错。
 
 /**
  * Commands to execute at the start of G29 probing,
@@ -3120,6 +3140,8 @@
  * Auto-leveling needs preheating  // 自动调平前需要提前预热
  * 注（译者注）：
  * 调平前需要加热热床，因为升温会导致热床产生形变。模拟实际打印温度环境，贴合真实打印工况
+ * 我的热床铝板是 MIC6铝，热胀冷缩导致的形变更小。
+ * 启用下方宏定义则开启调平前预热功能。
  */
 //#define PREHEAT_BEFORE_LEVELING
 #if ENABLED(PREHEAT_BEFORE_LEVELING)
@@ -3397,7 +3419,7 @@
  * 3. 若步进电机休眠断电，再次Z回零前需重新完成XY回零
  *
  */
-//#define Z_SAFE_HOMING
+//#define Z_SAFE_HOMING    //（译者注）：我启用了 Z 轴安全回零功能，避免探头悬空撞击热床或喷头。
 //（译者注）：上方功能作用是：先把喷头移到热床中心，防止探头悬在热床外面。只要你的探头偏移量不超过床尺寸的一半，喷嘴移到中心后，探头就一定在床内。
 // 如果探头不在热床上方那么在Z轴回零的时候就触发不了信号，热床一直往上升，直到撞到喷头。
 
@@ -3517,6 +3539,7 @@
  *
  */
 //#define EEPROM_SETTINGS     // Persistent storage with M500 and M501                     // 通过 M500 / M501 实现参数持久化存储（断电不丢设置）
+//（译者注）：上方启用EEPROM功能后，Marlin固件会把一些可调参数存储在EEPROM里。断电重启后，打印机会自动读取这些参数，保持上次的设置状态。前提你的主板硬件支持。
 //#define DISABLE_M503        // Saves ~2700 bytes of flash. Disable for release!          // 节省大约 2700 字节的闪存空间。正式发布固件时建议关闭！
 #define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save flash.  // 执行 EEPROM 指令（M500/M501/M502）时，给出提示信息。关闭它可以节省一点点闪存空间。
 #define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load    // 让 M503 指令输出保持静默，只在首次加载时显示错误信息。
@@ -4989,6 +5012,7 @@
  * 可选值：[0,1,2,3,4,5,6,7]
  * 
  * 注（译者注）：
+ * 注释中说会影响加热设备（affecting heaters),是因为风扇的软件 PWM 与加热器共用同一个定时器TIM14。
  * SOFT_PWM_SCALE = 软件 PWM 频率档位
  * 数字越小，精度越高，频率越低
  * 数字越大，精度越低，频率越高

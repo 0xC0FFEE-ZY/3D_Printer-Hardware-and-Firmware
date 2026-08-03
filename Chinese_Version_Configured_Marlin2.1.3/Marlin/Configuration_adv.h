@@ -951,7 +951,7 @@
  * 多个挤出机可共用同一个风扇引脚，
  * 此时**任意一个挤出机超温**，风扇就会启动。
  */
-#define E0_AUTO_FAN_PIN -1
+#define E0_AUTO_FAN_PIN -1     // （译者注）：这里 E0_AUTO_FAN_PIN 为喷嘴喉管散热风扇，我在硬件设计中指定了 FAN1_PIN 作为喉管散热风扇。具体引脚见引脚文件（Marlin\src\pins\stm32f4\pins_0xC0FFEE_ZY.h）中的映射
 #define E1_AUTO_FAN_PIN -1
 #define E2_AUTO_FAN_PIN -1
 #define E3_AUTO_FAN_PIN -1
@@ -962,9 +962,10 @@
 #define CHAMBER_AUTO_FAN_PIN -1
 #define COOLER_AUTO_FAN_PIN -1
 
-#define EXTRUDER_AUTO_FAN_TEMPERATURE 50
-#define EXTRUDER_AUTO_FAN_SPEED 255   // 255 == full speed（全速运行）
-#define CHAMBER_AUTO_FAN_TEMPERATURE 30
+#define EXTRUDER_AUTO_FAN_TEMPERATURE 50    //（译者注）：这是喉管散热风扇温度阈值。超过阈值散热风扇启动。否则保持关闭。
+#define EXTRUDER_AUTO_FAN_SPEED 255         //（译者注）：这是喉管散热风扇在启动后的转速。255为全速，0为关闭。可以根据需要设置为其他值。
+                                            // 喉管散热风扇可以避免热量传导到上方耗材，防止耗材软化导致堵头，打印失败。
+#define CHAMBER_AUTO_FAN_TEMPERATURE 30     //（译者注）：仓温散热风扇，如果你的打印机封箱了，需要用上。解释同上。
 #define CHAMBER_AUTO_FAN_SPEED 255
 #define COOLER_AUTO_FAN_TEMPERATURE 18
 #define COOLER_AUTO_FAN_SPEED 255
@@ -1279,7 +1280,7 @@
 
 //#define SENSORLESS_BACKOFF_MM  { 2, 2, 0 }  // (linear=mm, rotational=°) Backoff from endstops before sensorless homing
                                               // （直线轴单位：毫米 / 旋转轴单位：度）
-                                              // 无传感器回零（sensorless homing）时，离开限位开关的回退距离
+                                              // 无传感器回零（sensorless homing）时的回退距离
 
 #define HOMING_BUMP_MM      { 5, 5, 2 }       // (linear=mm, rotational=°) Backoff from endstops after first bump  // 直线轴单位毫米，旋转轴单位度，首次撞限位后回退距离
                                               // （译者注）：上面是配置轴第一次碰撞限位停下后，自动反向退回设定距离，用于二次精准找零，避免硬顶限位卡死，提升回零定位精度。
@@ -1328,7 +1329,9 @@
   //         Minimum command delay (ms). Enable and increase if needed.
   // 安全项：探头需要时间来识别指令
   // 最小指令延迟时间（毫秒）。如出现异常可启用并增大该值。
-  //#define BLTOUCH_DELAY 500  //（译者注）：3D Touch 不稳定时才开启此项。
+  //#define BLTOUCH_DELAY 500  
+  //（译者注）：我使用的是 3DTouch 而非 正版BLTouch，我的探针在执行 G29网络补偿调平 的时候出现了异常，取消此行注释，问题得到解决。
+  // 推测原因：仿制版BLTouch(3DTouch)内部用了较慢的廉价比较器，PWM 脉冲结束后电路需要额外时间才能让输出电平稳定到正确状态。500ms 给了这个窗口。
 
   /**
    * Settings for BLTOUCH Classic 1.2, 1.3 or BLTouch Smart 1.0, 2.0, 2.2, 3.0, 3.1, and most clones:
@@ -4082,20 +4085,20 @@
     // Max Current. Lower for more internal resolution. Raise to run cooler.          // 最大电流设置。数值越低 → 内部分辨率越高  数值越高 → 驱动运行温度越低（更凉快）
 
     #define TMC2240_CURRENT_RANGE   1   // :{ 0:'RMS=690mA PEAK=1A', 1:'RMS=1410mA PEAK=2A', 2:'RMS=2120mA PEAK=3A', 3:'RMS=2110mA PEAK=3A' }
-// 可选档位对照表：
-// 0: 有效值电流 690mA / 峰值电流 1A
-// 1: 有效值电流 1410mA / 峰值电流 2A
-// 2: 有效值电流 2120mA / 峰值电流 3A
-// 3: 有效值电流 2110mA / 峰值电流 3A
+ // 可选档位对照表：
+ // 0: 有效值电流 690mA / 峰值电流 1A
+ // 1: 有效值电流 1410mA / 峰值电流 2A
+ // 2: 有效值电流 2120mA / 峰值电流 3A
+ // 3: 有效值电流 2110mA / 峰值电流 3A
 
 
     // Slope Control: Lower is more silent. Higher runs cooler.                                         // 斜率控制：数值越低越静音，数值越高散热越好（运行更凉）
     #define TMC2240_SLOPE_CONTROL   0   // :{ 0:'100V/µs', 1:'200V/µs', 2:'400V/µs', 3:'800V/µs' }
-// 可选档位：
-// 0: 100V/µs（最静音）
-// 1: 200V/µs
-// 2: 400V/µs
-// 3: 800V/µs（发热最低、声音最大）
+ // 可选档位：
+ // 0: 100V/µs（最静音）
+ // 1: 200V/µs
+ // 2: 400V/µs
+ // 3: 800V/µs（发热最低、声音最大）
   #endif
 
   #if AXIS_IS_TMC_CONFIG(X)
@@ -4336,7 +4339,7 @@
    */
 
    //（译者注）：
-   // 如果你用的是 TMC2208 / TMC2209（UART 模式），可以直接忽略这些了。
+   // 如果你用的是 TMC2208 / TMC2209（UART 模式），可以直接忽略这些了。因为CS（Chip Select）引脚是 SPI 通信用的，适用于 TMC5160 / TMC5161 等型号的驱动。
   //#define X_CS_PIN      -1
   //#define Y_CS_PIN      -1
   //#define Z_CS_PIN      -1
@@ -4484,9 +4487,11 @@
    * CHOPPER_PRUSAMK3_24V  Prusa MK3 专用参数
    * CHOPPER_MARLIN_119    老版本Marlin默认参数
    * 
-   * 自定义参数格式（极复杂，新手绝对不要碰）：
+   * 自定义参数格式：
    * { <off_time[1..15]>, <hysteresis_end[-3..12]>, hysteresis_start[1..8] }
    */
+  // 我的 XYZ 轴电机均为24V供电，并且步距角均为0.9°，所以选择参数组CHOPPER_09STEP_24V，是 0.9° 电机专用斩波时序。挤出机电机1.8°，选用CHOPPER_DEFAULT_24V.
+  // 具体根据你们自己的打印机实际情况进行选用。
   #define CHOPPER_TIMING CHOPPER_DEFAULT_12V        // All axes (override below)       // 所有轴统一设置（下方可单独覆盖）
   //#define CHOPPER_TIMING_X  CHOPPER_TIMING        // For X Axes (override below)     // 用于 X 轴（可在下方单独覆盖设置）
   //#define CHOPPER_TIMING_X2 CHOPPER_TIMING_X
@@ -4559,10 +4564,10 @@
    * 必须启用 STEALTHCHOP_(XY|Z|E)（静音模式）才能使用混合阈值功能。
    * 可使用 M913 X/Y/Z/E 指令实时调参。
    */
-  //#define HYBRID_THRESHOLD
+  //#define HYBRID_THRESHOLD    // （译者注）：启用混合模式自动切换，当步进电机速度超过 混合阈值 时，驱动会自动切换到 spreadCycle 模式。此模式支持更快的运动速度。
 
   #define X_HYBRID_THRESHOLD     100  // [mm/s]
-  #define X2_HYBRID_THRESHOLD    100
+  #define X2_HYBRID_THRESHOLD    100  //（译者注）：我设置的是：当轴移速超过150mm/s时，驱动会自动切换到 spreadCycle 模式。此模式支持更快的运动速度，但代价是噪音会变大。
   #define Y_HYBRID_THRESHOLD     100
   #define Y2_HYBRID_THRESHOLD    100
   #define Z_HYBRID_THRESHOLD       3
@@ -4632,11 +4637,12 @@
    *
    * 注释掉对应轴的 *_STALL_SENSITIVITY 即可关闭该轴无传感器归位
    */
-  //#define SENSORLESS_HOMING // StallGuard capable drivers only   // 仅适用于支持 StallGuard (无传感器归位）功能的驱动
+  //#define SENSORLESS_HOMING // StallGuard capable drivers only   // 仅适用于支持 StallGuard （无传感器归位）功能的驱动
+  // (译者注)：我的 XY 轴电机使用了无传感器归零，无需限位开关，所以开启了上方 #define SENSORLESS_HOMING功能。前提是你在 Configuration.h 中配置驱动型号为：#define X_DRIVER_TYPE  TMC2209 等支持 DIAG 的型号
 
   #if ANY(SENSORLESS_HOMING, SENSORLESS_PROBING)
     // TMC2209: 0...255. TMC2130: -64...63
-    #define X_STALL_SENSITIVITY  8  //（译者注）：堵转灵敏度。TMC2209：数值越大越灵敏（0=最迟钝，255=最灵敏）
+    #define X_STALL_SENSITIVITY  8  //（译者注）：堵转灵敏度。TMC2209：数值越大越灵敏（0=最迟钝，255=最灵敏）。每台打印机机械性能不一样则灵敏度也不一样。我的打印机经过测试最终取值为140。
     #define X2_STALL_SENSITIVITY X_STALL_SENSITIVITY
     #define Y_STALL_SENSITIVITY  8
     #define Y2_STALL_SENSITIVITY Y_STALL_SENSITIVITY
