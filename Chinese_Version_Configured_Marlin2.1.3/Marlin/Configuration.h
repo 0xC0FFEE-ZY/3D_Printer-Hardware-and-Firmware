@@ -52,8 +52,8 @@
  *
  * 
  * 本工程保留了原版工程所有英文注释，并新增了中文注释及本人的注解（译者注），一些代码配置有改动，适用于本人的双X双Y双Z UM架构打印机。
- * 本人的开源仓库同时提供了“仅翻译版本”，所有代码与配置均保持默认，仅新增了中文注释。
- * 详见：
+ 
+ 
 
  * up为2024级本科生，热爱电子科技，欢迎和我一起进行讨论和交流！
 
@@ -64,6 +64,42 @@
 
 =============================================================================================================
 */
+
+/*
+//===========================================================================
+// 配置总览
+//===========================================================================
+// 在 Configuration.h 文件中，我总共做了如下配置与修改：
+
+  1.  第158行：  #define MOTHERBOARD BOARD_0xC0FFEE_ZY          // 选择主板型号（注意：这是自制主板型号，所以需要自己给它写引脚资源映射表 Marlin\src\pins\stm32f4\0xC0FFEE_ZY.h）
+  2.  第187行：  #define SERIAL_PORT 3                          // 自制主板使用硬件串口 USART3 并通过 CH340 与电脑USB通讯
+  3.  第230行：  #define SERIAL_PORT_2 1                        // 第二串口，用于与串口屏通讯
+                #define BAUDRATE_2 57600                       // 由于我的串口屏与主板之间的距离较远，连接线很长，所以降低频率提高稳定性。
+  4.  第311-316行：#define X_DRIVER_TYPE  TMC2209               // 我的步进电机驱动是 TMC2209
+                  #define Y_DRIVER_TYPE  TMC2209 
+                  #define Z_DRIVER_TYPE  TMC2209
+                  #define X2_DRIVER_TYPE TMC2209                // 我的打印机是 双X 双Y 双Z 结构，所以启用了X2,Y2,Z2电机
+                  #define Y2_DRIVER_TYPE TMC2209
+                  #define Z2_DRIVER_TYPE TMC2209
+                  #define E0_DRIVER_TYPE TMC2209                // 挤出机电机
+  5.  第1781行：  #define Z_MIN_PROBE_ENDSTOP_HIT_STATE HIGH    // 配置高电平触发
+  6.  第1865行：  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 160, 160, 3200, 562 } // 大括号里四个参数依次为：X 轴，Y 轴，Z 轴，挤出机 E0 的步数/毫米。根据你的打印机硬件实际情况计算（计算公式见第1866行“译者注”）
+  7.  第2050行：  //#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN  // 本行注释掉，因为我的自制主板将 3DTOUCH 信号独立分配给 PA5，不需要复用 Z 限位引脚
+  8.  第2172行：  #define BLTOUCH                               // 启用 3D Touch 探头
+  9.  第2054行：  #define USE_PROBE_FOR_Z_HOMING                // 强制使用Z探头进行归位，不开启则默认使用Z_MIN_PIN进行归位！（如果你的Z探针引脚和Z_MIN_PIN是独立的两个引脚，请务必开启此！
+  10. 第2499行：  #define NOZZLE_TO_PROBE_OFFSET { -32, -10, -2.2 } // 设置探针探测点相对于喷嘴偏移距离
+  11. 第2766行：  #define INVERT_E0_DIR true                    // 设置挤出机电机方向（根据你的打印机硬件实际情况设置）
+  12. 第2845-2846行：#define X_BED_SIZE 250
+                    #define Y_BED_SIZE 255                     // 设置打印范围（单位：mm）
+  13. 第3141行： #define AUTO_BED_LEVELING_BILINEAR             //（译者注）：这是我选择的调平方式。
+  14. 第3285行： #define GRID_MAX_POINTS_X 5                    // 启用5*5网格补偿
+  15. 第3457行： #define Z_SAFE_HOMING                          //（译者注）：我启用了 Z 轴安全回零功能，避免探头悬空撞击热床或喷头。  
+  16. 第3576行： #define EEPROM_SETTINGS                        // 启用EEPROM
+  17. 第4137行： #define SPEAKER                                // 开启蜂鸣器（开启此处，才可启用开机音乐）
+  18. 第4168行： #define STARTUP_TUNE { 659, 150, 659, 150, 0, 150, 659, 150, 0, 150, 523, 150, 659, 150, 0, 150, 784, 300, 0, 300, 392, 300, 0, 300 }  // 启用开机音乐
+  19. 第5035行： #define FAN_SOFT_PWM                           // 开启风扇软件PWM，不依赖特定的硬件引脚
+*/
+
 
 /**
  * Configuration.h
@@ -119,7 +155,7 @@
 // Choose the name from boards.h that matches your setup   // 从boards.h中选择与您的设备匹配的型号
 
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_RAMPS_14_EFB  // （译者注）：我的打印机主板为自制主板，主板芯片硬件引脚资源映射均为自定义，我在Marlin\src\pins\stm32f4目录下新建的头文件(pins_0xC0FFEE_ZY.h)里的宏定义映射了芯片硬件引脚功能
+  #define MOTHERBOARD BOARD_0xC0FFEE_ZY  // （译者注）：我的打印机主板为自制主板，主板芯片硬件引脚资源映射均为自定义，我在Marlin\src\pins\stm32f4目录下新建的头文件(pins_0xC0FFEE_ZY.h)里的宏定义映射了芯片硬件引脚功能
 #endif
 //（译者注）：
 // 如果你使用的是市面上的商品3D打印机主板，请输入对应的型号即可。
@@ -145,13 +181,12 @@
  * 注意：Arduino 引导程序将始终占用第一个串口（-1 或 0）。
  * 
  * （译者注）：
- * 如果用 USB 虚拟串口（USB 直接连电脑）。
- * 常见于：SKR 系列、LPC1768/1769、STM32 有 USB 直连的主板，值可以填-1
- * 如果用 硬件串口 0（TX0/RX0），USB 转 TTL 芯片（CH340/CP2102）接电脑，值可以填0
- * 如果用其他硬件串口，一般接 蓝牙、WiFi、LCD、扩展板，值可以填 1、2、3…
+ * 如果用 USB 虚拟串口（USB 直接连电脑）,值可以填-1
+ * 如果用 硬件串口 （TX/RX），USB 转 TTL 芯片（CH340/CP2102）接电脑，值可以填 1、2、3...
  */
-#define SERIAL_PORT 0
+#define SERIAL_PORT 3
 // （译者注）：这里我的自制主板使用硬件串口（PD9-RX,PD8-TX）通过 CH340 与电脑 USB 通讯，PD9 和 PD8 对应 USART3，所以上方我配置值为 3
+// （注意：在 pinmap 中 UART3 默认是 PB10和PB11,但我在硬件设计时将 PB10和PB11 分配给了EEPROM，所以需要在ini\stm32f4.ini中重定义）
 
 /**
  * Serial Port Baud Rate
@@ -192,8 +227,8 @@
  * （译者注）：
  * 如果你的打印机主板连接了串口屏，或者其他通过串口与主板通讯的外设，请开启第二串口
  */
-//#define SERIAL_PORT_2 -1
-//#define BAUDRATE_2 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE  // 启用此项，用来覆盖（主串口）BAUDRATE
+#define SERIAL_PORT_2 1
+#define BAUDRATE_2 57600   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE  // 启用此项，用来覆盖（主串口）BAUDRATE
 // 由于我的串口屏与主板之间的距离较远，连接线很长，所以降低频率提高稳定性。
 
 /**
@@ -228,7 +263,7 @@
 
 // Name displayed in the LCD "Ready" message and Info menu                              // 在液晶显示屏的就绪提示和信息菜单中显示的设备名称
 
-//#define CUSTOM_MACHINE_NAME "3D Printer"
+#define CUSTOM_MACHINE_NAME "0xC0FFEE_ZY_3DPrinter"
 //#define CONFIGURABLE_MACHINE_NAME // Add G-code M550 to set/report the machine name   // 启用 M550 指令，用来设置 / 查看打印机名字
 
 // Printer's unique ID, used by some programs to differentiate between machines.
@@ -273,12 +308,12 @@
  * 'TMC2208_STANDALONE', 'TMC2209', 'TMC2209_STANDALONE', 'TMC2240', 'TMC2660', 
  * 'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE', 'TMC5160', 'TMC5160_STANDALONE']
  */
-#define X_DRIVER_TYPE  A4988           // （译者注）：请根据你电机驱动实际硬件型号，选择上面列表里的驱动型号。我用的是TMC2209。
-#define Y_DRIVER_TYPE  A4988
-#define Z_DRIVER_TYPE  A4988
-//#define X2_DRIVER_TYPE A4988         // （译者注）：第二个X轴电机，如果你的打印机是双X电机，应当取消注释此行，启用X2电机。
-//#define Y2_DRIVER_TYPE A4988         // （译者注）：第二个Y轴电机，如果你的打印机是双Y电机，应当取消注释此行，启用Y2电机。
-//#define Z2_DRIVER_TYPE A4988         // （译者注）：第二个Z轴电机，如果你的打印机是双Z电机，应当取消注释此行，启用Z2电机。
+#define X_DRIVER_TYPE  TMC2209         // （译者注）：请根据你电机驱动实际硬件型号，选择上面列表里的驱动型号。我用的是TMC2209。
+#define Y_DRIVER_TYPE  TMC2209
+#define Z_DRIVER_TYPE  TMC2209
+#define X2_DRIVER_TYPE TMC2209         // （译者注）：第二个X轴电机，如果你的打印机是双X电机，应当取消注释此行，启用X2电机。
+#define Y2_DRIVER_TYPE TMC2209         // （译者注）：第二个Y轴电机，如果你的打印机是双Y电机，应当取消注释此行，启用Y2电机。
+#define Z2_DRIVER_TYPE TMC2209         // （译者注）：第二个Z轴电机，如果你的打印机是双Z电机，应当取消注释此行，启用Z2电机。
 //#define Z3_DRIVER_TYPE A4988         // （译者注）：第三个Z轴电机，如果你的打印机是三Z电机，应当取消注释此行，启用Z3电机。
 //#define Z4_DRIVER_TYPE A4988         // （译者注）：第四个Z轴电机，如果你的打印机是四Z电机，应当取消注释此行，启用Z4电机。
 //#define I_DRIVER_TYPE  A4988
@@ -287,7 +322,7 @@
 //#define U_DRIVER_TYPE  A4988
 //#define V_DRIVER_TYPE  A4988
 //#define W_DRIVER_TYPE  A4988
-#define E0_DRIVER_TYPE A4988           // （译者注）：挤出机电机
+#define E0_DRIVER_TYPE TMC2209         // （译者注）：挤出机电机
 //#define E1_DRIVER_TYPE A4988
 //#define E2_DRIVER_TYPE A4988
 //#define E3_DRIVER_TYPE A4988
@@ -1827,7 +1862,7 @@
  *                                    X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  *
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 500 }    //（译者注：大括号里四个参数依次为：X 轴，Y 轴，Z 轴，挤出机 E0 的步数/毫米。根据你的机器实际情况修改这些数值，确保打印机运动的准确性。）
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 160, 160, 3200, 562 }    //（译者注：大括号里四个参数依次为：X 轴，Y 轴，Z 轴，挤出机 E0 的步数/毫米。根据你的机器实际情况修改这些数值，确保打印机运动的准确性。）
 /* (译者注)：
  * ----------->> 如果你的打印机运动轴是同步轮+皮带驱动（例如XY轴），则:
  * steps/mm = (电机每转步数 × 细分数) ÷ (皮带轮齿数 × 皮带节距)
@@ -2012,11 +2047,11 @@
  * 该探头将替代 Z-MIN 限位开关，用于 Z 轴归位。
  * （启用后会自动开启 USE_PROBE_FOR_Z_HOMING 功能。）
  */
-#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN   //（译者注）：我的 3DTouch 探针的信号引脚与 Z 轴限位开关独立，因此本段注释掉。
+//#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN   //（译者注）：我的 3DTouch 探针的信号引脚与 Z 轴限位开关独立，因此本段注释掉。
 
 // Force the use of the probe for Z-axis homing
 // 强制使用探头进行 Z 轴归位
-//#define USE_PROBE_FOR_Z_HOMING             // 强制使用 Z 探针（3DTouch)进行归位，不开启则默认使用Z_MIN_PIN进行归位！（如果你的Z探针引脚和Z_MIN_PIN是独立的两个引脚，请务必开启此！
+#define USE_PROBE_FOR_Z_HOMING             // 强制使用 Z 探针（3DTouch)进行归位，不开启则默认使用Z_MIN_PIN进行归位！（如果你的Z探针引脚和Z_MIN_PIN是独立的两个引脚，请务必开启此！）
 
 /**
  * Z_MIN_PROBE_PIN
@@ -2134,7 +2169,7 @@
  * BLTouch 探头使用霍尔效应传感器，并模拟一个舵机工作。
  *
  */
-//#define BLTOUCH
+#define BLTOUCH
 // （译者注）：我的打印机使用3D-Touch（BLTouch平替），所以启用上方代码。
 
 
@@ -2461,7 +2496,7 @@
  * Y 偏移：探头在喷嘴前边还是后边，差几毫米
  * Z 偏移：探头比喷嘴高还是低，差多少
  */
-#define NOZZLE_TO_PROBE_OFFSET { 10, 10, 0 }
+#define NOZZLE_TO_PROBE_OFFSET { -32, -10, -2.2 }
 // 注（译者注）：这是我打印机的实际参数，这三个偏移量的数值取决于你的调平探头的安装位置。具体可以看本人抖音/B站教程视频-
 
 // Enable and set to use a specific tool for probing. Disable to allow any tool.
@@ -2728,7 +2763,7 @@
 // For direct drive extruder v9 set to true, for geared extruder set to false.
 // 直驱挤出机 v9 版本设置为 true，齿轮减速挤出机设置为 false。
 // （译者注：这和你选择的挤出机型号有关。）
-#define INVERT_E0_DIR false
+#define INVERT_E0_DIR true
 #define INVERT_E1_DIR false
 #define INVERT_E2_DIR false
 #define INVERT_E3_DIR false
@@ -2807,8 +2842,8 @@
 
 // The size of the printable area  // 可打印区域的尺寸
 // （译者注：这是打印机的最大工作范围，通常也是热床的尺寸，由你的打印机硬件结构决定。单位是毫米。）
-#define X_BED_SIZE 200
-#define Y_BED_SIZE 200
+#define X_BED_SIZE 250
+#define Y_BED_SIZE 255
 
 // Travel limits (linear=mm, rotational=°) after homing, corresponding to endstop positions.
 // 回零后的运动限制（直线单位：mm，旋转单位：°），对应限位开关的位置。
@@ -3103,7 +3138,7 @@
  */
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
-//#define AUTO_BED_LEVELING_BILINEAR   //（译者注）：这是我选择的调平方式。
+#define AUTO_BED_LEVELING_BILINEAR   //（译者注）：这是我选择的调平方式，此行取消注释。
 //#define AUTO_BED_LEVELING_UBL
 //#define MESH_BED_LEVELING
 // (译者注)：如果你开启了 #define AUTO_BED_LEVELING_BILINEAR ，需要同时开启 #define Z_SAFE_HOMING 和#define BLTOUCH，否则编译报错。
@@ -3220,7 +3255,7 @@
 #if ANY(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
 
   // Set the number of grid points per dimension.  // 设置每个维度的网格点数量
-  #define GRID_MAX_POINTS_X 3
+  #define GRID_MAX_POINTS_X 5
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   // Probe along the Y axis, advancing X after each column  // 沿 Y 轴探测，每列完成后前进 X 轴
@@ -3419,7 +3454,7 @@
  * 3. 若步进电机休眠断电，再次Z回零前需重新完成XY回零
  *
  */
-//#define Z_SAFE_HOMING    //（译者注）：我启用了 Z 轴安全回零功能，避免探头悬空撞击热床或喷头。
+#define Z_SAFE_HOMING    //（译者注）：我启用了 Z 轴安全回零功能，避免探头悬空撞击热床或喷头。
 //（译者注）：上方功能作用是：先把喷头移到热床中心，防止探头悬在热床外面。只要你的探头偏移量不超过床尺寸的一半，喷嘴移到中心后，探头就一定在床内。
 // 如果探头不在热床上方那么在Z轴回零的时候就触发不了信号，热床一直往上升，直到撞到喷头。
 
@@ -3538,7 +3573,7 @@
  *   M502 - 恢复设置为固件默认值（之后用 M500 初始化）
  *
  */
-//#define EEPROM_SETTINGS     // Persistent storage with M500 and M501                     // 通过 M500 / M501 实现参数持久化存储（断电不丢设置）
+#define EEPROM_SETTINGS       // Persistent storage with M500 and M501                     // 通过 M500 / M501 实现参数持久化存储（断电不丢设置）
 //（译者注）：上方启用EEPROM功能后，Marlin固件会把一些可调参数存储在EEPROM里。断电重启后，打印机会自动读取这些参数，保持上次的设置状态。前提你的主板硬件支持。
 //#define DISABLE_M503        // Saves ~2700 bytes of flash. Disable for release!          // 节省大约 2700 字节的闪存空间。正式发布固件时建议关闭！
 #define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save flash.  // 执行 EEPROM 指令（M500/M501/M502）时，给出提示信息。关闭它可以节省一点点闪存空间。
@@ -4099,7 +4134,7 @@
 // 如果你的打印机带有扬声器，在这里启用。
 // 默认情况下，Marlin 固件认为你使用的是固定频率的蜂鸣器。
 //
-//#define SPEAKER
+#define SPEAKER  //（译者注：开启蜂鸣器（开启此处，才可启用开机音乐））
 
 //
 // The duration and frequency for the UI feedback sound.
@@ -4130,7 +4165,7 @@
 // A sequence of tones to play at startup, in pairs of tone (Hz), duration (ms).  // 开机启动提示音序列，格式为【音调(赫兹)、时长(毫秒)】成对设置
 // Silence in-between tones.
 //
-//#define STARTUP_TUNE { 698, 300, 0, 50, 523, 50, 0, 25, 494, 50, 0, 25, 523, 100, 0, 50, 554, 300, 0, 100, 523, 300 }
+#define STARTUP_TUNE { 659, 150, 659, 150, 0, 150, 659, 150, 0, 150, 523, 150, 659, 150, 0, 150, 784, 300, 0, 300, 392, 300, 0, 300 } //（译者注：这是开机音乐）
 
 //=============================================================================
 //======================== LCD / Controller Selection =========================
@@ -4997,7 +5032,7 @@
  * 这种方式使用非常低的频率，不会像硬件 PWM 那样产生刺耳的噪音。
  * 另一方面，如果这个频率过低，你也需要增加 SOFT_PWM_SCALE 的值。
  */
-//#define FAN_SOFT_PWM
+#define FAN_SOFT_PWM  //（译者注：启用软件PWM，这样在硬件设计时可供选择的芯片引脚会更多、更自由）
 
 /**
  * Incrementing this by 1 will double the software PWM frequency, affecting heaters, and

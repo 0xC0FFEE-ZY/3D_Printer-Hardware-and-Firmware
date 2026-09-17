@@ -42,6 +42,56 @@
 ==============================================================================================================
 */
 
+
+
+
+/*
+//===========================================================================
+// 配置总览
+//===========================================================================
+
+在 Configuration_adv.h 文件中，我总共做了如下配置与修改:         
+  1. 第1004行  #define E0_AUTO_FAN_PIN   FAN1_PIN           // 这里 E0_AUTO_FAN_PIN 为喷嘴喉管散热风扇，我在硬件设计中指定了 FAN1_PIN 作为喉管散热风扇。具体引脚见
+                                                            // 引脚文件（Marlin\src\pins\stm32f4\pins_0xC0FFEE_ZY.h）中第125行的映射
+
+  2. 第1016行：#define EXTRUDER_AUTO_FAN_SPEED 70           // 因为我的风扇转速较高，所以我设置了比较低的功率                                                   
+  3. 第1332行：#define SENSORLESS_BACKOFF_MM  { 2, 2, 0 }   // 无传感器回零（sensorless homing）时的回退距离
+  4. 第1383行：#define BLTOUCH_DELAY 500                    // 我使用的是 仿制3DTouch 而非 正版BLTouch，我的探针在执行 G29网络补偿调平的时候出现了异常，取消此行注释，问题得到解决。
+  5. 第1502行：#define Z_STEPPER_AUTO_ALIGN                 // （需要启用）没写丝杆坐标，无法自动算，则读取AMP；写了丝杆坐标则忽略AMP。我这里没写丝杆坐标，写了AMP
+  6. 第1522行：#define Z_STEPPER_ALIGN_XY { {  24.5, 127 }, { 212.5,  127 } } // 设置双Z调平左右探测点坐标
+  7. 第1575行：#define Z_STEPPER_ALIGN_AMP 1.92              // 双Z调平放大系数（探测点为（10，127）和（235，127），左丝杆X=-62,右丝杆X=289。
+  8. 第3112行：#define BABYSTEPPING
+
+  9. 第4157行： #define X_CURRENT       1000                // 设置 X 轴电机电流（更改电机电流后需要重新调节DIAG灵敏度）
+  10.第4181行： #define Y_CURRENT       1000                // 设置 Y 轴电机电流
+                 #define E0_CURRENT      1200
+                 #define Z_CURRENT       1000
+
+  11.第4547-4553行：    
+    //#define CHOPPER_TIMING CHOPPER_DEFAULT_12V      // 注释掉所有轴统一配置，改成每个单独配置
+    #define CHOPPER_TIMING_X  CHOPPER_09STEP_24V      // 我的 X 轴电机使用24V供电，0.9°步距角。0.9° 电机专用斩波时序
+    #define CHOPPER_TIMING_X2 CHOPPER_TIMING_X
+    #define CHOPPER_TIMING_Y  CHOPPER_09STEP_24V      // 我的 Y 轴电机使用24V供电，0.9°步距角。
+    #define CHOPPER_TIMING_Y2 CHOPPER_TIMING_Y
+    #define CHOPPER_TIMING_Z  CHOPPER_09STEP_24V      // 我的 Z 轴电机使用24V供电，0.9°步距角。
+    #define CHOPPER_TIMING_Z2 CHOPPER_TIMING_Z
+    #define CHOPPER_TIMING_E  CHOPPER_DEFAULT_24V     // 我的挤出机电机使用24V供电，1.8°步距角。
+
+  12.第4619-4624行： 
+    #define HYBRID_THRESHOLD                          // 启用混合模式自动切换，当步进电机速度超过 混合阈值 时，驱动会自动切换到 spreadCycle 模式。此模式支持更快的运动速度。
+    #define X_HYBRID_THRESHOLD     150                // 我设置的是：当轴移速超过150mm/s时，驱动会自动切换到 spreadCycle 模式。此模式支持更快的运动速度，但代价是噪音会变大。
+    #define X2_HYBRID_THRESHOLD    150
+    #define Y_HYBRID_THRESHOLD     150
+    #define Y2_HYBRID_THRESHOLD    150     
+
+  13.第4692行：#define SENSORLESS_HOMING               // 开启无传感器回零。仅适用于支持 StallGuard （无传感器归位）功能的驱动
+  14.第4697行：#define X_STALL_SENSITIVITY  140        // X轴回零时堵转检测灵敏度
+  15.第4699行：#define Y_STALL_SENSITIVITY  150        // Y轴回零时堵转检测灵敏度
+
+
+*/
+
+
 /**
  * Configuration_adv.h
  *
@@ -951,7 +1001,7 @@
  * 多个挤出机可共用同一个风扇引脚，
  * 此时**任意一个挤出机超温**，风扇就会启动。
  */
-#define E0_AUTO_FAN_PIN -1     // （译者注）：这里 E0_AUTO_FAN_PIN 为喷嘴喉管散热风扇，我在硬件设计中指定了 FAN1_PIN 作为喉管散热风扇。具体引脚见引脚文件（Marlin\src\pins\stm32f4\pins_0xC0FFEE_ZY.h）中的映射
+#define E0_AUTO_FAN_PIN   FAN1_PIN     // （译者注）：这里 E0_AUTO_FAN_PIN 为喷嘴喉管散热风扇，我在硬件设计中指定了 FAN1_PIN 作为喉管散热风扇。具体引脚见引脚文件（Marlin\src\pins\stm32f4\pins_0xC0FFEE_ZY.h）中的映射
 #define E1_AUTO_FAN_PIN -1
 #define E2_AUTO_FAN_PIN -1
 #define E3_AUTO_FAN_PIN -1
@@ -963,8 +1013,9 @@
 #define COOLER_AUTO_FAN_PIN -1
 
 #define EXTRUDER_AUTO_FAN_TEMPERATURE 50    //（译者注）：这是喉管散热风扇温度阈值。超过阈值散热风扇启动。否则保持关闭。
-#define EXTRUDER_AUTO_FAN_SPEED 255         //（译者注）：这是喉管散热风扇在启动后的转速。255为全速，0为关闭。可以根据需要设置为其他值。
+#define EXTRUDER_AUTO_FAN_SPEED 70          //（译者注）：这是喉管散热风扇在启动后的转速。255为全速，0为关闭。可以根据需要设置为其他值。
                                             // 喉管散热风扇可以避免热量传导到上方耗材，防止耗材软化导致堵头，打印失败。
+                                            // 由于我的风扇转速较高，所以我设置了比较低的功率
 #define CHAMBER_AUTO_FAN_TEMPERATURE 30     //（译者注）：仓温散热风扇，如果你的打印机封箱了，需要用上。解释同上。
 #define CHAMBER_AUTO_FAN_SPEED 255
 #define COOLER_AUTO_FAN_TEMPERATURE 18
@@ -1278,7 +1329,7 @@
  * 以此确定喷头相对于打印平台的初始位置。
  */
 
-//#define SENSORLESS_BACKOFF_MM  { 2, 2, 0 }  // (linear=mm, rotational=°) Backoff from endstops before sensorless homing
+#define SENSORLESS_BACKOFF_MM  { 2, 2, 0 }    // (linear=mm, rotational=°) Backoff from endstops before sensorless homing
                                               // （直线轴单位：毫米 / 旋转轴单位：度）
                                               // 无传感器回零（sensorless homing）时的回退距离
 
@@ -1290,7 +1341,7 @@
 //#define HOMING_BACKOFF_POST_MM { 2, 2, 2 }  // (linear=mm, rotational=°) Backoff from endstops after homing      // （直线轴：毫米 / 旋转轴：度）回零完成后，从限位开关处回退的距离
 //#define XY_COUNTERPART_BACKOFF_MM 0         // (mm) Backoff X after homing Y, and vice-versa                     // （毫米）Y轴回零后X轴的回退距离，反之亦然
 
-//#define QUICK_HOME                          // If G28 contains XY do a diagonal move first                       // 执行G28同时回零XY轴时，先进行斜向联动移动
+//#define QUICK_HOME                            // If G28 contains XY do a diagonal move first                       // 执行G28同时回零XY轴时，先进行斜向联动移动
                                               // （译者注）：上方选项勾选启用后，一键回零 XY 时，喷头不再单独先后走 X、走 Y，而是斜着同步移动靠近原点，适配 CoreXY 等联动结构，减少皮带拉扯，回零更顺滑。
 //#define HOME_Y_BEFORE_X                     // If G28 contains XY home Y before X                                // 执行G28同时回零XY时，优先先回零Y轴，再回零X轴
                                               // （译者注）：开启后一键 XY 回零顺序变为：先归位 Y 轴到位，再执行 X 轴回零，适配部分机械结构避免走位干涉，按需调换 XY 回零先后次序。
@@ -1329,7 +1380,7 @@
   //         Minimum command delay (ms). Enable and increase if needed.
   // 安全项：探头需要时间来识别指令
   // 最小指令延迟时间（毫秒）。如出现异常可启用并增大该值。
-  //#define BLTOUCH_DELAY 500  
+  #define BLTOUCH_DELAY 500  
   //（译者注）：我使用的是 3DTouch 而非 正版BLTouch，我的探针在执行 G29网络补偿调平 的时候出现了异常，取消此行注释，问题得到解决。
   // 推测原因：仿制版BLTouch(3DTouch)内部用了较慢的廉价比较器，PWM 脉冲结束后电路需要额外时间才能让输出电平稳定到正确状态。500ms 给了这个窗口。
 
@@ -1448,7 +1499,7 @@
  * 如果两边高度不一样 → 热床倾斜、打印一边高一边低
  * 开启后，可用指令 G34 让机器自动调平两侧 Z 轴，让热床完全水平
  */
-//#define Z_STEPPER_AUTO_ALIGN
+#define Z_STEPPER_AUTO_ALIGN
 #if ENABLED(Z_STEPPER_AUTO_ALIGN)
   /**
    * Define probe X and Y positions for Z1, Z2 [, Z3 [, Z4]]
@@ -1468,7 +1519,7 @@
    * 探测右 Z 电机时，探头要去哪个 XY 坐标
    * 坐标是固定机器坐标，不会被其他设置改动
    */
-  //#define Z_STEPPER_ALIGN_XY { {  10, 190 }, { 100,  10 }, { 190, 190 } }
+  #define Z_STEPPER_ALIGN_XY { {  24.5, 127 }, { 212.5,  127 } }   //（译者注：设置双Z调平左右探测点坐标）
 
   /**
    * Orientation for the automatically-calculated probe positions.
@@ -1521,8 +1572,9 @@
   #ifndef Z_STEPPER_ALIGN_STEPPER_XY
     // Amplification factor. Used to scale the correction step up or down in case                   // 放大系数。当步进电机（丝杆）的实际位置比测试点更远时，
     // the stepper (spindle) position is farther out than the test point.                           // 用这个系数来放大或缩小每一步的修正量。
-    #define Z_STEPPER_ALIGN_AMP 1.0       // Use a value > 1.0 NOTE: This may cause instability!    // 使用大于 1.0 的数值。注意：这可能会导致系统不稳定！
+    #define Z_STEPPER_ALIGN_AMP 1.92       // Use a value > 1.0 NOTE: This may cause instability!    // 使用大于 1.0 的数值。注意：这可能会导致系统不稳定！
   #endif
+  //（译者注：Z_STEPPER_ALIGN_AMP这个参数是用来放大或缩小每次修正的步进量的）
 
   // On a 300mm bed a 5% grade would give a misalignment of ~1.5cm                                    // 以300毫米尺寸热床为例，5%的倾斜坡度会造成约1.5厘米的高度偏差
   #define G34_MAX_GRADE              5    // (%) Maximum incline that G34 will handle                 // G34 指令能处理的**最大热床倾斜百分比**
@@ -3057,7 +3109,7 @@
  * 警告：该功能不受限位开关约束限制
 
  */
-//#define BABYSTEPPING
+#define BABYSTEPPING
 #if ENABLED(BABYSTEPPING)
   //#define EP_BABYSTEPPING                 // M293/M294 babystepping with EMERGENCY_PARSER support                // 支持紧急解析器的 M293 / M294 微步调节指令
   //#define BABYSTEP_WITHOUT_HOMING
@@ -4102,10 +4154,10 @@
   #endif
 
   #if AXIS_IS_TMC_CONFIG(X)
-    #define X_CURRENT       800        // (mA) RMS current. Multiply by 1.414 for peak current.            // (毫安) 有效值电流 (RMS)。乘以 1.414 即可得到峰值电流 (Peak Current)。
+    #define X_CURRENT       1000       // (mA) RMS current. Multiply by 1.414 for peak current.            // (毫安) 有效值电流 (RMS)。乘以 1.414 即可得到峰值电流 (Peak Current)。
     #define X_CURRENT_HOME  X_CURRENT  // (mA) RMS current for homing. (Typically lower than *_CURRENT.)   // (毫安) 回零（寻原点）时使用的有效值电流（RMS）。通常设置为 **低于** 正常运行电流 (*_CURRENT)。
-    #define X_MICROSTEPS     16        // 0..256
-    #define X_RSENSE          0.11
+    #define X_MICROSTEPS     16        // 0..256     //（译者注：这里是细分设置，目前为16细分）
+    #define X_RSENSE          0.11     //（译者注：这里是电流检测电阻值，与你的点金驱动硬件设计有关）
     #define X_CHAIN_POS      -1        // -1..0: Not chained. 1: MCU MOSI connected. 2: Next in chain, ...// -1 ~ 0：不串联（独立驱动） 1：连接到主控 MCU 的 MOSI 引脚； 2：串联链中的下一个驱动...
     //#define X_INTERPOLATE  true      // Enable to override 'INTERPOLATE' for the X axis                 // 启用此项以单独覆盖 X 轴的微步插值（INTERPOLATE）设置
     //#define X_HOLD_MULTIPLIER 0.5    // Enable to override 'HOLD_MULTIPLIER' for the X axis             // 启用此项以单独覆盖 X 轴的待机电流比例（HOLD_MULTIPLIER）设置
@@ -4113,10 +4165,10 @@
 
 
   //（译者注）：
-  // 这是所有轴（X/Y/Z/E）的电流、细分、插值配置
+  // 这是所有轴（X/Y/Z/E）的电流、细分、插值配置。注意，这些参数只有驱动工作在 UART 模式下才有效
   // 注释同上。
   #if AXIS_IS_TMC_CONFIG(X2)
-    #define X2_CURRENT      X_CURRENT
+    #define X2_CURRENT      X_CURRENT  //（译者注：X2电机与X电机电流参数相同）
     #define X2_CURRENT_HOME X_CURRENT_HOME
     #define X2_MICROSTEPS   X_MICROSTEPS
     #define X2_RSENSE       X_RSENSE
@@ -4126,7 +4178,7 @@
   #endif
 
   #if AXIS_IS_TMC_CONFIG(Y)
-    #define Y_CURRENT       800
+    #define Y_CURRENT       1000       //（译者注：Y轴电机电流设置为1000ma）
     #define Y_CURRENT_HOME  Y_CURRENT
     #define Y_MICROSTEPS     16
     #define Y_RSENSE          0.11
@@ -4136,7 +4188,7 @@
   #endif
 
   #if AXIS_IS_TMC_CONFIG(Y2)
-    #define Y2_CURRENT      Y_CURRENT
+    #define Y2_CURRENT      Y_CURRENT  //（译者注：Y2电机与Y电机电流参数相同）
     #define Y2_CURRENT_HOME Y_CURRENT_HOME
     #define Y2_MICROSTEPS   Y_MICROSTEPS
     #define Y2_RSENSE       Y_RSENSE
@@ -4146,7 +4198,7 @@
   #endif
 
   #if AXIS_IS_TMC_CONFIG(Z)
-    #define Z_CURRENT       800
+    #define Z_CURRENT       1000       //（译者注：Z轴电机电流设置为1000ma）
     #define Z_CURRENT_HOME  Z_CURRENT
     #define Z_MICROSTEPS     16
     #define Z_RSENSE          0.11
@@ -4156,7 +4208,7 @@
   #endif
 
   #if AXIS_IS_TMC_CONFIG(Z2)
-    #define Z2_CURRENT      Z_CURRENT
+    #define Z2_CURRENT      Z_CURRENT  //（译者注：Z2电机与Z电机电流参数相同）
     #define Z2_CURRENT_HOME Z_CURRENT_HOME
     #define Z2_MICROSTEPS   Z_MICROSTEPS
     #define Z2_RSENSE       Z_RSENSE
@@ -4246,7 +4298,7 @@
   #endif
 
   #if AXIS_IS_TMC_CONFIG(E0)
-    #define E0_CURRENT      800
+    #define E0_CURRENT      1200   //（译者注：挤出机电机电流设置为1200ma）
     #define E0_MICROSTEPS    16
     #define E0_RSENSE         0.11
     #define E0_CHAIN_POS     -1
@@ -4492,13 +4544,13 @@
    */
   // 我的 XYZ 轴电机均为24V供电，并且步距角均为0.9°，所以选择参数组CHOPPER_09STEP_24V，是 0.9° 电机专用斩波时序。挤出机电机1.8°，选用CHOPPER_DEFAULT_24V.
   // 具体根据你们自己的打印机实际情况进行选用。
-  #define CHOPPER_TIMING CHOPPER_DEFAULT_12V        // All axes (override below)       // 所有轴统一设置（下方可单独覆盖）
-  //#define CHOPPER_TIMING_X  CHOPPER_TIMING        // For X Axes (override below)     // 用于 X 轴（可在下方单独覆盖设置）
-  //#define CHOPPER_TIMING_X2 CHOPPER_TIMING_X
-  //#define CHOPPER_TIMING_Y  CHOPPER_TIMING        // For Y Axes (override below)     // 用于 Y 轴（可在下方单独覆盖设置）
-  //#define CHOPPER_TIMING_Y2 CHOPPER_TIMING_Y
-  //#define CHOPPER_TIMING_Z  CHOPPER_TIMING        // For Z Axes (override below)     // 用于 Z 轴（可在下方单独覆盖设置）
-  //#define CHOPPER_TIMING_Z2 CHOPPER_TIMING_Z
+  //#define CHOPPER_TIMING CHOPPER_DEFAULT_12V        // All axes (override below)       // 所有轴统一设置（下方可单独覆盖）
+  #define CHOPPER_TIMING_X  CHOPPER_09STEP_24V        // For X Axes (override below)     // 用于 X 轴（可在下方单独覆盖设置）
+  #define CHOPPER_TIMING_X2 CHOPPER_TIMING_X          //（译者注：X2轴与X轴共用同一参数）
+  #define CHOPPER_TIMING_Y  CHOPPER_09STEP_24V        // For Y Axes (override below)     // 用于 Y 轴（可在下方单独覆盖设置）
+  #define CHOPPER_TIMING_Y2 CHOPPER_TIMING_Y          //（译者注：Y2轴与Y轴共用同一参数）
+  #define CHOPPER_TIMING_Z  CHOPPER_09STEP_24V        // For Z Axes (override below)     // 用于 Z 轴（可在下方单独覆盖设置）
+  #define CHOPPER_TIMING_Z2 CHOPPER_TIMING_Z          //（译者注：Z2轴与Z轴共用同一参数）
   //#define CHOPPER_TIMING_Z3 CHOPPER_TIMING_Z
   //#define CHOPPER_TIMING_Z4 CHOPPER_TIMING_Z
   //#define CHOPPER_TIMING_I  CHOPPER_TIMING        // For I Axis
@@ -4507,7 +4559,7 @@
   //#define CHOPPER_TIMING_U  CHOPPER_TIMING        // For U Axis
   //#define CHOPPER_TIMING_V  CHOPPER_TIMING        // For V Axis
   //#define CHOPPER_TIMING_W  CHOPPER_TIMING        // For W Axis
-  //#define CHOPPER_TIMING_E  CHOPPER_TIMING        // For Extruders (override below)  // 用于挤出机（可在下方单独覆盖设置）
+  #define CHOPPER_TIMING_E  CHOPPER_DEFAULT_24V     // For Extruders (override below)  // 用于挤出机（可在下方单独覆盖设置）
   //#define CHOPPER_TIMING_E1 CHOPPER_TIMING_E
   //#define CHOPPER_TIMING_E2 CHOPPER_TIMING_E
   //#define CHOPPER_TIMING_E3 CHOPPER_TIMING_E
@@ -4564,12 +4616,12 @@
    * 必须启用 STEALTHCHOP_(XY|Z|E)（静音模式）才能使用混合阈值功能。
    * 可使用 M913 X/Y/Z/E 指令实时调参。
    */
-  //#define HYBRID_THRESHOLD    // （译者注）：启用混合模式自动切换，当步进电机速度超过 混合阈值 时，驱动会自动切换到 spreadCycle 模式。此模式支持更快的运动速度。
+  #define HYBRID_THRESHOLD    // （译者注）：启用混合模式自动切换，当步进电机速度超过 混合阈值 时，驱动会自动切换到 spreadCycle 模式。此模式支持更快的运动速度。
 
-  #define X_HYBRID_THRESHOLD     100  // [mm/s]
-  #define X2_HYBRID_THRESHOLD    100  //（译者注）：我设置的是：当轴移速超过150mm/s时，驱动会自动切换到 spreadCycle 模式。此模式支持更快的运动速度，但代价是噪音会变大。
-  #define Y_HYBRID_THRESHOLD     100
-  #define Y2_HYBRID_THRESHOLD    100
+  #define X_HYBRID_THRESHOLD     150  // [mm/s]
+  #define X2_HYBRID_THRESHOLD    150  //（译者注）：我设置的是：当轴移速超过150mm/s时，驱动会自动切换到 spreadCycle 模式。此模式支持更快的运动速度，但代价是噪音会变大。
+  #define Y_HYBRID_THRESHOLD     150
+  #define Y2_HYBRID_THRESHOLD    150
   #define Z_HYBRID_THRESHOLD       3
   #define Z2_HYBRID_THRESHOLD      3
   #define Z3_HYBRID_THRESHOLD      3
@@ -4637,14 +4689,14 @@
    *
    * 注释掉对应轴的 *_STALL_SENSITIVITY 即可关闭该轴无传感器归位
    */
-  //#define SENSORLESS_HOMING // StallGuard capable drivers only   // 仅适用于支持 StallGuard （无传感器归位）功能的驱动
+  #define SENSORLESS_HOMING // StallGuard capable drivers only   // 仅适用于支持 StallGuard （无传感器归位）功能的驱动
   // (译者注)：我的 XY 轴电机使用了无传感器归零，无需限位开关，所以开启了上方 #define SENSORLESS_HOMING功能。前提是你在 Configuration.h 中配置驱动型号为：#define X_DRIVER_TYPE  TMC2209 等支持 DIAG 的型号
 
   #if ANY(SENSORLESS_HOMING, SENSORLESS_PROBING)
     // TMC2209: 0...255. TMC2130: -64...63
-    #define X_STALL_SENSITIVITY  8  //（译者注）：堵转灵敏度。TMC2209：数值越大越灵敏（0=最迟钝，255=最灵敏）。每台打印机机械性能不一样则灵敏度也不一样。我的打印机经过测试最终取值为140。
+    #define X_STALL_SENSITIVITY  140  //（译者注）：堵转灵敏度。TMC2209：数值越大越灵敏（0=最迟钝，255=最灵敏）。每台打印机机械性能不一样则灵敏度也不一样。我的打印机经过测试最终取值为140。
     #define X2_STALL_SENSITIVITY X_STALL_SENSITIVITY
-    #define Y_STALL_SENSITIVITY  8
+    #define Y_STALL_SENSITIVITY  150
     #define Y2_STALL_SENSITIVITY Y_STALL_SENSITIVITY
     //#define Z_STALL_SENSITIVITY  8
     //#define Z2_STALL_SENSITIVITY Z_STALL_SENSITIVITY

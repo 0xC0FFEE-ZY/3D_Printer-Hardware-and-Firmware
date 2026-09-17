@@ -37,9 +37,9 @@
  * 运动架构:  UM 双轴 (X/X2, Y/Y2, Z/Z2 独立使能)
  * 挤出机:    1 个 (E0)
  * 驱动器:    7 × TMC2209 (UART模式, 软件串口)
- * 归零方式:  XY轴无传感器归零，Z轴使用限位开关归零
+ * 回零方式:  XY轴无传感器回零，Z轴使用 3DTouch 回零
  * 屏幕:      MKS TFT35 串口屏 
- * 调平:      3DTouch (5*5网格补偿, 探针信号 PA6)
+ * 调平:      3DTouch (5*5网格补偿, 探针信号 PA5)
  * 
  */
 
@@ -105,10 +105,9 @@
 //=============================================================================
 // DIAG 无传感器归零以及限位开关引脚
 //=============================================================================
-#define X_STOP_PIN                          PE3    // X 轴我使用 TMC2209 的 DIAG 功能归零
-#define Y_STOP_PIN                          PB4    // Y 轴我使用 TMC2209 的 DIAG 功能归零
-#define Z_MIN_PIN                           PA8    // Z 轴我使用限位开关检测归零
-#define Z2_MIN_PIN                          PD13
+#define X_STOP_PIN                          PE3    // X 轴我使用 TMC2209 的 DIAG 功能回零
+#define Y_STOP_PIN                          PB4    // Y 轴我使用 TMC2209 的 DIAG 功能回零
+#define Z_MIN_PIN                           PA8    // Z 轴我使用机械限位开关做紧急停机， 3DTouch 探针检测回零(PA5)
 
 
 
@@ -122,9 +121,9 @@
 #define TEMP_1_PIN                          PC1   // 腔体温度传感器
 #define TEMP_BED_PIN                        PC2   // 热床处温度传感器
 
-#define FAN0_PIN                            PE5  // 模型冷却风扇
-#define FAN1_PIN                            PE6  // 喷嘴喉管风扇
-#define FAN2_PIN                            PA7  // 腔体风扇
+#define FAN0_PIN                            PE5   // 模型冷却风扇
+#define FAN1_PIN                            PE6   // 喷嘴喉管风扇
+#define FAN2_PIN                            PD12  // 腔体风扇
 
 
 
@@ -143,8 +142,8 @@
 //=============================================================================
 // BLTouch(3DTouch)
 //=============================================================================
-#define SERVO0_PIN                          PA6    // BLTouch 探针收放控制 (PWM)
-#define Z_MIN_PROBE_PIN                     PA5   // 探针触发信号（独立引脚，不共用 Z 限位）
+#define SERVO0_PIN                          PA6    // BLTouch 探针收放控制
+#define Z_MIN_PROBE_PIN                     PA5    // 探针触发信号（独立引脚，不共用 Z 限位）
 // 3DTOUCH 内部有一个小舵机来伸缩探针，Marlin 通过 SERVO0_PIN 这个引脚发送 PWM 信号来控制它
 #if ENABLED(PROBE_ENABLE_DISABLE) && !defined(PROBE_ENABLE_PIN)
   #define PROBE_ENABLE_PIN            SERVO0_PIN
@@ -153,13 +152,9 @@
 
 
 //=============================================================================
-// 断料检测
+// 蜂鸣器
 //=============================================================================
-#ifndef FIL_RUNOUT_PIN
-  #define FIL_RUNOUT_PIN                    PA4
-#endif
-
-
+#define BEEPER_PIN                          PD13
 
 //=============================================================================
 // 板子信息
