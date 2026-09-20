@@ -4157,7 +4157,7 @@
     #define X_CURRENT       1000       // (mA) RMS current. Multiply by 1.414 for peak current.            // (毫安) 有效值电流 (RMS)。乘以 1.414 即可得到峰值电流 (Peak Current)。
     #define X_CURRENT_HOME  X_CURRENT  // (mA) RMS current for homing. (Typically lower than *_CURRENT.)   // (毫安) 回零（寻原点）时使用的有效值电流（RMS）。通常设置为 **低于** 正常运行电流 (*_CURRENT)。
     #define X_MICROSTEPS     16        // 0..256     //（译者注：这里是细分设置，目前为16细分）
-    #define X_RSENSE          0.11     //（译者注：这里是电流检测电阻值，与你的点金驱动硬件设计有关）
+    #define X_RSENSE          0.11     //（译者注：这里是电流检测电阻值，与你的电机驱动硬件设计有关）
     #define X_CHAIN_POS      -1        // -1..0: Not chained. 1: MCU MOSI connected. 2: Next in chain, ...// -1 ~ 0：不串联（独立驱动） 1：连接到主控 MCU 的 MOSI 引脚； 2：串联链中的下一个驱动...
     //#define X_INTERPOLATE  true      // Enable to override 'INTERPOLATE' for the X axis                 // 启用此项以单独覆盖 X 轴的微步插值（INTERPOLATE）设置
     //#define X_HOLD_MULTIPLIER 0.5    // Enable to override 'HOLD_MULTIPLIER' for the X axis             // 启用此项以单独覆盖 X 轴的待机电流比例（HOLD_MULTIPLIER）设置
