@@ -59,7 +59,7 @@
   4. 第1383行：#define BLTOUCH_DELAY 500                    // 我使用的是 仿制3DTouch 而非 正版BLTouch，我的探针在执行 G29网络补偿调平的时候出现了异常，取消此行注释，问题得到解决。
   5. 第1502行：#define Z_STEPPER_AUTO_ALIGN                 // （需要启用）没写丝杆坐标，无法自动算，则读取AMP；写了丝杆坐标则忽略AMP。我这里没写丝杆坐标，写了AMP
   6. 第1522行：#define Z_STEPPER_ALIGN_XY { {  24.5, 127 }, { 212.5,  127 } } // 设置双Z调平左右探测点坐标
-  7. 第1575行：#define Z_STEPPER_ALIGN_AMP 1.92              // 双Z调平放大系数（探测点为（10，127）和（235，127），左丝杆X=-62,右丝杆X=289。
+  7. 第1575行：#define Z_STEPPER_ALIGN_AMP 1.92             // 双Z调平放大系数（探测点为（ 24.5, 127 ）和（ 212.5，127 ）
   8. 第3112行：#define BABYSTEPPING
 
   9. 第4157行： #define X_CURRENT       1000                // 设置 X 轴电机电流（更改电机电流后需要重新调节DIAG灵敏度）

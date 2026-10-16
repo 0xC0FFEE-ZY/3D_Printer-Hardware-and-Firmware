@@ -92,7 +92,7 @@
   12. 第2845-2846行：#define X_BED_SIZE 250
                     #define Y_BED_SIZE 255                     // 设置打印范围（单位：mm）
   13. 第3141行： #define AUTO_BED_LEVELING_BILINEAR             //（译者注）：这是我选择的调平方式。
-  14. 第3285行： #define GRID_MAX_POINTS_X 5                    // 启用5*5网格补偿
+  14. 第3258行： #define GRID_MAX_POINTS_X 5                    // 启用5*5网格补偿
   15. 第3457行： #define Z_SAFE_HOMING                          //（译者注）：我启用了 Z 轴安全回零功能，避免探头悬空撞击热床或喷头。  
   16. 第3576行： #define EEPROM_SETTINGS                        // 启用EEPROM
   17. 第4137行： #define SPEAKER                                // 开启蜂鸣器（开启此处，才可启用开机音乐）
@@ -885,7 +885,7 @@
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.          // 999 : 始终读取 100°C 或下方定义的温度的虚拟表。
  */
 // 下面的配置，请根据上方列出的多种型号的热敏电阻，然后选择与你的硬件相匹配的型号，将对应的数值填进去。
-#define TEMP_SENSOR_0 1      // （译者注：这一行是挤出机的热敏电阻配置）
+#define TEMP_SENSOR_0 11     // （译者注：这一行是挤出机的热敏电阻配置）
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
@@ -893,7 +893,7 @@
 #define TEMP_SENSOR_5 0
 #define TEMP_SENSOR_6 0
 #define TEMP_SENSOR_7 0
-#define TEMP_SENSOR_BED 1    // （译者注：这一行是热床的热敏电阻配置）
+#define TEMP_SENSOR_BED 11   // （译者注：这一行是热床的热敏电阻配置）
 #define TEMP_SENSOR_PROBE 0
 #define TEMP_SENSOR_CHAMBER 0
 #define TEMP_SENSOR_COOLER 0
